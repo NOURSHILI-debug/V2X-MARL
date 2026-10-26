@@ -23,17 +23,18 @@ def masks_of(env, agents):
 
 def run_episode(env, agents, policy, seed):
     """policy(obs, masks) -> actions array. Returns list of transitions + return."""
-    obs_d, _ = env.reset(seed=seed)
+    obs_d = env.reset(seed=seed)
     obs, masks = stack(obs_d, agents), masks_of(env, agents)
     transitions, ep_ret = [], 0.0
     while True:
         act = policy(obs, masks)
-        obs_d, rew, term, trunc, _ = env.step({a: int(act[i]) for i, a in enumerate(agents)})
+        obs_d, rew, terminated, truncated, _ = env.step(
+            {a: int(act[i]) for i, a in enumerate(agents)}
+        )
         next_obs, next_masks = stack(obs_d, agents), masks_of(env, agents)
         team_r = float(np.mean([rew[a] for a in agents]))
-        terminal = all(term[a] for a in agents)
-        ended = terminal or all(trunc[a] for a in agents)
-        transitions.append((obs, act, team_r, next_obs, terminal, next_masks))
+        ended = terminated or truncated
+        transitions.append((obs, act, team_r, next_obs, terminated, next_masks))
         ep_ret += team_r
         obs, masks = next_obs, next_masks
         if ended:
@@ -54,7 +55,7 @@ def main():
     env = ToyEnv()
     agents = list(env.agents)
     N = len(agents)
-    obs_d, _ = env.reset(seed=args.seed)
+    obs_d = env.reset(seed=args.seed)
     obs_dim = len(np.asarray(obs_d[agents[0]]))
     n_actions = len(env.action_masks()[agents[0]])
     print(f"agents={N} obs_dim={obs_dim} n_actions={n_actions}")
