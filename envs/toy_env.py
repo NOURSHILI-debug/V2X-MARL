@@ -40,7 +40,7 @@ class ToyEnv:
         self.speeds = np.array([2.0, 2.0])
         self.steps = 0
 
-        return self._get_observations()
+        return self._get_observations(), {}
 
     def _get_observations(self):
         """Return each vehicle's local observation."""
@@ -105,10 +105,12 @@ class ToyEnv:
         ])
 
         all_reached = bool(np.all(reached_goal))
-        terminated = collision or all_reached
-        truncated = (
-            self.steps >= self.max_steps and not terminated
+        terminated_flag = collision or all_reached
+        terminated = {agent: bool(terminated_flag) for agent in self.agents}
+        truncated_flag = (
+            self.steps >= self.max_steps and not terminated_flag
         )
+        truncated = {agent: bool(truncated_flag) for agent in self.agents}
 
         # 5. Temporary reward: progress, with a collision penalty.
         progress = np.linalg.norm(
