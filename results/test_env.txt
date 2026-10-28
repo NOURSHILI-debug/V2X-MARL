@@ -1,0 +1,11 @@
+[1] 100 ticks OK
+[2] vehicles after 10 resets: 2 (expected 2)
+[3] episode 0 done, steps=50
+[3] episode 1 done, steps=50
+[3] episode 2 done, steps=50
+[3] episode 3 done, steps=50
+[3] episode 4 done, steps=50
+ALL OK
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town10HD_Opt.bin 
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 
