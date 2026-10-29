@@ -1,0 +1,5 @@
+TOY reset returns: dict len -
+ agents: ['vehicle_0', 'vehicle_1'] | obs shape: (4,)
+ mask shape: (3,)
+ step returns 5 items | terminated: bool | truncated: bool
+ state shape: (6,)

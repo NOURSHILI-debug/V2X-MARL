@@ -1,0 +1,7 @@
+CARLA reset returns: tuple len 2
+ agents: ['cav_0', 'cav_1'] | obs shape: (56,)
+ mask shape: (6,)
+ step returns 5 items | terminated: dict | truncated: dict
+ state shape: (10,)
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 
