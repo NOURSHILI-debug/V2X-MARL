@@ -1,6 +1,8 @@
 
 import numpy as np
 
+from envs.reward import RewardCalculator
+
 
 class ToyEnv:
     """Simple 2D intersection environment for two vehicles."""
@@ -23,6 +25,7 @@ class ToyEnv:
             self.MAINTAIN: 0.0,
             self.ACCELERATE: 2.0,
         }
+        self.reward_calculator = RewardCalculator(agent_ids=self.agents)
 
         self.reset()
 
@@ -30,14 +33,16 @@ class ToyEnv:
         """Reset both vehicles to their initial states."""
         self.rng = np.random.default_rng(seed)
 
-        # Vehicle 0 approaches from the west.
-        # Vehicle 1 approaches from the south.
+        # Keep each vehicle on its approach while varying its distance to the
+        # intersection in a reproducible way for a given seed.
+        start_distances = self.rng.uniform(8.0, 12.0, size=self.n_agents)
         self.positions = np.array([
-            [-10.0, 0.0],
-            [0.0, -10.0],
+            [-start_distances[0], 0.0],
+            [0.0, -start_distances[1]],
         ])
 
         self.speeds = np.array([2.0, 2.0])
+        self.reached_goal = np.zeros(self.n_agents, dtype=bool)
         self.steps = 0
 
         return self._get_observations(), {}
@@ -82,6 +87,9 @@ class ToyEnv:
 
         # 1. Update both vehicle speeds.
         for i, agent in enumerate(self.agents):
+            if self.reached_goal[i]:
+                self.speeds[i] = 0.0
+                continue
             acceleration = self.accelerations[actions[agent]]
 
             self.speeds[i] = np.clip(
@@ -91,18 +99,28 @@ class ToyEnv:
             )
 
         # 2. Move vehicle 0 along x and vehicle 1 along y.
-        self.positions[0, 0] += self.speeds[0] * self.dt
-        self.positions[1, 1] += self.speeds[1] * self.dt
+        self.positions[0, 0] = min(
+            10.0,
+            self.positions[0, 0] + self.speeds[0] * self.dt,
+        )
+        self.positions[1, 1] = min(
+            10.0,
+            self.positions[1, 1] + self.speeds[1] * self.dt,
+        )
 
         self.steps += 1
 
         collision = self._has_collision(old_positions)
 
         # 4. Check whether each vehicle has crossed the intersection.
-        reached_goal = np.array([
+        reached_now = np.array([
             self.positions[0, 0] >= 10.0,
             self.positions[1, 1] >= 10.0,
         ])
+        newly_reached = reached_now & ~self.reached_goal
+        self.reached_goal |= reached_now
+        self.speeds[self.reached_goal] = 0.0
+        reached_goal = self.reached_goal.copy()
 
         all_reached = bool(np.all(reached_goal))
         terminated_flag = collision or all_reached
@@ -112,25 +130,20 @@ class ToyEnv:
         )
         truncated = {agent: bool(truncated_flag) for agent in self.agents}
 
-        # 5. Temporary reward: progress, with a collision penalty.
-        progress = np.linalg.norm(
-            self.positions - old_positions, axis=1
-        )
-
-        rewards = {
-            agent: float(progress[i])
-            for i, agent in enumerate(self.agents)
-        }
-
-        if collision:
-            rewards = {
-                agent: rewards[agent] - 100.0
-                for agent in self.agents
-            }
+        # 5. Calculate progress, collision, and one-time goal rewards.
+        rewards = {}
+        for i, agent in enumerate(self.agents):
+            progress = float(np.linalg.norm(self.positions[i] - old_positions[i]))
+            rewards[agent] = self.reward_calculator.compute(
+                agent,
+                progress=progress,
+                collision=collision,
+                goal_reached=bool(newly_reached[i]),
+            )
 
         info = {
             "collision": collision,
-            "reached_goal": reached_goal.copy(),
+            "reached_goal": reached_goal,
             "positions": self.positions.copy(),
             "speeds": self.speeds.copy(),
             "steps": self.steps,
