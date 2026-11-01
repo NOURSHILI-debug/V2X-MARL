@@ -15,6 +15,8 @@ import random
 import numpy as np
 import carla
 
+from envs.base import MultiAgentEnv
+
 # ---- spec constants -------------------------------------------------------
 N_AGENTS = 4
 M_CANDIDATES = 6
@@ -29,7 +31,7 @@ SPEED_STEP_KMH = 5.0
 KEEP, ACCEL, DECEL, BRAKE, LANE_LEFT, LANE_RIGHT = range(6)
 
 
-class CarlaMultiAgentEnv:
+class CarlaMultiAgentEnv(MultiAgentEnv):
     def __init__(self, town="Town03", n_agents=N_AGENTS, host="localhost",
                  port=2000, tm_port=8000, seed=0):
         self.town = town
@@ -37,6 +39,9 @@ class CarlaMultiAgentEnv:
         self.agents = [f"cav_{i}" for i in range(n_agents)]
         self.seed = seed
         self.tm_port = tm_port
+        self.obs_dim = OBS_DIM
+        self.n_actions = N_ACTIONS
+        self.max_steps = MAX_STEPS
 
         self.client = carla.Client(host, port)
         self.client.set_timeout(30.0)
@@ -126,7 +131,7 @@ class CarlaMultiAgentEnv:
         rewards = {a: 0.0 for a in self.agents}                 # TODO (B): reward
         terminated = {a: False for a in self.agents}            # TODO (B): collision/goal
         truncated = {a: self.step_count >= MAX_STEPS for a in self.agents}
-        info = {"step": self.step_count}
+        info = {"steps": self.step_count}   # TODO (S1): collision, goal_reached, success, min_ttc, jerk
         return obs, rewards, terminated, truncated, info
 
     # ---- actions ----------------------------------------------------------
