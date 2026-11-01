@@ -8,13 +8,14 @@ from envs.toy_env import ToyEnv
 def test_reset_initializes_two_vehicles():
     env = ToyEnv()
 
-    observations = env.reset(seed=42)
+    observations, info = env.reset(seed=42)
 
     assert env.n_agents == 2
     assert set(observations.keys()) == {
         "vehicle_0",
         "vehicle_1",
     }
+    assert info == {}
     assert env.positions.shape == (2, 2)
     assert env.speeds.shape == (2,)
 
@@ -22,8 +23,8 @@ def test_reset_initializes_two_vehicles():
 def test_reset_is_reproducible():
     env = ToyEnv()
 
-    first = env.reset(seed=42)
-    second = env.reset(seed=42)
+    first, _ = env.reset(seed=42)
+    second, _ = env.reset(seed=42)
 
     for agent in env.agents:
         np.testing.assert_array_equal(first[agent], second[agent])
