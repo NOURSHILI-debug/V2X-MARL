@@ -4,4 +4,4 @@ __pycache__/
 .pytest_cache/
 .coverage
 results/raw/*
-!results/raw/.gitkeep
+!results/raw/.gitkeep*.pt

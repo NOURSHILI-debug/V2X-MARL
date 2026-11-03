@@ -31,11 +31,19 @@ def _make_toy():
 
 
 def _make_highway():
+    """Accepts either module name: envs.highway_adapter.HighwayAdapter or envs.highway_env.HighwayV2XEnv."""
+    cls = None
     try:
-        from envs.highway_adapter import HighwayAdapter   # class name is part of the contract
-    except ImportError as e:
-        pytest.skip(f"highway adapter not available: {e}")
-    return HighwayAdapter()
+        from envs.highway_adapter import HighwayAdapter as cls
+    except ImportError:
+        try:
+            from envs.highway_env import HighwayV2XEnv as cls
+        except ImportError as e:
+            pytest.skip(f"highway env not available (is highway-env installed?): {e}")
+    try:
+        return cls()
+    except TypeError as e:
+        pytest.skip(f"highway env needs constructor arguments: {e}")
 
 
 def _make_carla():
