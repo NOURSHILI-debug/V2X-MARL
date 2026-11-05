@@ -1,0 +1,6 @@
+agents=2 obs_dim=4 n_actions=3
+random baseline return: -7.47
+ep     0 | train   -90.32 | greedy eval   -75.12 | eps 1.00
+ep    50 | train   -89.59 | greedy eval   -75.12 | eps 0.96
+ep   100 | train   -90.23 | greedy eval     2.87 | eps 0.93
+^C

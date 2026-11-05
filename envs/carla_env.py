@@ -6,17 +6,25 @@ Implemented:
   - seeded spawn, one seeded route + goal per agent, clean teardown
   - 6 meta-actions on top of Traffic Manager control
   - collision monitor (envs/safety.py) and termination (T1.1, spec section 7):
-      collision (any CAV), all CAVs at goal, timeout, stuck > 10 s
+      collision (any CAV), all CAVs at goal, timeout, stuck, off-road
 TODO:
   - full observation vector + action masks      (T1.2)
   - reward, min_ttc and jerk in info            (T1.3)
 """
 import random
+import logging
 import numpy as np
 import carla
 
 from envs.base import MultiAgentEnv
 from envs.safety import CollisionMonitor
+from envs.termination import (
+    OFF_ROAD_STEP_LIMIT,
+    build_step_info,
+    evaluate_termination,
+    is_off_road,
+    update_off_road_steps,
+)
 
 # ---- spec constants -------------------------------------------------------
 N_AGENTS = 4
@@ -37,6 +45,8 @@ STUCK_STEPS = 50        # 10 s at 5 Hz
 
 # meta-actions
 KEEP, ACCEL, DECEL, BRAKE, LANE_LEFT, LANE_RIGHT = range(6)
+
+logger = logging.getLogger(__name__)
 
 
 class CarlaMultiAgentEnv(MultiAgentEnv):
@@ -65,6 +75,8 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.goal = {}            # agent_id -> carla.Location
         self.reached = {}         # agent_id -> bool
         self.stuck_steps = {}     # agent_id -> consecutive slow steps
+        self.off_road_steps = {}  # agent_id -> consecutive off-road decision steps
+        self.route_applied = {}   # agent_id -> Traffic Manager accepted the route
         self.monitor = None       # CollisionMonitor (envs/safety.py)
         self.step_count = 0
 
@@ -83,21 +95,30 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
 
     # ---- teardown ---------------------------------------------------------
     def _destroy_actors(self):
-        if self.monitor is not None:          # sensors first, then their vehicles
-            self.monitor.destroy()
-            self.monitor = None
-        if self.vehicles:
-            self.client.apply_batch(
-                [carla.command.DestroyActor(v.id) for v in self.vehicles.values()]
-            )
-        self.vehicles, self.target_speed = {}, {}
-        self.route, self.goal, self.reached, self.stuck_steps = {}, {}, {}, {}
-        self.world.tick()
+        try:
+            if self.monitor is not None:          # sensors first, then their vehicles
+                self.monitor.destroy()
+        finally:
+            try:
+                if self.vehicles:
+                    self.client.apply_batch(
+                        [carla.command.DestroyActor(v.id) for v in self.vehicles.values()]
+                    )
+            finally:
+                self.monitor = None
+                self.vehicles, self.target_speed = {}, {}
+                self.route, self.goal, self.reached, self.stuck_steps = {}, {}, {}, {}
+                self.off_road_steps, self.route_applied = {}, {}
+                self.world.tick()
 
     def close(self):
-        self._destroy_actors()
-        self._set_sync(False)             # never leave the server stuck in sync
-        self.tm.set_synchronous_mode(False)
+        try:
+            self._destroy_actors()
+        finally:
+            try:
+                self._set_sync(False)             # never leave the server stuck in sync
+            finally:
+                self.tm.set_synchronous_mode(False)
 
     # ---- routes -----------------------------------------------------------
     def _plan_route(self, start_wp, rng):
@@ -111,13 +132,15 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             dist += ROUTE_STEP_M
         return route
 
-    def _follow_route(self, vehicle, route):
+    def _follow_route(self, agent_id, vehicle, route):
         """Make the Traffic Manager follow the planned route (sparse points, last = goal)."""
         path = [wp.transform.location for wp in route[4:-1:4]] + [route[-1].transform.location]
         try:
             self.tm.set_path(vehicle, path)
-        except (AttributeError, RuntimeError):
-            pass                              # route following unavailable: agent drives freely
+        except Exception as exc:
+            logger.warning("Traffic Manager did not accept route for %s: %s", agent_id, exc)
+            return False
+        return True
 
     # ---- API --------------------------------------------------------------
     def reset(self, seed=None, town=None):
@@ -132,42 +155,62 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             self.tm.set_synchronous_mode(True)
 
         self._destroy_actors()
-        self.tm.set_random_device_seed(self.seed)
-        rng = random.Random(self.seed)
+        reset_complete = False
+        try:
+            self.tm.set_random_device_seed(self.seed)
+            rng = random.Random(self.seed)
 
-        spawn_points = self.world.get_map().get_spawn_points()
-        rng.shuffle(spawn_points)
-        bp = self.world.get_blueprint_library().filter("vehicle.tesla.model3")[0]
+            spawn_points = self.world.get_map().get_spawn_points()
+            rng.shuffle(spawn_points)
+            bp = self.world.get_blueprint_library().filter("vehicle.tesla.model3")[0]
 
-        for sp in spawn_points:               # skip blocked points until all agents exist
-            if len(self.vehicles) == self.n_agents:
-                break
-            v = self.world.try_spawn_actor(bp, sp)
-            if v is None:
-                continue
-            agent_id = self.agents[len(self.vehicles)]
-            v.set_autopilot(True, self.tm_port)
-            self.tm.auto_lane_change(v, False)      # lane changes only by action
-            self.tm.ignore_lights_percentage(v, 0)
-            self.vehicles[agent_id] = v
-            self.target_speed[agent_id] = 30.0
-        assert len(self.vehicles) == self.n_agents, "not enough free spawn points"
+            for sp in spawn_points:               # skip blocked points until all agents exist
+                if len(self.vehicles) == self.n_agents:
+                    break
+                v = self.world.try_spawn_actor(bp, sp)
+                if v is None:
+                    continue
+                agent_id = self.agents[len(self.vehicles)]
+                self.vehicles[agent_id] = v
+                self.target_speed[agent_id] = 30.0
+                v.set_autopilot(True, self.tm_port)
+                self.tm.auto_lane_change(v, False)      # lane changes only by action
+                self.tm.ignore_lights_percentage(v, 0)
 
-        carla_map = self.world.get_map()
-        for agent_id, v in self.vehicles.items():
-            route = self._plan_route(carla_map.get_waypoint(v.get_location()), rng)
-            self.route[agent_id] = route
-            self.goal[agent_id] = route[-1].transform.location
-            self.reached[agent_id] = False
-            self.stuck_steps[agent_id] = 0
-            self._follow_route(v, route)
+            spawned_count = len(self.vehicles)
+            if spawned_count != self.n_agents:
+                self._destroy_actors()
+                assert spawned_count == self.n_agents, "not enough free spawn points"
 
-        for _ in range(5):                          # let physics settle
-            self.world.tick()
-        self.monitor = CollisionMonitor(self.world, self.vehicles)   # after settling
+            carla_map = self.world.get_map()
+            for agent_id, v in self.vehicles.items():
+                route = self._plan_route(carla_map.get_waypoint(v.get_location()), rng)
+                self.route[agent_id] = route
+                self.goal[agent_id] = route[-1].transform.location
+                self.reached[agent_id] = False
+                self.stuck_steps[agent_id] = 0
+                self.off_road_steps[agent_id] = 0
+                self.route_applied[agent_id] = self._follow_route(agent_id, v, route)
 
-        self.step_count = 0
-        return self._get_obs(), {"seed": self.seed, "town": self.town}
+            for _ in range(5):                          # let physics settle
+                self.world.tick()
+            self.monitor = CollisionMonitor(self.world, self.vehicles)   # after settling
+
+            self.step_count = 0
+            reset_info = {
+                "seed": self.seed,
+                "town": self.town,
+                "route_applied": bool(all(self.route_applied.values())),
+                "per_agent": {
+                    agent_id: {"route_applied": applied}
+                    for agent_id, applied in self.route_applied.items()
+                },
+            }
+            reset_complete = True
+            return self._get_obs(), reset_info
+        finally:
+            if not reset_complete:
+                self._destroy_actors()
 
     def step(self, actions):
         """actions: dict agent_id -> int in [0, 5]"""
@@ -181,27 +224,48 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         collided = {a: self.monitor.is_collided(a) for a in self.agents}
         self._update_goal_and_stuck()
 
-        any_collision = any(collided.values())
-        all_reached = all(self.reached.values())
-        stuck = [a for a in self.agents if self.stuck_steps[a] > STUCK_STEPS]
-        ended = bool(any_collision or all_reached or stuck)
-        timeout = bool(self.step_count >= self.max_steps and not ended)
+        off_road_by_agent = {}
+        for agent_id in self.agents:
+            waypoint = self.world.get_map().get_waypoint(
+                self.vehicles[agent_id].get_location(),
+                project_to_road=False,
+                lane_type=carla.LaneType.Driving,
+            )
+            off_road_by_agent[agent_id] = is_off_road(waypoint)
+            self.off_road_steps[agent_id] = update_off_road_steps(
+                self.off_road_steps[agent_id],
+                off_road_by_agent[agent_id],
+            )
+
+        result = evaluate_termination(
+            self.agents,
+            collided,
+            self.reached,
+            self.off_road_steps,
+            self.stuck_steps,
+            step_count=self.step_count,
+            max_steps=self.max_steps,
+            off_road_step_limit=OFF_ROAD_STEP_LIMIT,
+            stuck_step_limit=STUCK_STEPS,
+        )
 
         obs = self._get_obs()
         rewards = {a: 0.0 for a in self.agents}                 # TODO (T1.3)
-        terminated = {a: ended for a in self.agents}
-        truncated = {a: timeout for a in self.agents}
-        info = {
-            "steps": self.step_count,
-            "collision": bool(any_collision),
-            "goal_reached": bool(all_reached),
-            "collided_agents": [a for a in self.agents if collided[a]],
-            "reached_agents": [a for a in self.agents if self.reached[a]],
-            "stuck_agents": stuck,
-        }
-        if ended or timeout:
-            info["success"] = bool(all_reached and not any_collision)
-            # TODO (T1.3): info["min_ttc"], info["jerk"]
+        terminated = {a: result.terminated for a in self.agents}
+        truncated = {a: result.truncated for a in self.agents}
+        info = build_step_info(
+            self.agents,
+            collided,
+            self.reached,
+            result.stuck_by_agent,
+            off_road_by_agent,
+            self.route_applied,
+            steps=self.step_count,
+            episode_ended=result.terminated or result.truncated,
+            success=result.success,
+            town=self.town,
+            seed=self.seed,
+        )
         return obs, rewards, terminated, truncated, info
 
     def _update_goal_and_stuck(self):

@@ -1,0 +1,10 @@
+* [33m8132f06[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/phase1-core[m[33m, [m[1;31morigin/feat/phase1-core[m[33m, [m[1;31morigin/feat/env-and-vdn[m[33m, [m[1;32mfeat/env-and-vdn[m[33m)[m test_env: use info['steps']
+* [33m93bf9f0[m Spec section 12: contract v1
+* [33mca587fd[m gitignore: ignore checkpoints
+* [33m61513d3[m T1.1 collision/termination, contract test, pytest.ini
+* [33md703462[m T1.1 collision/termination, contract test, spec section 12
+*   [33m7d9cc01[m Merge remote-tracking branch 'origin/main' into feat/env-and-vdn
+[32m|[m[33m\[m  
+[32m|[m * [33m1c8dc44[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat(envs): implement highway environment and improve toy env
+[32m|[m *   [33md0c99b7[m Merge remote-tracking branch 'origin/feat/env-and-vdn'
+[32m|[m [34m|[m[35m\[m  

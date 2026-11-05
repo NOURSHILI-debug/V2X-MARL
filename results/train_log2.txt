@@ -1,0 +1,39 @@
+agents=2 obs_dim=4 n_actions=3
+random baseline return: -7.47
+ep     0 | train   -90.32 | greedy eval   -75.12 | eps 1.00
+ep    50 | train   -89.59 | greedy eval   -75.12 | eps 0.96
+Traceback (most recent call last):
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\train_toy.py", line 132, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\train_toy.py", line 106, in main
+    agent.update(buf.sample(args.batch))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\..\marl\vdn.py", line 37, in update
+    nq_tot = self.target(next_obs).gather(2, next_a).squeeze(-1).sum(dim=1)
+             ~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\..\marl\networks.py", line 22, in forward
+    return self.net(torch.cat([obs, ids], dim=-1))
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\container.py", line 250, in forward
+    input = module(input)
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\souro\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\nn\modules\linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+^C
