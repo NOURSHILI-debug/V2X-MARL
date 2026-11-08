@@ -67,11 +67,11 @@ def main() -> None:
                         round(info["x"], 1),
                         round(info["y"], 1),
                     )
-                    for agent, info in infos.items()
+                    for agent, info in infos["per_agent"].items()
                 }
                 speeds = {
                     agent: round(info["speed_mps"], 1)
-                    for agent, info in infos.items()
+                    for agent, info in infos["per_agent"].items()
                 }
                 print(
                     f"step={step + 1:03d} "
