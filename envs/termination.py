@@ -39,6 +39,7 @@ def evaluate_termination(
     max_steps: int,
     off_road_step_limit: int = OFF_ROAD_STEP_LIMIT,
     stuck_step_limit: int = 50,
+    stuck_grace_steps: int = 0,
 ) -> TerminationResult:
     """Evaluate shared episode completion in Contract v1 priority order."""
     if not agents:
@@ -54,13 +55,14 @@ def evaluate_termination(
         or max_steps <= 0
         or off_road_step_limit <= 0
         or stuck_step_limit < 0
+        or stuck_grace_steps < 0
     ):
         raise ValueError("step limits must be positive and step_count non-negative")
     if any(count < 0 for counts in (off_road_steps, stuck_steps) for count in counts.values()):
         raise ValueError("consecutive step counts cannot be negative")
 
     stuck_by_agent = {
-        agent_id: count > stuck_step_limit
+        agent_id: step_count > stuck_grace_steps and count > stuck_step_limit
         for agent_id, count in stuck_steps.items()
     }
 

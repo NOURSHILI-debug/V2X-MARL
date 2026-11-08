@@ -90,6 +90,22 @@ def test_stuck_requires_more_than_fifty_slow_steps():
     assert result.stuck_by_agent == {"cav_0": False, "cav_1": False}
 
 
+def test_stuck_detection_waits_through_grace_period():
+    result = evaluate_termination(
+        AGENTS,
+        dict.fromkeys(AGENTS, False),
+        dict.fromkeys(AGENTS, False),
+        dict.fromkeys(AGENTS, 0),
+        {"cav_0": 51, "cav_1": 0},
+        step_count=25,
+        max_steps=300,
+        stuck_grace_steps=25,
+    )
+
+    assert result.reason is None
+    assert result.stuck_by_agent == {"cav_0": False, "cav_1": False}
+
+
 def test_termination_requires_matching_agent_keys():
     with pytest.raises(ValueError, match="exactly the configured agents"):
         evaluate_termination(
