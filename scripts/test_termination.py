@@ -35,8 +35,8 @@ def _find_aligned_waypoints(env):
     raise RuntimeError("Could not find two waypoints on the same lane.")
 
 
-def _forced_collision(env):
-    env.reset(seed=101)
+def _setup_forced_collision(env, seed=101):
+    env.reset(seed=seed)
     front_id, rear_id = env.agents
     front_wp, rear_wp = _find_aligned_waypoints(env)
     front = env.vehicles[front_id]
@@ -53,8 +53,13 @@ def _forced_collision(env):
 
     rear.set_autopilot(True, env.tm_port)
     env.tm.ignore_vehicles_percentage(rear, 100)
-    rear_route = env._plan_route(rear_wp, random.Random(101))
+    rear_route = env._plan_route(rear_wp, random.Random(seed))
     env.tm.set_path(rear, [waypoint.transform.location for waypoint in rear_route[1:]])
+    return front_id, rear_id
+
+
+def _forced_collision(env, seed=101):
+    front_id, rear_id = _setup_forced_collision(env, seed)
 
     for _ in range(MAX_STEPS):
         _, _, terminated, truncated, info = env.step(

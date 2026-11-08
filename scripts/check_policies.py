@@ -63,12 +63,17 @@ def _run_policy(env, policy_name, episode_seeds, max_steps):
         "max_steps_cap": 0,
         "unknown": 0,
     }
-    goal_reached_count = 0
+    goal_episode_count = 0
+    arrived_agents = 0
+    agent_count = 0
+    arrival_steps = []
+    unfinished_stop_reasons = {name: 0 for name in ("red_light", "blocked", "stuck", "none")}
     collision_count = 0
     seconds_per_step = []
 
     for seed in episode_seeds:
         env.reset(seed=seed)
+        agent_count += len(env.agents)
         episode_step_seconds = []
         episode_reason = None
         info = None
@@ -97,7 +102,18 @@ def _run_policy(env, policy_name, episode_seeds, max_steps):
                 episode_steps.append(steps)
                 reason_counts[reason] += 1
                 episode_reason = reason
-                goal_reached_count += int(bool(info["goal_reached"]))
+                episode_arrivals = [
+                    details.get("arrival_step")
+                    for details in info.get("per_agent", {}).values()
+                    if details.get("arrival_step") is not None
+                ]
+                arrived_agents += len(episode_arrivals)
+                arrival_steps.extend(episode_arrivals)
+                for details in info.get("per_agent", {}).values():
+                    if not details.get("goal_reached", False):
+                        reason = details.get("stop_reason", "none")
+                        unfinished_stop_reasons[reason if reason in unfinished_stop_reasons else "none"] += 1
+                goal_episode_count += int(bool(info["goal_reached"]))
                 collision_count += int(bool(info["collision"]))
                 if reason == "unknown":
                     print(
@@ -122,7 +138,18 @@ def _run_policy(env, policy_name, episode_seeds, max_steps):
             steps = int(info["steps"])
             episode_steps.append(steps)
             reason_counts["max_steps_cap"] += 1
-            goal_reached_count += int(bool(info["goal_reached"]))
+            episode_arrivals = [
+                details.get("arrival_step")
+                for details in info.get("per_agent", {}).values()
+                if details.get("arrival_step") is not None
+            ]
+            arrived_agents += len(episode_arrivals)
+            arrival_steps.extend(episode_arrivals)
+            for details in info.get("per_agent", {}).values():
+                if not details.get("goal_reached", False):
+                    reason = details.get("stop_reason", "none")
+                    unfinished_stop_reasons[reason if reason in unfinished_stop_reasons else "none"] += 1
+            goal_episode_count += int(bool(info["goal_reached"]))
             collision_count += int(bool(info["collision"]))
             if steps > int(getattr(env, "max_steps", 300)):
                 raise RuntimeError(
@@ -143,9 +170,17 @@ def _run_policy(env, policy_name, episode_seeds, max_steps):
         "mean_speed": float(np.mean(speed_samples)) if speed_samples else 0.0,
         "mean_steps": float(np.mean(episode_steps)) if episode_steps else 0.0,
         "reason_counts": reason_counts,
-        "goal_reached": goal_reached_count,
+        "goal_episodes": goal_episode_count,
+        "mean_arrival_step": float(np.mean(arrival_steps)) if arrival_steps else 0.0,
+        "arrived_agent_fraction": arrived_agents / agent_count if agent_count else 0.0,
         "collisions": collision_count,
         "seconds_per_step": float(np.mean(seconds_per_step)) if seconds_per_step else 0.0,
+        "unfinished_stop_reasons": unfinished_stop_reasons,
+        "arrival_steps_min": int(min(arrival_steps)) if arrival_steps else None,
+        "arrival_steps_median": float(np.median(arrival_steps)) if arrival_steps else None,
+        "arrival_steps_max": int(max(arrival_steps)) if arrival_steps else None,
+        "arrival_steps_above_250": sum(step > 250 for step in arrival_steps),
+        "arrival_step_count": len(arrival_steps),
     }
 
 
@@ -195,7 +230,17 @@ def main(argv=None):
         print(f"  mean steps:       {result['mean_steps']:.1f}")
         print(f"  seconds per step: {result['seconds_per_step']:.4f}")
         print(f"  termination counts: {result['reason_counts']}")
-        print(f"  goal-reached episodes: {result['goal_reached']}")
+        print(f"  goal-reached episodes: {result['goal_episodes']}")
+        print(f"  mean arrival step:     {result['mean_arrival_step']:.1f}")
+        print(f"  arrived agent fraction: {result['arrived_agent_fraction']:.3f}")
+        print(f"  per-agent arrival rate: {result['arrived_agent_fraction']:.3f}")
+        print(f"  unfinished stop reasons: {result['unfinished_stop_reasons']}")
+        print(
+            "  arrival steps (min/median/max/count>250/count): "
+            f"{result['arrival_steps_min']}/{result['arrival_steps_median']}/"
+            f"{result['arrival_steps_max']}/{result['arrival_steps_above_250']}/"
+            f"{result['arrival_step_count']}"
+        )
         print(f"  collision episodes:    {result['collisions']}")
     print("STATUS: COMPLETE" if completed else "STATUS: INCOMPLETE", flush=True)
 

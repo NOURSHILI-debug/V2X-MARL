@@ -26,7 +26,14 @@ from envs.obs_builder import (
     build_observation,
     make_action_mask,
 )
-from envs.metrics import TTC_CAP_SECONDS, jerk_magnitude, longitudinal_ttc
+from envs.metrics import (
+    DECISION_DT_SECONDS,
+    TTC_CAP_SECONDS,
+    longitudinal_dynamics,
+    longitudinal_ttc,
+)
+from envs.reward import RewardCalculator
+from envs.reward_integration import compute_agent_step_reward
 from envs.safety import CollisionMonitor
 from envs.termination import (
     OFF_ROAD_STEP_LIMIT,
@@ -43,13 +50,16 @@ M_CANDIDATES = 6
 OBS_DIM = OBSERVATION_DIM
 N_ACTIONS = 6
 SIM_DT = 0.05           # 20 Hz simulation
-TICKS_PER_STEP = 4      # 5 Hz decision rate
+TICKS_PER_STEP = int(DECISION_DT_SECONDS / SIM_DT)  # 5 Hz decision rate
 MAX_STEPS = 300         # 60 s of sim time
 
 # ---- route / termination constants (spec section 7) -----------------------
 ROUTE_STEP_M = 5.0      # waypoint spacing of the planned route
 ROUTE_LENGTH_M = 150.0  # start-to-goal route length
-GOAL_RADIUS_M = 6.0     # agent counts as "at goal" inside this radius
+GOAL_RADIUS = 8.0       # agent counts as "at goal" inside this radius
+GOAL_MARGIN = 15.0      # goal is this far before the route endpoint
+GOAL_RADIUS_M = GOAL_RADIUS  # compatibility alias for diagnostics
+ROUTE_START_TOLERANCE_M = 3.0
 STUCK_SPEED_MS = 0.5    # slower than this counts as not moving
 STUCK_STEPS = 50        # 10 s at 5 Hz
 STUCK_GRACE_STEPS = 25  # 5 s after reset before stuck detection starts
@@ -64,7 +74,8 @@ logger = logging.getLogger(__name__)
 
 class CarlaMultiAgentEnv(MultiAgentEnv):
     def __init__(self, town="Town03", n_agents=N_AGENTS, host="localhost",
-                 port=2000, tm_port=8000, seed=0, light_cycle=True):
+                 port=2000, tm_port=8000, seed=0, reset_traffic_lights=True,
+                 light_cycle=True):
         self.town = town
         self.n_agents = n_agents
         self.agents = [f"cav_{i}" for i in range(n_agents)]
@@ -74,6 +85,7 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.n_actions = N_ACTIONS
         self.max_steps = MAX_STEPS
         self.light_cycle = bool(light_cycle)
+        self.reset_traffic_lights = bool(reset_traffic_lights)
 
         self.client = carla.Client(host, port)
         self.client.set_timeout(30)
@@ -88,6 +100,7 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.route = {}           # agent_id -> list of carla.Waypoint (start ... goal)
         self.goal = {}            # agent_id -> carla.Location
         self.reached = {}         # agent_id -> bool
+        self.arrival_step = {agent_id: None for agent_id in self.agents}
         self.stuck_steps = {}     # agent_id -> consecutive slow steps
         self.off_road_steps = {}  # agent_id -> consecutive off-road decision steps
         self.route_applied = {}   # agent_id -> Traffic Manager accepted the route
@@ -97,7 +110,12 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.step_count = 0
         self.min_ttc = TTC_CAP_SECONDS
         self.jerk_samples = []
-        self.previous_acceleration = {}
+        self.previous_longitudinal_acceleration = {
+            agent_id: None for agent_id in self.agents
+        }
+        self.previous_velocity = {agent_id: None for agent_id in self.agents}
+        self.previous_route_arc = {agent_id: 0.0 for agent_id in self.agents}
+        self.reward_calculator = RewardCalculator(self.agents)
 
     # ---- setup helpers ----------------------------------------------------
     def _load_town(self, town):
@@ -173,6 +191,27 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         ]
 
     @staticmethod
+    def _goal_before_route_end(path):
+        """Return the path location GOAL_MARGIN metres before its endpoint."""
+        if not path:
+            raise ValueError("route path cannot be empty")
+        if len(path) == 1:
+            return path[0]
+        remaining = GOAL_MARGIN
+        for index in range(len(path) - 1, 0, -1):
+            start, end = path[index - 1], path[index]
+            segment = start.distance(end)
+            if segment >= remaining:
+                fraction = (segment - remaining) / segment if segment else 0.0
+                return carla.Location(
+                    x=start.x + (end.x - start.x) * fraction,
+                    y=start.y + (end.y - start.y) * fraction,
+                    z=start.z + (end.z - start.z) * fraction,
+                )
+            remaining -= segment
+        return path[0]
+
+    @staticmethod
     def _path_length_from_spawn(spawn_location, path):
         points = [spawn_location, *path]
         return sum(
@@ -180,13 +219,65 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             for index in range(len(points) - 1)
         )
 
+    @staticmethod
+    def _nearest_route_point(location, route):
+        """Return distance and nearest waypoint index for a waypoint route."""
+        best_distance = float("inf")
+        best_index = 0
+        for index, waypoint in enumerate(route):
+            distance = location.distance(waypoint.transform.location)
+            if distance < best_distance:
+                best_distance = distance
+                best_index = index
+        return best_distance, best_index
+
+    @staticmethod
+    def _route_start_is_valid(location, route):
+        distance, nearest_index = CarlaMultiAgentEnv._nearest_route_point(
+            location, route
+        )
+        return distance <= ROUTE_START_TOLERANCE_M and nearest_index <= 2
+
     def _configure_traffic_lights(self):
-        for light in self.world.get_actors().filter("traffic.traffic_light*"):
+        if not self.reset_traffic_lights:
+            logger.info("Traffic lights left unchanged (reset_traffic_lights=False)")
+            return
+        lights = self.world.get_actors().filter("traffic.traffic_light*")
+        configured_groups = set()
+        for light in lights:
             if self.light_cycle:
-                light.set_green_time(10.0)
-                light.set_yellow_time(2.0)
-                light.set_red_time(5.0)
-            light.freeze(False)
+                group = light.get_group_traffic_lights()
+                if not group:
+                    group = [light]
+                group_key = tuple(sorted(
+                    getattr(item, "id", id(item)) for item in group
+                ))
+                if group_key in configured_groups:
+                    continue
+                for group_light in group:
+                    group_light.set_green_time(10.0)
+                    group_light.set_yellow_time(2.0)
+                    group_light.set_red_time(5.0)
+                light.reset_group()
+                for group_light in group:
+                    group_light.freeze(False)
+                    logger.info(
+                        "Traffic light id=%s durations green=%.2fs yellow=%.2fs red=%.2fs",
+                        getattr(group_light, "id", "unknown"),
+                        group_light.get_green_time(),
+                        group_light.get_yellow_time(),
+                        group_light.get_red_time(),
+                    )
+                configured_groups.add(group_key)
+            else:
+                light.freeze(False)
+        logger.info(
+            "Traffic lights reset: light_cycle=%s lights=%d groups=%d durations=%s",
+            self.light_cycle,
+            len(lights),
+            len(configured_groups),
+            "green=10.0s yellow=2.0s red=5.0s" if self.light_cycle else "unchanged",
+        )
 
     # ---- API --------------------------------------------------------------
     def reset(self, seed=None, town=None):
@@ -197,6 +288,15 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             self.town = town
             self.world = self._load_town(town)
             self.tm = self.client.get_trafficmanager(self.tm_port)
+
+        # Reward state belongs to an episode and must exist before any route or
+        # step path can read it, including failed/partial resets.
+        self.previous_longitudinal_acceleration = {
+            agent_id: None for agent_id in self.agents
+        }
+        self.previous_velocity = {agent_id: None for agent_id in self.agents}
+        self.previous_route_arc = {agent_id: 0.0 for agent_id in self.agents}
+        self.arrival_step = {agent_id: None for agent_id in self.agents}
 
         self._stop_sync_and_destroy()
         self._set_sync(True)
@@ -213,7 +313,8 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             carla_map = self.world.get_map()
             spawn_cursor = 0
             accepted_routes = {}
-            for agent_id in self.agents:
+            route_rejections = dict.fromkeys(self.agents, 0)
+            for agent_index, agent_id in enumerate(self.agents):
                 accepted = False
                 while spawn_cursor < len(spawn_points):
                     spawn_transform = spawn_points[spawn_cursor]
@@ -221,26 +322,47 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                     v = self.world.try_spawn_actor(bp, spawn_transform)
                     if v is None:
                         continue
+                    v.set_autopilot(True, self.tm_port)
+                    self.world.tick()
                     start_waypoint = carla_map.get_waypoint(v.get_location())
-                    route = self._plan_route(start_waypoint, rng)
+                    agent_rng = random.Random(self.seed + agent_index)
+                    route = self._plan_route(start_waypoint, agent_rng)
                     path = self._tm_path(route)
-                    goal = path[-1]
+                    goal = self._goal_before_route_end(path)
                     goal_distance_at_reset = v.get_location().distance(goal)
                     route_length = self._path_length_from_spawn(v.get_location(), path)
-                    if goal_distance_at_reset > route_length + 10.0:
+                    logger.info(
+                        "Reset route for %s: distance_to_goal=%.2f m "
+                        "route_length=%.2f m goal_radius=%.2f m",
+                        agent_id, goal_distance_at_reset, route_length, GOAL_RADIUS,
+                    )
+                    start_to_goal_distance = v.get_location().distance(path[-1])
+                    if start_to_goal_distance > route_length:
                         logger.warning(
-                            "Rejecting spawn for %s: reset goal distance %.2f m "
-                            "exceeds route length %.2f m + 10 m",
+                            "Rejecting spawn for %s: Euclidean start-to-goal distance "
+                            "%.2f m exceeds planned route length %.2f m",
                             agent_id,
-                            goal_distance_at_reset,
+                            start_to_goal_distance,
                             route_length,
                         )
                         v.destroy()
+                        route_rejections[agent_id] += 1
                         continue
-                    assert goal_distance_at_reset <= route_length + 10.0
+                    assert start_to_goal_distance <= route_length
+                    start_distance, start_index = self._nearest_route_point(
+                        v.get_location(), route
+                    )
+                    if not self._route_start_is_valid(v.get_location(), route):
+                        logger.warning(
+                            "Rejecting spawn for %s: route start misaligned "
+                            "distance=%.2f m nearest_waypoint=%d",
+                            agent_id, start_distance, start_index,
+                        )
+                        v.destroy()
+                        route_rejections[agent_id] += 1
+                        continue
                     self.vehicles[agent_id] = v
                     self.target_speed[agent_id] = CRUISE_SPEED_MPS
-                    v.set_autopilot(True, self.tm_port)
                     self._set_tm_target_speed(agent_id)
                     self.tm.auto_lane_change(v, False)      # lane changes only by action
                     self.tm.ignore_lights_percentage(v, 0)
@@ -252,12 +374,26 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                     raise RuntimeError(
                         f"could not find a spawn with a valid route for {agent_id}"
                     )
+            route_signatures = {
+                agent_id: tuple(
+                    (round(wp.transform.location.x, 2),
+                     round(wp.transform.location.y, 2),
+                     round(wp.transform.location.z, 2))
+                    for wp in accepted_routes[agent_id][0]
+                )
+                for agent_id in self.agents
+            }
+            assert len(set(route_signatures.values())) == len(self.agents), (
+                "each agent must have a distinct planned route"
+            )
+            logger.info("Route-invalid spawn rejections per reset: %s", route_rejections)
 
             for agent_id, v in self.vehicles.items():
                 route, goal = accepted_routes[agent_id]
                 self.route[agent_id] = route
                 self.goal[agent_id] = goal
                 self.reached[agent_id] = False
+                self.arrival_step[agent_id] = None
                 self.stuck_steps[agent_id] = 0
                 self.off_road_steps[agent_id] = 0
                 self.finished[agent_id] = False
@@ -276,7 +412,9 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             self.step_count = 0
             self.min_ttc = TTC_CAP_SECONDS
             self.jerk_samples = []
-            self.previous_acceleration = {agent_id: None for agent_id in self.agents}
+            self.previous_longitudinal_acceleration = {agent_id: None for agent_id in self.agents}
+            self.previous_velocity = {agent_id: None for agent_id in self.agents}
+            self.previous_route_arc = {agent_id: 0.0 for agent_id in self.agents}
             reset_info = {
                 "seed": self.seed,
                 "town": self.town,
@@ -300,6 +438,7 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             if isinstance(action, bool) or not isinstance(action, (int, np.integer)) or not 0 <= int(action) < N_ACTIONS:
                 raise ValueError("each action must be an integer in 0..5")
 
+        was_finished = {agent_id: self.finished.get(agent_id, False) for agent_id in self.agents}
         invalid_action = 0
         masks = self.action_masks()
         effective_actions = dict(actions)
@@ -328,19 +467,24 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
 
         step_ttc = self._measure_min_ttc()
         self.min_ttc = min(self.min_ttc, step_ttc)
+        step_kinematics = {}
         for agent_id, vehicle in self.vehicles.items():
-            if self.finished.get(agent_id, False):
+            if was_finished[agent_id]:
                 continue
-            acceleration = vehicle.get_acceleration()
-            acceleration_magnitude = acceleration.length()
-            self.jerk_samples.append(
-                jerk_magnitude(
-                    acceleration_magnitude,
-                    self.previous_acceleration[agent_id],
-                    SIM_DT * TICKS_PER_STEP,
-                )
+            velocity = vehicle.get_velocity()
+            transform = vehicle.get_transform()
+            yaw = math.radians(float(transform.rotation.yaw))
+            acceleration_longitudinal, jerk = longitudinal_dynamics(
+                (velocity.x, velocity.y),
+                self.previous_velocity[agent_id],
+                self.previous_longitudinal_acceleration[agent_id],
+                yaw,
+                DECISION_DT_SECONDS,
             )
-            self.previous_acceleration[agent_id] = acceleration_magnitude
+            self.jerk_samples.append(jerk)
+            self.previous_velocity[agent_id] = (float(velocity.x), float(velocity.y))
+            self.previous_longitudinal_acceleration[agent_id] = acceleration_longitudinal
+            step_kinematics[agent_id] = (acceleration_longitudinal, jerk)
 
         off_road_by_agent = {}
         for agent_id in self.agents:
@@ -376,7 +520,49 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 self.finished[agent_id] = True
 
         obs = self._get_obs()
-        rewards = {a: 0.0 for a in self.agents}                 # TODO (T1.3)
+        rewards = {}
+        reward_terms = {}
+        for agent_id in self.agents:
+            if was_finished[agent_id]:
+                rewards[agent_id], reward_terms[agent_id] = compute_agent_step_reward(
+                    self.reward_calculator, agent_id, distance_travelled=0.0,
+                    finished=True,
+                )
+                continue
+            route = self.route[agent_id]
+            location = self.vehicles[agent_id].get_location()
+            _, route_index = self._nearest_route_point(location, route)
+            current_arc = sum(
+                route[index - 1].transform.location.distance(
+                    route[index].transform.location
+                ) for index in range(1, route_index + 1)
+            )
+            previous_arc = self.previous_route_arc.get(agent_id, current_arc)
+            distance_travelled = max(0.0, current_arc - previous_arc)
+            self.previous_route_arc[agent_id] = current_arc
+            acceleration_longitudinal, jerk = step_kinematics.get(agent_id, (0.0, 0.0))
+            speed = self.vehicles[agent_id].get_velocity().length()
+            at_red_light = (
+                self.vehicles[agent_id].is_at_traffic_light()
+                and self.vehicles[agent_id].get_traffic_light_state() == carla.TrafficLightState.Red
+            )
+            rewards[agent_id], terms = compute_agent_step_reward(
+                self.reward_calculator,
+                agent_id,
+                distance_travelled=distance_travelled,
+                collision=collided[agent_id],
+                ttc=self._measure_agent_ttc(agent_id),
+                goal_reached=self.reached[agent_id] and self.arrival_step[agent_id] == self.step_count,
+                acceleration=acceleration_longitudinal,
+                jerk=jerk,
+                speed=speed,
+                at_red_light=at_red_light,
+            )
+            reward_terms[agent_id] = terms
+            assert math.isfinite(rewards[agent_id]), f"non-finite reward for {agent_id}"
+        team_reward = self.reward_calculator.team_reward(
+            rewards, collision=any(collided.values())
+        )
         terminated = {
             a: bool(result.terminated or self.reached[a]) for a in self.agents
         }
@@ -397,8 +583,15 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             jerk=float(np.mean(self.jerk_samples)) if self.jerk_samples else 0.0,
             invalid_action=invalid_action,
             stop_reason=self.stop_reason,
+            arrival_step=getattr(self, "arrival_step", dict.fromkeys(self.agents)),
             ending_reason=result.reason,
         )
+        info["team_reward"] = float(team_reward)
+        for agent_id in self.agents:
+            info["per_agent"][agent_id]["reward_terms"] = reward_terms[agent_id]
+            acceleration_longitudinal, jerk = step_kinematics.get(agent_id, (0.0, 0.0))
+            info["per_agent"][agent_id]["a_long"] = float(acceleration_longitudinal)
+            info["per_agent"][agent_id]["jerk"] = float(jerk)
         return obs, rewards, terminated, truncated, info
 
     def _update_goal_and_stuck(self):
@@ -409,6 +602,8 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 self.reached[a] = True
                 self.finished[a] = True
                 self.stop_reason[a] = "goal"
+                if self.arrival_step[a] is None:
+                    self.arrival_step[a] = self.step_count
                 self._remove_finished_agent(v)
                 continue
             at_red_light = (
@@ -593,6 +788,44 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             gap, closing = min(leads, key=lambda pair: pair[0]) if leads else (None, None)
             values.append(longitudinal_ttc(gap, closing))
         return min(values, default=TTC_CAP_SECONDS)
+
+    def _measure_agent_ttc(self, agent_id):
+        """Measure same-lane TTC for one agent using the episode metric rules."""
+        ego = self.vehicles[agent_id]
+        location = ego.get_location()
+        yaw = math.radians(float(ego.get_transform().rotation.yaw))
+        forward_x, forward_y = math.cos(yaw), math.sin(yaw)
+        ego_velocity = ego.get_velocity()
+        ego_waypoint = self.world.get_map().get_waypoint(
+            location, project_to_road=True, lane_type=carla.LaneType.Driving,
+        )
+        leads = []
+        finished_actor_ids = {
+            int(self.vehicles[finished_id].id)
+            for finished_id, done in self.finished.items()
+            if done and finished_id != agent_id and finished_id in self.vehicles
+        }
+        for actor in self.world.get_actors().filter("vehicle.*"):
+            if actor.id == ego.id or int(actor.id) in finished_actor_ids:
+                continue
+            other = actor.get_location()
+            dx, dy = other.x - location.x, other.y - location.y
+            gap = dx * forward_x + dy * forward_y
+            if gap <= 0:
+                continue
+            waypoint = self.world.get_map().get_waypoint(
+                other, project_to_road=True, lane_type=carla.LaneType.Driving,
+            )
+            if (waypoint is None or ego_waypoint is None
+                    or waypoint.road_id != ego_waypoint.road_id
+                    or waypoint.lane_id != ego_waypoint.lane_id):
+                continue
+            velocity = actor.get_velocity()
+            closing = ((ego_velocity.x - velocity.x) * forward_x
+                       + (ego_velocity.y - velocity.y) * forward_y)
+            leads.append((gap, closing))
+        gap, closing = min(leads, key=lambda pair: pair[0]) if leads else (None, None)
+        return longitudinal_ttc(gap, closing)
 
     def _extract_observation_inputs(self, agent_id):
         vehicle = self.vehicles[agent_id]

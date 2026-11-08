@@ -118,6 +118,7 @@ def build_step_info(
     jerk: float = 0.0,
     invalid_action: int = 0,
     stop_reason: Mapping[str, str] | None = None,
+    arrival_step: Mapping[str, int | None] | None = None,
     ending_reason: str | None = None,
 ) -> dict[str, object]:
     """Build per-step info, adding episode metadata only on the final step."""
@@ -130,6 +131,9 @@ def build_step_info(
             "route_applied": bool(route_applied[agent_id]),
             "stop_reason": (
                 stop_reason[agent_id] if stop_reason is not None else "none"
+            ),
+            "arrival_step": (
+                arrival_step[agent_id] if arrival_step is not None else None
             ),
         }
         for agent_id in agents

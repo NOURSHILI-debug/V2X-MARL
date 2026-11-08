@@ -135,9 +135,25 @@ def _step_env(carla_env, masks=None):
     env = object.__new__(carla_env.CarlaMultiAgentEnv)
     env.agents = ["cav_0", "cav_1"]
     env.reached = dict.fromkeys(env.agents, False)
+    class FakeLocation:
+        x = y = z = 0.0
+
+        def distance(self, _other):
+            return 0.0
+
+    class FakeVector:
+        x = y = z = 0.0
+
+        def length(self):
+            return 0.0
+
+    fake_location = FakeLocation()
+    fake_vector = FakeVector()
     fake_vehicle = SimpleNamespace(
-        get_location=lambda: SimpleNamespace(),
-        get_acceleration=lambda: SimpleNamespace(length=lambda: 0.0),
+        get_location=lambda: fake_location,
+        get_acceleration=lambda: fake_vector,
+        get_velocity=lambda: fake_vector,
+        is_at_traffic_light=lambda: False,
         get_transform=lambda: SimpleNamespace(rotation=SimpleNamespace(yaw=0.0)),
     )
     env.vehicles = {agent: fake_vehicle for agent in env.agents}
@@ -164,7 +180,14 @@ def _step_env(carla_env, masks=None):
     env._step_vehicle_location = lambda vehicle: SimpleNamespace()
     env.town, env.seed = "Town03", 0
     env.min_ttc, env.jerk_samples = 10.0, []
-    env.previous_acceleration = dict.fromkeys(env.agents)
+    env.previous_longitudinal_acceleration = dict.fromkeys(env.agents)
+    env.previous_velocity = dict.fromkeys(env.agents)
+    env.previous_route_arc = dict.fromkeys(env.agents, 0.0)
+    env.arrival_step = dict.fromkeys(env.agents)
+    waypoint = SimpleNamespace(transform=SimpleNamespace(location=fake_location))
+    env.route = {agent: [waypoint] for agent in env.agents}
+    env.reward_calculator = carla_env.RewardCalculator(env.agents)
+    env._measure_agent_ttc = lambda _agent: 10.0
     return env
 
 

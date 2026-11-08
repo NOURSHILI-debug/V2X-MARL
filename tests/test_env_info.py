@@ -34,6 +34,7 @@ def test_step_info_keeps_per_agent_status_nested_and_boolean():
             "off_road": True,
             "route_applied": True,
             "stop_reason": "goal",
+            "arrival_step": None,
         },
         "cav_1": {
             "collision": False,
@@ -42,13 +43,14 @@ def test_step_info_keeps_per_agent_status_nested_and_boolean():
             "off_road": False,
             "route_applied": False,
             "stop_reason": "red_light",
+            "arrival_step": None,
         },
     }
     assert all(
         isinstance(value, bool)
         for agent_info in info["per_agent"].values()
         for key, value in agent_info.items()
-        if key != "stop_reason"
+        if key not in {"stop_reason", "arrival_step"}
     )
     assert info["collision"] is True
     assert info["goal_reached"] is False
