@@ -5,3 +5,4 @@ __pycache__/
 .coverage
 results/raw/*
 !results/raw/.gitkeep
+*.pt

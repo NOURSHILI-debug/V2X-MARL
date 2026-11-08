@@ -32,7 +32,7 @@ for ep in range(5):
     for t in range(50):
         actions = {a: random.randrange(N_ACTIONS) for a in env.agents}
         obs, rew, term, trunc, info = env.step(actions)
-    print(f"[3] episode {ep} done, steps={info['step']}")
+    print(f"[3] episode {ep} done, steps={info['steps']}")
 
 env.close()
 print("ALL OK")

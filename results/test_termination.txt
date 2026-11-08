@@ -1,0 +1,10 @@
+PASS forced collision terminates all agents
+PASS stuck or timeout termination
+PASS short route goal termination
+PASS ten resets leave exactly two vehicles
+ALL OK
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
