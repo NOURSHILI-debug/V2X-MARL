@@ -3,10 +3,7 @@
 from __future__ import annotations
 
 import threading
-from typing import Any, Dict, List, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import carla
+from typing import Any, Dict, List
 
 
 class CollisionMonitor:

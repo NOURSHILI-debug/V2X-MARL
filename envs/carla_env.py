@@ -7,7 +7,7 @@ Implemented:
   - target-speed actions with temporary emergency-brake override
   - shared collision, goal, timeout, stuck, and off-road termination
 TODO:
-  - reward, min_ttc and jerk in info            (T1.3)
+  - reward integration and team reward           (T1.3)
 """
 import logging
 import math
@@ -26,12 +26,14 @@ from envs.obs_builder import (
     build_observation,
     make_action_mask,
 )
+from envs.metrics import TTC_CAP_SECONDS, jerk_magnitude, longitudinal_ttc
 from envs.safety import CollisionMonitor
 from envs.termination import (
     OFF_ROAD_STEP_LIMIT,
     build_step_info,
     evaluate_termination,
     is_off_road,
+    is_goal_reached,
     update_off_road_steps,
 )
 
@@ -62,7 +64,7 @@ logger = logging.getLogger(__name__)
 
 class CarlaMultiAgentEnv(MultiAgentEnv):
     def __init__(self, town="Town03", n_agents=N_AGENTS, host="localhost",
-                 port=2000, tm_port=8000, seed=0):
+                 port=2000, tm_port=8000, seed=0, light_cycle=True):
         self.town = town
         self.n_agents = n_agents
         self.agents = [f"cav_{i}" for i in range(n_agents)]
@@ -71,6 +73,7 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.obs_dim = OBS_DIM
         self.n_actions = N_ACTIONS
         self.max_steps = MAX_STEPS
+        self.light_cycle = bool(light_cycle)
 
         self.client = carla.Client(host, port)
         self.client.set_timeout(30)
@@ -89,8 +92,12 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.off_road_steps = {}  # agent_id -> consecutive off-road decision steps
         self.route_applied = {}   # agent_id -> Traffic Manager accepted the route
         self.finished = {}        # agent_id -> terminal state zero-fill marker
+        self.stop_reason = {}     # agent_id -> goal/red_light/blocked/stuck/none
         self.monitor = None       # CollisionMonitor (envs/safety.py)
         self.step_count = 0
+        self.min_ttc = TTC_CAP_SECONDS
+        self.jerk_samples = []
+        self.previous_acceleration = {}
 
     # ---- setup helpers ----------------------------------------------------
     def _load_town(self, town):
@@ -122,6 +129,7 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 self.route, self.goal, self.reached, self.stuck_steps = {}, {}, {}, {}
                 self.off_road_steps, self.route_applied = {}, {}
                 self.finished = {}
+                self.stop_reason = {}
                 self.world.tick()
 
     def close(self):
@@ -150,13 +158,35 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
 
     def _follow_route(self, agent_id, vehicle, route):
         """Make the Traffic Manager follow the planned route (sparse points, last = goal)."""
-        path = [wp.transform.location for wp in route[4:-1:4]] + [route[-1].transform.location]
+        path = self._tm_path(route)
         try:
             self.tm.set_path(vehicle, path)
         except Exception as exc:
             logger.warning("Traffic Manager did not accept route for %s: %s", agent_id, exc)
             return False
         return True
+
+    @staticmethod
+    def _tm_path(route):
+        return [wp.transform.location for wp in route[4:-1:4]] + [
+            route[-1].transform.location
+        ]
+
+    @staticmethod
+    def _path_length_from_spawn(spawn_location, path):
+        points = [spawn_location, *path]
+        return sum(
+            points[index].distance(points[index + 1])
+            for index in range(len(points) - 1)
+        )
+
+    def _configure_traffic_lights(self):
+        for light in self.world.get_actors().filter("traffic.traffic_light*"):
+            if self.light_cycle:
+                light.set_green_time(10.0)
+                light.set_yellow_time(2.0)
+                light.set_red_time(5.0)
+            light.freeze(False)
 
     # ---- API --------------------------------------------------------------
     def reset(self, seed=None, town=None):
@@ -179,42 +209,74 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             spawn_points = self.world.get_map().get_spawn_points()
             rng.shuffle(spawn_points)
             bp = self.world.get_blueprint_library().filter("vehicle.tesla.model3")[0]
-
-            for sp in spawn_points:               # skip blocked points until all agents exist
-                if len(self.vehicles) == self.n_agents:
-                    break
-                v = self.world.try_spawn_actor(bp, sp)
-                if v is None:
-                    continue
-                agent_id = self.agents[len(self.vehicles)]
-                self.vehicles[agent_id] = v
-                self.target_speed[agent_id] = CRUISE_SPEED_MPS
-                v.set_autopilot(True, self.tm_port)
-                self._set_tm_target_speed(agent_id)
-                self.tm.auto_lane_change(v, False)      # lane changes only by action
-                self.tm.ignore_lights_percentage(v, 0)
-
-            spawned_count = len(self.vehicles)
-            if spawned_count != self.n_agents:
-                self._destroy_actors()
-                assert spawned_count == self.n_agents, "not enough free spawn points"
-
+            self._configure_traffic_lights()
             carla_map = self.world.get_map()
+            spawn_cursor = 0
+            accepted_routes = {}
+            for agent_id in self.agents:
+                accepted = False
+                while spawn_cursor < len(spawn_points):
+                    spawn_transform = spawn_points[spawn_cursor]
+                    spawn_cursor += 1
+                    v = self.world.try_spawn_actor(bp, spawn_transform)
+                    if v is None:
+                        continue
+                    start_waypoint = carla_map.get_waypoint(v.get_location())
+                    route = self._plan_route(start_waypoint, rng)
+                    path = self._tm_path(route)
+                    goal = path[-1]
+                    goal_distance_at_reset = v.get_location().distance(goal)
+                    route_length = self._path_length_from_spawn(v.get_location(), path)
+                    if goal_distance_at_reset > route_length + 10.0:
+                        logger.warning(
+                            "Rejecting spawn for %s: reset goal distance %.2f m "
+                            "exceeds route length %.2f m + 10 m",
+                            agent_id,
+                            goal_distance_at_reset,
+                            route_length,
+                        )
+                        v.destroy()
+                        continue
+                    assert goal_distance_at_reset <= route_length + 10.0
+                    self.vehicles[agent_id] = v
+                    self.target_speed[agent_id] = CRUISE_SPEED_MPS
+                    v.set_autopilot(True, self.tm_port)
+                    self._set_tm_target_speed(agent_id)
+                    self.tm.auto_lane_change(v, False)      # lane changes only by action
+                    self.tm.ignore_lights_percentage(v, 0)
+                    accepted_routes[agent_id] = (route, goal)
+                    accepted = True
+                    break
+                if not accepted:
+                    self._destroy_actors()
+                    raise RuntimeError(
+                        f"could not find a spawn with a valid route for {agent_id}"
+                    )
+
             for agent_id, v in self.vehicles.items():
-                route = self._plan_route(carla_map.get_waypoint(v.get_location()), rng)
+                route, goal = accepted_routes[agent_id]
                 self.route[agent_id] = route
-                self.goal[agent_id] = route[-1].transform.location
+                self.goal[agent_id] = goal
                 self.reached[agent_id] = False
                 self.stuck_steps[agent_id] = 0
                 self.off_road_steps[agent_id] = 0
                 self.finished[agent_id] = False
-                self.route_applied[agent_id] = self._follow_route(agent_id, v, route)
+                self.stop_reason[agent_id] = "none"
+                applied = self._follow_route(agent_id, v, route)
+                if not applied:
+                    applied = self._follow_route(agent_id, v, route)
+                self.route_applied[agent_id] = applied
+                if not applied:
+                    logger.warning("Route remains unapplied after retry for %s", agent_id)
 
             for _ in range(5):                          # let physics settle
                 self.world.tick()
             self.monitor = CollisionMonitor(self.world, self.vehicles)   # after settling
 
             self.step_count = 0
+            self.min_ttc = TTC_CAP_SECONDS
+            self.jerk_samples = []
+            self.previous_acceleration = {agent_id: None for agent_id in self.agents}
             reset_info = {
                 "seed": self.seed,
                 "town": self.town,
@@ -232,18 +294,60 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
 
     def step(self, actions):
         """actions: dict agent_id -> int in [0, 5]"""
-        for agent_id, a in actions.items():
+        if not isinstance(actions, dict) or set(actions) != set(self.agents):
+            raise ValueError("actions must contain exactly the configured agent ids")
+        for action in actions.values():
+            if isinstance(action, bool) or not isinstance(action, (int, np.integer)) or not 0 <= int(action) < N_ACTIONS:
+                raise ValueError("each action must be an integer in 0..5")
+
+        invalid_action = 0
+        masks = self.action_masks()
+        effective_actions = dict(actions)
+        for agent_id, action in actions.items():
+            if (
+                action == LANE_LEFT and not masks[agent_id][LANE_LEFT]
+            ) or (
+                action == LANE_RIGHT and not masks[agent_id][LANE_RIGHT]
+            ):
+                # addition beyond spec §2, pending agreement
+                effective_actions[agent_id] = KEEP
+                invalid_action += 1
+
+        for agent_id, a in effective_actions.items():
             if not self.reached[agent_id]:          # agents parked at their goal ignore actions
                 self._apply_action(agent_id, a)
         for _ in range(TICKS_PER_STEP):
             self.world.tick()
         self.step_count += 1
 
-        collided = {a: self.monitor.is_collided(a) for a in self.agents}
+        collided = {
+            a: self.monitor.is_collided(a) if not self.finished.get(a, False) else False
+            for a in self.agents
+        }
         self._update_goal_and_stuck()
+
+        step_ttc = self._measure_min_ttc()
+        self.min_ttc = min(self.min_ttc, step_ttc)
+        for agent_id, vehicle in self.vehicles.items():
+            if self.finished.get(agent_id, False):
+                continue
+            acceleration = vehicle.get_acceleration()
+            acceleration_magnitude = acceleration.length()
+            self.jerk_samples.append(
+                jerk_magnitude(
+                    acceleration_magnitude,
+                    self.previous_acceleration[agent_id],
+                    SIM_DT * TICKS_PER_STEP,
+                )
+            )
+            self.previous_acceleration[agent_id] = acceleration_magnitude
 
         off_road_by_agent = {}
         for agent_id in self.agents:
+            if self.finished.get(agent_id, False):
+                off_road_by_agent[agent_id] = False
+                self.off_road_steps[agent_id] = 0
+                continue
             waypoint = self.world.get_map().get_waypoint(
                 self.vehicles[agent_id].get_location(),
                 project_to_road=False,
@@ -268,19 +372,14 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             stuck_grace_steps=STUCK_GRACE_STEPS,
         )
         for agent_id in self.agents:
-            if (
-                self.reached[agent_id]
-                or collided[agent_id]
-                or self.off_road_steps[agent_id] >= OFF_ROAD_STEP_LIMIT
-                or result.stuck_by_agent[agent_id]
-                or result.terminated
-                or result.truncated
-            ):
+            if result.terminated or result.truncated:
                 self.finished[agent_id] = True
 
         obs = self._get_obs()
         rewards = {a: 0.0 for a in self.agents}                 # TODO (T1.3)
-        terminated = {a: result.terminated for a in self.agents}
+        terminated = {
+            a: bool(result.terminated or self.reached[a]) for a in self.agents
+        }
         truncated = {a: result.truncated for a in self.agents}
         info = build_step_info(
             self.agents,
@@ -294,6 +393,11 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             success=result.success,
             town=self.town,
             seed=self.seed,
+            min_ttc=self.min_ttc,
+            jerk=float(np.mean(self.jerk_samples)) if self.jerk_samples else 0.0,
+            invalid_action=invalid_action,
+            stop_reason=self.stop_reason,
+            ending_reason=result.reason,
         )
         return obs, rewards, terminated, truncated, info
 
@@ -301,15 +405,42 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         for a, v in self.vehicles.items():
             if self.reached[a]:
                 continue
-            if v.get_location().distance(self.goal[a]) < GOAL_RADIUS_M:
+            if is_goal_reached(v, self.goal[a], GOAL_RADIUS_M):
                 self.reached[a] = True
-                self.tm.vehicle_percentage_speed_difference(v, 100.0)   # park at the goal
+                self.finished[a] = True
+                self.stop_reason[a] = "goal"
+                self._remove_finished_agent(v)
                 continue
-            if self.step_count <= STUCK_GRACE_STEPS:
+            at_red_light = (
+                v.is_at_traffic_light()
+                and v.get_traffic_light_state() == carla.TrafficLightState.Red
+            )
+            if at_red_light:
                 self.stuck_steps[a] = 0
-                continue
-            slow = v.get_velocity().length() < STUCK_SPEED_MS
-            self.stuck_steps[a] = self.stuck_steps[a] + 1 if (slow and not v.is_at_traffic_light()) else 0
+                self.stop_reason[a] = "red_light"
+            elif v.get_velocity().length() < STUCK_SPEED_MS:
+                self.stuck_steps[a] += 1
+                self.stop_reason[a] = (
+                    "stuck" if self.stuck_steps[a] > STUCK_STEPS else "blocked"
+                )
+            else:
+                self.stuck_steps[a] = 0
+                self.stop_reason[a] = "none"
+
+    def _remove_finished_agent(self, vehicle):
+        vehicle.set_autopilot(False, self.tm_port)
+        vehicle.apply_control(
+            carla.VehicleControl(
+                throttle=0.0,
+                steer=0.0,
+                brake=1.0,
+                hand_brake=True,
+            )
+        )
+        vehicle.set_simulate_physics(False)
+        transform = vehicle.get_transform()
+        transform.location.z -= 200.0
+        vehicle.set_transform(transform)
 
     # ---- actions ----------------------------------------------------------
     def _set_tm_target_speed(self, agent_id):
@@ -375,11 +506,18 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
 
     def get_candidates(self, agent_id):
         """Return nearby controlled/background vehicles in stable distance/ID order."""
+        if self.finished.get(agent_id, False):
+            return []
         ego = self.vehicles[agent_id]
+        finished_actor_ids = {
+            int(self.vehicles[finished_id].id)
+            for finished_id, done in self.finished.items()
+            if done and finished_id in self.vehicles
+        }
         ego_location = ego.get_location()
         candidates = []
         for actor in self.world.get_actors().filter("vehicle.*"):
-            if actor.id == ego.id:
+            if actor.id == ego.id or int(actor.id) in finished_actor_ids:
                 continue
             location = actor.get_location()
             distance = math.hypot(
@@ -406,6 +544,55 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             )
         candidates.sort(key=lambda item: (item[0], item[1]))
         return [candidate for _, _, candidate in candidates]
+
+    def _measure_min_ttc(self):
+        """Measure nearest same-lane lead TTC, capped when no lead is closing."""
+        values = []
+        actors = self.world.get_actors().filter("vehicle.*")
+        finished_actor_ids = {
+            int(self.vehicles[finished_id].id)
+            for finished_id, done in self.finished.items()
+            if done and finished_id in self.vehicles
+        }
+        for agent_id, ego in self.vehicles.items():
+            if self.finished.get(agent_id, False):
+                continue
+            ego_location = ego.get_location()
+            transform = ego.get_transform()
+            yaw = math.radians(float(transform.rotation.yaw))
+            forward_x, forward_y = math.cos(yaw), math.sin(yaw)
+            ego_velocity = ego.get_velocity()
+            ego_waypoint = self.world.get_map().get_waypoint(
+                ego_location, project_to_road=True, lane_type=carla.LaneType.Driving,
+            )
+            leads = []
+            for actor in actors:
+                if actor.id == ego.id or int(actor.id) in finished_actor_ids:
+                    continue
+                location = actor.get_location()
+                dx, dy = location.x - ego_location.x, location.y - ego_location.y
+                gap = dx * forward_x + dy * forward_y
+                if gap <= 0:
+                    continue
+                lead_waypoint = self.world.get_map().get_waypoint(
+                    location, project_to_road=True, lane_type=carla.LaneType.Driving,
+                )
+                if (
+                    lead_waypoint is None
+                    or ego_waypoint is None
+                    or lead_waypoint.road_id != ego_waypoint.road_id
+                    or lead_waypoint.lane_id != ego_waypoint.lane_id
+                ):
+                    continue
+                lead_velocity = actor.get_velocity()
+                closing = (
+                    (ego_velocity.x - lead_velocity.x) * forward_x
+                    + (ego_velocity.y - lead_velocity.y) * forward_y
+                )
+                leads.append((gap, closing))
+            gap, closing = min(leads, key=lambda pair: pair[0]) if leads else (None, None)
+            values.append(longitudinal_ttc(gap, closing))
+        return min(values, default=TTC_CAP_SECONDS)
 
     def _extract_observation_inputs(self, agent_id):
         vehicle = self.vehicles[agent_id]
@@ -507,6 +694,9 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
     def _get_obs(self):
         observations = {}
         for agent_id in self.agents:
+            if self.finished.get(agent_id, False):
+                observations[agent_id] = np.zeros(self.obs_dim, dtype=np.float32)
+                continue
             data = self._extract_observation_inputs(agent_id)
             observations[agent_id] = build_observation(
                 data["ego"],

@@ -1,6 +1,10 @@
 import pytest
 
-from envs.termination import evaluate_termination, update_off_road_steps
+from envs.termination import (
+    evaluate_termination,
+    is_goal_reached,
+    update_off_road_steps,
+)
 
 
 AGENTS = ("cav_0", "cav_1")
@@ -39,7 +43,7 @@ def test_off_road_counter_requires_consecutive_steps():
             {
                 "collided": {"cav_0": True, "cav_1": False},
                 "reached": {"cav_0": True, "cav_1": True},
-                "off_road_steps": {"cav_0": 10, "cav_1": 0},
+                "off_road_steps": {"cav_0": 51, "cav_1": 0},
                 "stuck_steps": {"cav_0": 51, "cav_1": 0},
                 "step_count": 300,
             },
@@ -48,7 +52,7 @@ def test_off_road_counter_requires_consecutive_steps():
         (
             {
                 "reached": {"cav_0": True, "cav_1": True},
-                "off_road_steps": {"cav_0": 10, "cav_1": 0},
+                "off_road_steps": {"cav_0": 51, "cav_1": 0},
                 "stuck_steps": {"cav_0": 51, "cav_1": 0},
                 "step_count": 300,
             },
@@ -56,13 +60,13 @@ def test_off_road_counter_requires_consecutive_steps():
         ),
         (
             {
-                "off_road_steps": {"cav_0": 10, "cav_1": 0},
+                "off_road_steps": {"cav_0": 51, "cav_1": 0},
                 "stuck_steps": {"cav_0": 51, "cav_1": 0},
                 "step_count": 300,
             },
             "off_road",
         ),
-        ({"stuck_steps": {"cav_0": 51, "cav_1": 0}, "step_count": 300}, "stuck"),
+        ({"stuck_steps": {"cav_0": 51, "cav_1": 51}, "step_count": 300}, "stuck"),
         ({"step_count": 300}, "timeout"),
     ],
 )
@@ -89,6 +93,18 @@ def test_stuck_requires_more_than_fifty_slow_steps():
     assert result.reason is None
     assert result.stuck_by_agent == {"cav_0": False, "cav_1": False}
 
+    result = _decision(stuck_steps={"cav_0": 51, "cav_1": 51}, step_count=51)
+    assert result.reason == "stuck"
+    one_stuck = _decision(
+        stuck_steps={"cav_0": 51, "cav_1": 0}, step_count=51
+    )
+    assert one_stuck.reason is None
+
+
+def test_off_road_requires_more_than_fifty_consecutive_steps():
+    assert _decision(off_road_steps={"cav_0": 50, "cav_1": 0}).reason is None
+    assert _decision(off_road_steps={"cav_0": 51, "cav_1": 0}).reason == "off_road"
+
 
 def test_stuck_detection_waits_through_grace_period():
     result = evaluate_termination(
@@ -96,14 +112,42 @@ def test_stuck_detection_waits_through_grace_period():
         dict.fromkeys(AGENTS, False),
         dict.fromkeys(AGENTS, False),
         dict.fromkeys(AGENTS, 0),
-        {"cav_0": 51, "cav_1": 0},
-        step_count=25,
+        {"cav_0": 51, "cav_1": 51},
+        step_count=24,
         max_steps=300,
         stuck_grace_steps=25,
     )
 
     assert result.reason is None
     assert result.stuck_by_agent == {"cav_0": False, "cav_1": False}
+
+    result = evaluate_termination(
+        AGENTS,
+        dict.fromkeys(AGENTS, False),
+        dict.fromkeys(AGENTS, False),
+        dict.fromkeys(AGENTS, 0),
+        {"cav_0": 51, "cav_1": 51},
+        step_count=25,
+        max_steps=300,
+        stuck_grace_steps=25,
+    )
+    assert result.reason == "stuck"
+
+
+def test_goal_radius_includes_fake_vehicle_inside_radius():
+    class FakeVehicle:
+        def __init__(self, distance):
+            self._distance = distance
+
+        def get_location(self):
+            return self
+
+        def distance(self, _goal):
+            return self._distance
+
+    assert is_goal_reached(FakeVehicle(0.62), object(), radius_m=6.0)
+    assert is_goal_reached(FakeVehicle(5.2), object(), radius_m=6.0)
+    assert is_goal_reached(FakeVehicle(6.0), object(), radius_m=6.0)
 
 
 def test_termination_requires_matching_agent_keys():

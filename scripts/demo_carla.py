@@ -9,7 +9,7 @@ import sys, os, time, argparse
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import carla
-from envs.carla_env import (CarlaMultiAgentEnv, KEEP, ACCEL, DECEL, BRAKE,
+from envs.carla_env import (CarlaMultiAgentEnv, KEEP, ACCEL, BRAKE,
                             LANE_LEFT, LANE_RIGHT)
 
 p = argparse.ArgumentParser()
