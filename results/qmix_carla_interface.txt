@@ -1,0 +1,5 @@
+QMIX CARLA interface OK: steps=100 sec/step=0.0634
+final info: {'steps': 100, 'collision': False, 'goal_reached': False, 'stuck': False, 'off_road': False, 'route_applied': True, 'invalid_action': 0}
+STATUS: COMPLETE
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 
