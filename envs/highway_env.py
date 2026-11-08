@@ -8,6 +8,8 @@ import gymnasium as gym
 import highway_env
 import numpy as np
 
+from envs.reward import RewardCalculator
+
 N_ACTIONS = 6
 AGENT_IDS = tuple(f"cav_{index}" for index in range(4))
 
@@ -16,6 +18,7 @@ _NATIVE_ACTIONS = (1, 3, 4, 1, 0, 2)
 
 MAX_TTC_S = 10.0
 DECISION_DT = 1.0 / 5.0
+PROGRESS_DISTANCE = 30.0 * DECISION_DT
 SCENARIO_ID = "highway-v0"
 TOWN = "highway"
 
@@ -53,6 +56,7 @@ class HighwayV2XEnv:
         self.env = gym.make("highway-v0", render_mode=render_mode, config=config)
         self.agent_ids = AGENT_IDS
         self.agents = list(AGENT_IDS)
+        self.reward_calculator = RewardCalculator(agent_ids=self.agent_ids)
         first_space = self.env.observation_space[0]
         self.obs_dim = int(np.prod(first_space.shape))
         self.n_actions = N_ACTIONS
@@ -173,7 +177,7 @@ class HighwayV2XEnv:
             vehicle.target_speed = (
                 0.0 if agent_id in emergency_brakes else self._targets[agent_id]
             )
-        observations, native_reward, native_terminated, native_truncated, native_info = (
+        observations, _native_reward, native_terminated, native_truncated, native_info = (
             self.env.step(tuple(native_actions))
         )
         self.steps += 1
@@ -190,12 +194,25 @@ class HighwayV2XEnv:
         truncated_flag = bool(native_truncated) and not terminated_flag
 
         per_agent = {}
+        rewards = {}
         for agent_id, vehicle in zip(self.agent_ids, vehicles, strict=True):
             x = float(vehicle.position[0])
             speed = float(vehicle.speed)
             acceleration = (speed - self._prev_speed[agent_id]) / DECISION_DT
             jerk = abs(acceleration - self._prev_accel[agent_id])
             ttc = self._lead_ttc(vehicle)
+            progress = max(0.0, x - self._prev_x[agent_id]) / PROGRESS_DISTANCE
+            reward_terms = self.reward_calculator.compute_terms(
+                agent_id,
+                progress=progress,
+                collision=crashed[agent_id],
+                ttc=ttc,
+                goal_reached=False,
+                acceleration=acceleration,
+                jerk=jerk,
+                idle=speed < 1.0,
+            )
+            rewards[agent_id] = float(sum(reward_terms.values()))
             self._agent_jerk_sum[agent_id] += jerk
             self._agent_jerk_count[agent_id] += 1
             self._agent_min_ttc[agent_id] = min(self._agent_min_ttc[agent_id], ttc)
@@ -212,6 +229,7 @@ class HighwayV2XEnv:
                     / self._agent_jerk_count[agent_id]
                 ),
                 "step": self.steps,
+                "reward_terms": reward_terms,
                 "native_info": native_info,
             }
             self._prev_x[agent_id] = x
@@ -220,6 +238,10 @@ class HighwayV2XEnv:
 
         total_jerk = sum(self._agent_jerk_sum.values())
         total_jerk_count = sum(self._agent_jerk_count.values())
+        team_reward = self.reward_calculator.team_reward(
+            rewards,
+            collision=collision,
+        )
         infos = {
             "collision": collision,
             "goal_reached": False,
@@ -230,9 +252,9 @@ class HighwayV2XEnv:
             "scenario_id": SCENARIO_ID,
             "town": TOWN,
             "seed": self._seed,
+            "team_reward": team_reward,
             "per_agent": per_agent,
         }
-        rewards = {agent_id: float(native_reward) for agent_id in self.agent_ids}
         terminated = {agent_id: terminated_flag for agent_id in self.agent_ids}
         truncated = {agent_id: truncated_flag for agent_id in self.agent_ids}
         return (
