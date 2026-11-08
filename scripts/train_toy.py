@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
 import torch
+from envs.highway_env import HighwayV2XEnv
 from envs.toy_env import ToyEnv
 from marl.vdn import VDN
 from marl.buffers import ReplayBuffer
@@ -76,17 +77,25 @@ def main():
     p.add_argument("--eval_every", type=int, default=50)
     p.add_argument("--reward_scale", type=float, default=0.1)
     p.add_argument("--out", default="results")
+    p.add_argument("--env", choices=("toy", "highway"), default="toy")
+    p.add_argument("--obs-layout", default="kinematics25")
     args = p.parse_args()
     os.makedirs(args.out, exist_ok=True)
     np.random.seed(args.seed); torch.manual_seed(args.seed)
 
-    env = ToyEnv()
+    if args.env == "highway":
+        env = HighwayV2XEnv(
+            render_mode=None,
+            obs_layout=args.obs_layout,
+        )
+    else:
+        env = ToyEnv()
     agents = list(env.agents)
     N = len(agents)
     obs_d = env_reset(env, args.seed)
-    obs_dim = len(np.asarray(obs_d[agents[0]]))
+    obs_dim = int(getattr(env, "obs_dim", len(np.asarray(obs_d[agents[0]]))))
     n_actions = len(env.action_masks()[agents[0]])
-    print(f"agents={N} obs_dim={obs_dim} n_actions={n_actions}")
+    print(f"env={args.env} agents={N} obs_dim={obs_dim} n_actions={n_actions}")
 
     # random baseline (for the demo slide)
     def rand_policy(obs, masks):

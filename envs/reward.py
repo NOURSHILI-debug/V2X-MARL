@@ -1,12 +1,12 @@
 """Reward utilities for per-vehicle driving objectives.
 
-The reward is intentionally simple and explicit: it combines progress toward a goal,
-collision penalties, TTC-based safety penalties, comfort penalties, and a goal bonus.
-All inputs are plain Python/NumPy numeric values, so the calculator stays independent
-from CARLA actor APIs.
+The reward follows Contract v1 (docs/env_spec.md section 12): progress toward a
+goal, collision penalties, TTC-based safety penalties, comfort penalties, a goal
+bonus, and an idle penalty. All inputs are plain Python/NumPy numeric values, so
+the calculator stays independent from CARLA actor APIs.
 
-The caller is responsible for passing one-time event flags only when they occur in the
-current step. For example, a collision or goal completion should be passed as
+The caller is responsible for passing one-time event flags only when they occur in
+the current step. For example, a collision or goal completion should be passed as
 ``collision=True`` or ``goal_reached=True`` only for the step on which the event
 happens; repeated calls with the same state will continue to apply the same reward.
 """
@@ -18,23 +18,17 @@ from typing import Any, Dict, Iterable, Mapping, Optional
 
 
 class RewardCalculator:
-    """Compute deterministic scalar rewards for a controlled vehicle.
-
-    Default weights are intentionally conservative and can be overridden at
-    initialization. Progress and goal completion are positive rewards; collisions,
-    low TTC, and excessive comfort signals are negative penalties.
-    """
+    """Compute deterministic scalar rewards for a controlled vehicle."""
 
     DEFAULT_WEIGHTS = {
         "progress": 1.0,
-        "collision": 100.0,
-        "safety": 15.0,
-        "safety_threshold": 2.5,
-        "comfort_accel": 1.0,
-        "comfort_jerk": 1.0,
-        "comfort_accel_threshold": 2.0,
-        "comfort_jerk_threshold": 2.0,
-        "goal": 50.0,
+        "collision": -10.0,
+        "ttc": -0.5,
+        "ttc_threshold": 3.0,
+        "comfort": -0.05,
+        "goal": 10.0,
+        "idle": -0.1,
+        "team_collision": -10.0,
     }
 
     def __init__(
@@ -62,34 +56,56 @@ class RewardCalculator:
             raise ValueError(f"{name} must be finite.")
         return number
 
-    def _safety_penalty(self, ttc: Optional[float]) -> float:
+    def _ttc_term(self, ttc: Optional[float]) -> float:
         if ttc is None:
             return 0.0
         ttc_value = self._as_float(ttc, "ttc")
-        threshold = self.weights["safety_threshold"]
+        threshold = self.weights["ttc_threshold"]
         if ttc_value >= threshold:
             return 0.0
-        if ttc_value <= 0.0:
-            return self.weights["safety"]
-        normalized = (threshold - ttc_value) / max(threshold, 1e-9)
-        return self.weights["safety"] * normalized
+        fraction = 1.0 - max(ttc_value, 0.0) / max(threshold, 1e-9)
+        return self.weights["ttc"] * fraction
 
-    def _comfort_penalty(
+    def _comfort_term(
         self,
-        value: Optional[float],
-        *,
-        weight_key: str,
-        threshold_key: str,
-        name: str,
+        acceleration: Optional[float],
+        jerk: Optional[float],
     ) -> float:
-        if value is None:
-            return 0.0
-        numeric = self._as_float(value, name)
-        threshold = self.weights[threshold_key]
-        magnitude = abs(numeric)
-        if magnitude <= threshold:
-            return 0.0
-        return self.weights[weight_key] * (magnitude - threshold)
+        magnitude = 0.0
+        if acceleration is not None:
+            magnitude += abs(self._as_float(acceleration, "acceleration"))
+        if jerk is not None:
+            magnitude += abs(self._as_float(jerk, "jerk"))
+        return self.weights["comfort"] * magnitude
+
+    def compute_terms(
+        self,
+        agent_id: str,
+        *,
+        progress: float,
+        collision: bool = False,
+        ttc: Optional[float] = None,
+        goal_reached: bool = False,
+        acceleration: Optional[float] = None,
+        jerk: Optional[float] = None,
+        idle: bool = False,
+    ) -> Dict[str, float]:
+        """Return the per-term reward contributions for one vehicle."""
+        self._validate_agent(agent_id)
+        progress_value = self._as_float(progress, "progress")
+
+        terms = {
+            "progress": self.weights["progress"] * progress_value,
+            "collision": self.weights["collision"] if collision else 0.0,
+            "safety": self._ttc_term(ttc),
+            "comfort": self._comfort_term(acceleration, jerk),
+            "goal": self.weights["goal"] if goal_reached else 0.0,
+            "idle": self.weights["idle"] if idle else 0.0,
+        }
+        for name, value in terms.items():
+            if not math.isfinite(value):
+                raise ValueError(f"Reward term '{name}' is not finite.")
+        return {name: float(value) for name, value in terms.items()}
 
     def compute(
         self,
@@ -101,63 +117,44 @@ class RewardCalculator:
         goal_reached: bool = False,
         acceleration: Optional[float] = None,
         jerk: Optional[float] = None,
+        idle: bool = False,
     ) -> float:
-        """Compute the scalar reward for one vehicle in the current step.
-
-        Positive terms:
-            - progress contribution: ``weight['progress'] * progress``
-            - goal completion bonus: ``weight['goal']`` when ``goal_reached`` is true
-
-        Negative terms:
-            - collision penalty: ``weight['collision']`` when ``collision`` is true
-            - TTC safety penalty when TTC is below the configured threshold
-            - comfort penalties when acceleration or jerk exceed configured limits
-
-        Missing safety or comfort measurements are ignored explicitly; they are not
-        treated as zero-valued penalties.
-        """
-        self._validate_agent(agent_id)
-        progress_value = self._as_float(progress, "progress")
-
-        reward = self.weights["progress"] * progress_value
-
-        if collision:
-            reward -= self.weights["collision"]
-
-        reward -= self._safety_penalty(ttc)
-
-        reward -= self._comfort_penalty(
-            acceleration,
-            weight_key="comfort_accel",
-            threshold_key="comfort_accel_threshold",
-            name="acceleration",
+        """Compute the scalar reward for one vehicle in the current step."""
+        terms = self.compute_terms(
+            agent_id,
+            progress=progress,
+            collision=collision,
+            ttc=ttc,
+            goal_reached=goal_reached,
+            acceleration=acceleration,
+            jerk=jerk,
+            idle=idle,
         )
-        reward -= self._comfort_penalty(
-            jerk,
-            weight_key="comfort_jerk",
-            threshold_key="comfort_jerk_threshold",
-            name="jerk",
-        )
-
-        if goal_reached:
-            reward += self.weights["goal"]
-
+        reward = float(sum(terms.values()))
         if not math.isfinite(reward):
             raise ValueError("Reward calculation produced a non-finite value.")
-        return float(reward)
+        return reward
+
+    def team_reward(
+        self,
+        rewards: Mapping[str, float],
+        *,
+        collision: bool = False,
+    ) -> float:
+        """Return ``mean(r_i)`` plus the team collision penalty."""
+        values = [self._as_float(value, "reward") for value in rewards.values()]
+        team = sum(values) / len(values) if values else 0.0
+        if collision:
+            team += self.weights["team_collision"]
+        if not math.isfinite(team):
+            raise ValueError("Team reward calculation produced a non-finite value.")
+        return float(team)
 
     def compute_batch(
         self,
         rewards: Mapping[str, Mapping[str, Any]],
     ) -> Dict[str, float]:
-        """Compute rewards for multiple agents from a simple mapping.
-
-        Example:
-            {
-                "vehicle_0": {"progress": 2.0, "collision": False, "ttc": 1.3},
-                "vehicle_1": {"progress": 1.5, "goal_reached": True},
-            }
-        """
+        """Compute rewards for multiple agents from a simple mapping."""
         results: Dict[str, float] = {}
         for agent_id, payload in rewards.items():
             results[agent_id] = self.compute(agent_id, **payload)
