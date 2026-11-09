@@ -11,6 +11,7 @@ Branch: `feat/marl-audit-mappo`
 | 4 trainer | `8ad131d` feat: qmix/vdn comparison trainer | tests 95 passed, 4 skipped; contract56 smoke 2 seeds x 5 eps for QMIX+VDN populated CSVs (see `results/raw/smoke_stage4/`) | 5 measure + budget |
 | 5 measure | `64ce2c0` docs: progress stage 5 timing | timing below; budget proposed | A survivability |
 | A env fix | `a55d771` fix(env): contract56 car-following safety speed | `tests/test_contract.py`+`test_highway_adapter.py` 26 passed/17 skipped; strict highway 9 passed; `tests` 114 passed/17 skipped | B step budget + launch |
+| B step budget + launch | `0e94ae6` feat(trainer): step-based budget and eval cadence | `tests` 114 passed/17 skipped; smoke+resume verified; 6/6 runs hit 15000 steps with eval at 3000/6000/9000/12000/15000 | C plots |
 
 ## Stage 1 summary
 
@@ -88,6 +89,25 @@ Branch: `feat/marl-audit-mappo`
   still collects `scripts/test_env.py` and `scripts/test_termination.py`, which
   import CARLA and fail without the CARLA package; unchanged.)
 
+## Stage B summary (step-based training, completed)
+
+Command (launched in background with `Start-Process`, PID 11344):
+`python scripts/train_qmix_highway.py --algorithms qmix vdn --seeds 0 1 2
+--total-steps 15000 --eval-interval 3000 --eval-seeds 7001 7002 7003
+--out results/raw/comparison --torch-threads 2`
+
+- Outputs: `results/raw/comparison/` (run_metadata.json, runs/*/metrics.csv,
+  resume.pt, buffer.npz, state.json), log `results/raw/comparison_train.log`,
+  stderr log empty, launch record `results/raw/comparison_launch.txt`.
+- 6/6 runs reached exactly 15000 steps: qmix_seed0/1/2, vdn_seed0/1/2.
+  Each has 15 eval rows = 5 eval points (3000, 6000, 9000, 12000, 15000) x 3
+  eval seeds (7001-7003); random baseline has 3 eval rows.
+- Wall time from the log: 8147.6 s total (~2.26 h); per run: QMIX
+  1218.7/1863.6/1656.8 s, VDN 1167.1/1100.4/1141.0 s.
+- Pre-launch gates: `pytest tests -q` -> 114 passed, 17 skipped; step-based
+  smoke and resume exercised under `results/raw/smoke_stageB/`.
+- Raw results only; no plots yet.
+
 ## Stage B budget (mandated, step-based; target ~2 h)
 
 - algorithms: QMIX and VDN; seeds: 0, 1, 2; ~15,000 env steps/seed/algo.
@@ -103,7 +123,8 @@ Branch: `feat/marl-audit-mappo`
 
 ## Resume instructions
 
-A fresh session should read this file plus `docs/qmix_audit.md`. Stage A is
-complete (`a55d771`). Stage B is next: convert the trainer to the step-based
-budget above, run the gates, commit, and launch the background training command
-immediately (pre-approved; do not wait for another OK). Do not redo stages 0-A.
+A fresh session should read this file plus `docs/qmix_audit.md`. Stages A and B
+are complete (`a55d771`, `0e94ae6`); raw runs are under
+`results/raw/comparison/`. Stage C is next: write `scripts/plot_comparison.py`
+so it tolerates partial CSVs, write PNGs under `results/raw/plots/`, test it on
+the first CSV rows, report the paths, and stop. Do not redo stages 0-B.
