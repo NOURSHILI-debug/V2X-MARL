@@ -156,7 +156,7 @@ def test_highway_environment_interaction():
         masks = np.stack([masks_by_agent[agent] for agent in agents])
         learner = QMIX(
             n_agents=len(agents),
-            obs_dim=local_observations.shape[1],
+            obs_dim=env.obs_dim,
             state_dim=env.state().size,
             n_actions=masks.shape[1],
             hidden_dim=16,
@@ -170,7 +170,70 @@ def test_highway_environment_interaction():
         )
 
         assert set(next_observations) == set(rewards) == set(agents)
-        assert set(terminated) == set(truncated) == set(info) == set(agents)
-        assert all(next_observations[agent].shape == (5, 5) for agent in agents)
+        assert set(terminated) == set(truncated) == set(agents)
+        assert set(info["per_agent"]) == set(agents)
+        assert all(
+            next_observations[agent].reshape(-1).shape == (env.obs_dim,)
+            for agent in agents
+        )
     finally:
         env.close()
+
+
+def test_state_normalization_off_does_not_build_normalizer():
+    learner = _learner()
+
+    assert learner.state_normalizer is None
+
+
+def test_state_normalization_requires_explicit_scales():
+    with pytest.raises(ValueError, match="requires explicit state_mean and state_std"):
+        QMIX(
+            n_agents=4,
+            obs_dim=5,
+            state_dim=8,
+            hidden_dim=16,
+            mixing_dim=8,
+            hypernet_dim=16,
+            state_norm=True,
+        )
+
+
+def test_state_normalization_mismatched_dimension_raises_clear_error():
+    with pytest.raises(ValueError, match=r"mean and std must have shape \(8,\)"):
+        QMIX(
+            n_agents=4,
+            obs_dim=5,
+            state_dim=8,
+            hidden_dim=16,
+            mixing_dim=8,
+            hypernet_dim=16,
+            state_norm=True,
+            state_mean=np.zeros(5, dtype=np.float32),
+            state_std=np.ones(5, dtype=np.float32),
+        )
+
+
+def test_state_normalization_enabled_round_trips(tmp_path):
+    learner = QMIX(
+        n_agents=4,
+        obs_dim=5,
+        state_dim=8,
+        hidden_dim=16,
+        mixing_dim=8,
+        hypernet_dim=16,
+        state_norm=True,
+        state_mean=np.arange(8, dtype=np.float32),
+        state_std=np.ones(8, dtype=np.float32),
+        seed=2,
+    )
+    checkpoint = tmp_path / "qmix_norm.pt"
+    learner.save(checkpoint)
+
+    loaded = QMIX.from_checkpoint(checkpoint)
+
+    assert loaded.state_normalizer is not None
+    torch.testing.assert_close(
+        learner.state_normalizer.mean,
+        loaded.state_normalizer.mean,
+    )

@@ -10,6 +10,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from marl.normalization import StateNormalizer
+
 
 class SharedAgentQNetwork(nn.Module):
     """Map one observation and an agent identity to that agent's action values."""
@@ -127,6 +129,9 @@ class QMIXReplayBuffer:
         self.next_observations = np.zeros_like(self.observations)
         self.next_states = np.zeros_like(self.states)
         self.terminated = np.zeros(capacity, dtype=np.float32)
+        self.action_masks = np.ones(
+            (capacity, n_agents, n_actions), dtype=np.float32
+        )
         self.next_action_masks = np.ones(
             (capacity, n_agents, n_actions), dtype=np.float32
         )
@@ -141,7 +146,12 @@ class QMIXReplayBuffer:
         next_state: np.ndarray,
         terminated: bool,
         next_action_masks: np.ndarray,
+        action_masks: np.ndarray | None = None,
     ) -> None:
+        if action_masks is None:
+            action_masks = np.ones(
+                (self.n_agents, self.n_actions), dtype=np.float32
+            )
         expected_shapes = (
             (observations, (self.n_agents, self.obs_dim), "observations"),
             (state, (self.state_dim,), "state"),
@@ -153,6 +163,7 @@ class QMIXReplayBuffer:
                 (self.n_agents, self.n_actions),
                 "next_action_masks",
             ),
+            (action_masks, (self.n_agents, self.n_actions), "action_masks"),
         )
         for value, expected, name in expected_shapes:
             if np.asarray(value).shape != expected:
@@ -174,6 +185,7 @@ class QMIXReplayBuffer:
         self.next_observations[index] = next_observations
         self.next_states[index] = next_state
         self.terminated[index] = float(terminated)
+        self.action_masks[index] = action_masks
         self.next_action_masks[index] = next_action_masks
         self.pointer = (self.pointer + 1) % self.capacity
         self.size = min(self.size + 1, self.capacity)
@@ -228,13 +240,15 @@ class QMIX:
         gamma: float = 0.99,
         tau: float = 0.01,
         reward_scale: float = 1.0,
+        double_q: bool = False,
+        state_norm: bool = False,
+        state_mean: Any = None,
+        state_std: Any = None,
         device: str | torch.device = "cpu",
         seed: int | None = None,
     ) -> None:
         if min(n_agents, obs_dim, state_dim, n_actions, hidden_dim) <= 0:
             raise ValueError("Network dimensions must be positive.")
-        if n_actions != 6:
-            raise ValueError("The V2X specification requires exactly six actions.")
         if not 0.0 <= gamma <= 1.0:
             raise ValueError("gamma must be between 0 and 1.")
         if not 0.0 < tau <= 1.0:
@@ -251,8 +265,22 @@ class QMIX:
         self.gamma = gamma
         self.tau = tau
         self.reward_scale = reward_scale
+        self.double_q = bool(double_q)
+        self.state_norm = bool(state_norm)
         self.device = torch.device(device)
         self.rng = np.random.default_rng(seed)
+        if self.state_norm:
+            if state_mean is None or state_std is None:
+                raise ValueError(
+                    "state_norm=True requires explicit state_mean and state_std."
+                )
+            self.state_normalizer: StateNormalizer | None = StateNormalizer(
+                state_dim,
+                mean=state_mean,
+                std=state_std,
+            ).to(self.device)
+        else:
+            self.state_normalizer = None
 
         self.agent_q = SharedAgentQNetwork(
             obs_dim, n_actions, n_agents, hidden_dim
@@ -310,9 +338,66 @@ class QMIX:
             if self.rng.random() < epsilon:
                 actions[agent_index] = self.rng.choice(valid_actions)
             else:
-                masked_q = np.where(action_masks[agent_index], q_values[agent_index], -np.inf)
+                masked_q = np.where(
+                    action_masks[agent_index],
+                    q_values[agent_index],
+                    -np.inf,
+                )
                 actions[agent_index] = int(np.argmax(masked_q))
         return actions
+
+    def _normalize_states(self, states: torch.Tensor) -> torch.Tensor:
+        if self.state_normalizer is None:
+            return states
+        return self.state_normalizer(states)
+
+    @torch.no_grad()
+    def target_actions(
+        self,
+        next_observations: torch.Tensor,
+        next_action_masks: torch.Tensor,
+    ) -> torch.Tensor:
+        """Return the next actions used by the target computation."""
+        target_q = self.target_agent_q(next_observations)
+        if self.double_q:
+            selector_q = self.agent_q(next_observations)
+        else:
+            selector_q = target_q
+        selector_q = selector_q.masked_fill(
+            ~next_action_masks.bool(),
+            -torch.inf,
+        )
+        return selector_q.argmax(dim=-1)
+
+    @torch.no_grad()
+    def td_target(self, batch: tuple[torch.Tensor, ...]) -> torch.Tensor:
+        """Compute the TD target; exposed for correctness tests."""
+        (
+            observations,
+            states,
+            actions,
+            rewards,
+            next_observations,
+            next_states,
+            terminated,
+            next_action_masks,
+        ) = batch
+        del observations, states, actions
+        if torch.any(~next_action_masks.bool().any(dim=-1)):
+            raise ValueError("Every agent must have at least one valid next action.")
+        next_actions = self.target_actions(next_observations, next_action_masks)
+        next_target_q = self.target_agent_q(next_observations).gather(
+            dim=2,
+            index=next_actions.unsqueeze(-1),
+        ).squeeze(-1)
+        next_total_q = self.target_mixer(
+            next_target_q,
+            self._normalize_states(next_states),
+        )
+        return (
+            rewards * self.reward_scale
+            + self.gamma * (1.0 - terminated) * next_total_q
+        )
 
     def update(self, batch: tuple[torch.Tensor, ...]) -> float:
         (
@@ -332,26 +417,10 @@ class QMIX:
             dim=2,
             index=actions.unsqueeze(-1),
         ).squeeze(-1)
-        total_q = self.mixer(chosen_agent_q, states)
+        total_q = self.mixer(chosen_agent_q, self._normalize_states(states))
+        targets = self.td_target(batch)
 
-        with torch.no_grad():
-            next_online_q = self.agent_q(next_observations)
-            next_online_q = next_online_q.masked_fill(
-                ~next_action_masks.bool(),
-                torch.finfo(next_online_q.dtype).min,
-            )
-            next_actions = next_online_q.argmax(dim=-1, keepdim=True)
-            next_target_q = self.target_agent_q(next_observations).gather(
-                dim=2,
-                index=next_actions,
-            ).squeeze(-1)
-            next_total_q = self.target_mixer(next_target_q, next_states)
-            targets = (
-                rewards * self.reward_scale
-                + self.gamma * (1.0 - terminated) * next_total_q
-            )
-
-        loss = F.smooth_l1_loss(total_q, targets)
+        loss = F.mse_loss(total_q, targets)
         self.optimizer.zero_grad(set_to_none=True)
         loss.backward()
         nn.utils.clip_grad_norm_(
@@ -399,6 +468,23 @@ class QMIX:
             "gamma": self.gamma,
             "tau": self.tau,
             "reward_scale": self.reward_scale,
+            "double_q": self.double_q,
+            "state_norm": self.state_norm,
+            "state_normalizer": (
+                None
+                if self.state_normalizer is None
+                else self.state_normalizer.state_dict()
+            ),
+            "state_mean": (
+                None
+                if self.state_normalizer is None
+                else self.state_normalizer.mean.detach().cpu().tolist()
+            ),
+            "state_std": (
+                None
+                if self.state_normalizer is None
+                else self.state_normalizer.std.detach().cpu().tolist()
+            ),
             "agent_q": self.agent_q.state_dict(),
             "mixer": self.mixer.state_dict(),
             "target_agent_q": self.target_agent_q.state_dict(),
@@ -421,10 +507,24 @@ class QMIX:
                     f"Checkpoint {key}={checkpoint.get(key)} does not match "
                     f"learner {key}={getattr(self, key)}."
                 )
+        for key in ("double_q", "state_norm"):
+            if key in checkpoint and bool(checkpoint[key]) != getattr(self, key):
+                raise ValueError(
+                    f"Checkpoint {key}={checkpoint[key]} does not match "
+                    f"learner {key}={getattr(self, key)}."
+                )
         self.agent_q.load_state_dict(checkpoint["agent_q"])
         self.mixer.load_state_dict(checkpoint["mixer"])
         self.target_agent_q.load_state_dict(checkpoint["target_agent_q"])
         self.target_mixer.load_state_dict(checkpoint["target_mixer"])
+        serialized_normalizer = checkpoint.get("state_normalizer")
+        if serialized_normalizer is not None:
+            if self.state_normalizer is None:
+                raise ValueError(
+                    "Checkpoint contains a state normalizer but the learner has "
+                    "state_norm=False."
+                )
+            self.state_normalizer.load_state_dict(serialized_normalizer)
         if "optimizer" in checkpoint:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
 
@@ -448,6 +548,10 @@ class QMIX:
             gamma=checkpoint["gamma"],
             tau=checkpoint["tau"],
             reward_scale=checkpoint["reward_scale"],
+            double_q=bool(checkpoint.get("double_q", False)),
+            state_norm=bool(checkpoint.get("state_norm", False)),
+            state_mean=checkpoint.get("state_mean"),
+            state_std=checkpoint.get("state_std"),
             device=device,
         )
         learner.load(path)

@@ -11,12 +11,15 @@ class ReplayBuffer:
         self.act = np.zeros((capacity, n_agents), np.int64)
         self.rew = np.zeros(capacity, np.float32)          # team reward
         self.done = np.zeros(capacity, np.float32)         # true terminal only
+        self.mask = np.ones((capacity, n_agents, n_actions), np.float32)
         self.next_mask = np.ones((capacity, n_agents, n_actions), np.float32)
 
-    def add(self, obs, act, rew, next_obs, done, next_mask):
+    def add(self, obs, act, rew, next_obs, done, next_mask, mask=None):
         i = self.ptr
         self.obs[i], self.act[i], self.rew[i] = obs, act, rew
         self.next_obs[i], self.done[i], self.next_mask[i] = next_obs, float(done), next_mask
+        if mask is not None:
+            self.mask[i] = mask
         self.ptr = (self.ptr + 1) % self.cap
         self.size = min(self.size + 1, self.cap)
 
