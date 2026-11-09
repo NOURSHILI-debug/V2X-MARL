@@ -37,6 +37,7 @@ CSV_FIELDS = [
     "algorithm",
     "seed",
     "episode",
+    "total_steps",
     "team_return",
     "collision",
     "mean_speed",
@@ -109,60 +110,8 @@ def _episode_metrics(
     }
 
 
-def _train_episode(
-    env: HighwayV2XEnv,
-    learner: QMIX | VDN,
-    algorithm: str,
-    reset_seed: int,
-    epsilon: float,
-) -> tuple[list[tuple[Any, ...]], dict[str, Any]]:
-    observations_dict, _ = env.reset(seed=reset_seed)
-    agents = env.agent_ids
-    observations = stack_observations(observations_dict, agents)
-    state = env.state().astype(np.float32, copy=True)
-    masks = stack_masks(env)
-    transitions: list[tuple[Any, ...]] = []
-    team_return = 0.0
-    speeds: list[float] = []
-    collision = False
-    steps = 0
-
-    while True:
-        actions = learner.act(observations, masks, epsilon=epsilon)
-        next_obs_dict, _rewards, terminated, truncated, info = env.step(
-            {agent: int(actions[index]) for index, agent in enumerate(agents)}
-        )
-        next_observations = stack_observations(next_obs_dict, agents)
-        next_state = env.state().astype(np.float32, copy=True)
-        next_masks = stack_masks(env)
-        team_reward = float(info["team_reward"])
-        terminal = any_flag(terminated)
-
-        transitions.append(
-            _transition(
-                algorithm,
-                observations,
-                state,
-                actions,
-                team_reward,
-                next_observations,
-                next_state,
-                terminal,
-                next_masks,
-                masks,
-            )
-        )
-        team_return += team_reward
-        speeds.extend(
-            float(info["per_agent"][agent]["speed_mps"]) for agent in agents
-        )
-        collision = collision or bool(info["collision"])
-        steps += 1
-        observations, state, masks = next_observations, next_state, next_masks
-        if terminal or any_flag(truncated):
-            break
-
-    return transitions, _episode_metrics(team_return, collision, speeds, steps)
+def _episode_seed(run_seed: int, episode: int) -> int:
+    return 100_000 + run_seed * 1_000_000 + episode
 
 
 def _eval_episode(
@@ -270,7 +219,7 @@ def _append_rows(path: Path, rows: list[dict[str, Any]]) -> None:
         file.flush()
 
 
-def _truncate_metrics(path: Path, keep_before_episode: int) -> None:
+def _truncate_metrics_by_step(path: Path, keep_through_step: int) -> None:
     if not path.exists():
         return
     with path.open(newline="", encoding="utf-8") as file:
@@ -278,14 +227,19 @@ def _truncate_metrics(path: Path, keep_before_episode: int) -> None:
     kept = [
         row
         for row in rows
-        if row.get("episode") not in (None, "")
-        and int(row["episode"]) < keep_before_episode
+        if str(row.get("total_steps", "")).isdigit()
+        and int(row["total_steps"]) <= keep_through_step
     ]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(kept)
+
+
+def _clear_metrics(path: Path) -> None:
+    if path.exists():
+        path.unlink()
 
 
 def _save_buffer(buffer: QMIXReplayBuffer | ReplayBuffer, path: Path) -> None:
@@ -328,6 +282,7 @@ def _run_training(
     buffer_path = run_dir / "buffer.npz"
     state_path = run_dir / "state.json"
     env = make_env(args.obs_layout, args.background_vehicles, args.duration)
+    eval_env = make_env(args.obs_layout, args.background_vehicles, args.duration)
     try:
         agents = env.agent_ids
         env.reset(seed=run_seed * 100_000)
@@ -340,7 +295,8 @@ def _run_training(
         learner, replay = _build_learner(
             algorithm, args, obs_dim, state_dim, n_actions, run_seed
         )
-        next_episode = 0
+        total_steps = 0
+        episode = 0
         if (
             args.resume
             and resume_path.exists()
@@ -353,38 +309,125 @@ def _run_training(
             )
             if buffer_path.exists():
                 _load_buffer(replay, buffer_path)
-            state = json.loads(state_path.read_text(encoding="utf-8"))
-            next_episode = int(state["next_episode"])
-            learner.rng.bit_generator.state = state["learner_rng"]
-            _truncate_metrics(metrics_path, next_episode)
+            resume_state = json.loads(state_path.read_text(encoding="utf-8"))
+            if "next_step" not in resume_state:
+                raise ValueError(
+                    "resume state lacks next_step; rerun without --resume"
+                )
+            total_steps = int(resume_state["next_step"])
+            episode = int(resume_state["next_episode"])
+            learner.rng.bit_generator.state = resume_state["learner_rng"]
+            _truncate_metrics_by_step(metrics_path, total_steps)
             print(
-                f"resume {algorithm} seed={run_seed}: next_episode={next_episode}",
+                f"resume {algorithm} seed={run_seed}: "
+                f"next_step={total_steps} next_episode={episode}",
                 flush=True,
             )
         else:
-            _truncate_metrics(metrics_path, 0)
+            _clear_metrics(metrics_path)
 
         start = time.perf_counter()
-        for episode in range(next_episode, args.episodes):
-            epsilon = max(
-                args.epsilon_end,
-                1.0 - episode / max(1.0, args.epsilon_fraction * args.episodes),
-            )
-            episode_seed = run_seed * 100_000 + episode
-            transitions, episode_metrics = _train_episode(
-                env, learner, algorithm, episode_seed, epsilon
-            )
+        budget = int(args.total_steps)
+        while total_steps < budget:
+            episode_seed = _episode_seed(run_seed, episode)
+            observations_dict, _ = env.reset(seed=episode_seed)
+            observations = stack_observations(observations_dict, agents)
+            state = env.state().astype(np.float32, copy=True)
+            masks = stack_masks(env)
+            team_return = 0.0
+            speeds: list[float] = []
+            collision = False
+            episode_steps = 0
             losses: list[float] = []
-            for transition in transitions:
-                replay.add(*transition)
+            eval_metrics: dict[str, Any] | None = None
+            epsilon = 1.0
+
+            while total_steps < budget:
+                epsilon = max(
+                    args.epsilon_end,
+                    1.0 - total_steps / max(1.0, args.epsilon_fraction * budget),
+                )
+                actions = learner.act(observations, masks, epsilon=epsilon)
+                next_obs_dict, _rewards, terminated, truncated, info = env.step(
+                    {agent: int(actions[index]) for index, agent in enumerate(agents)}
+                )
+                next_observations = stack_observations(next_obs_dict, agents)
+                next_state = env.state().astype(np.float32, copy=True)
+                next_masks = stack_masks(env)
+                team_reward = float(info["team_reward"])
+                terminal = any_flag(terminated)
+                replay.add(
+                    *_transition(
+                        algorithm,
+                        observations,
+                        state,
+                        actions,
+                        team_reward,
+                        next_observations,
+                        next_state,
+                        terminal,
+                        next_masks,
+                        masks,
+                    )
+                )
                 if len(replay) >= args.warmup:
                     batch = replay.sample(args.batch_size, args.device)
                     losses.append(learner.update(batch))
+                total_steps += 1
+                episode_steps += 1
+                team_return += team_reward
+                speeds.extend(
+                    float(info["per_agent"][agent]["speed_mps"]) for agent in agents
+                )
+                collision = collision or bool(info["collision"])
+                observations, state, masks = (
+                    next_observations,
+                    next_state,
+                    next_masks,
+                )
+                if total_steps % args.eval_interval == 0:
+                    eval_rows = []
+                    for eval_seed in eval_seeds:
+                        result = _eval_episode(
+                            eval_env,
+                            lambda obs, eval_masks: learner.act(
+                                obs, eval_masks, epsilon=0.0
+                            ),
+                            eval_seed,
+                        )
+                        eval_rows.append(
+                            {
+                                "algorithm": algorithm,
+                                "seed": run_seed,
+                                "episode": episode,
+                                "total_steps": total_steps,
+                                "epsilon": 0.0,
+                                "loss": "",
+                                "eval": 1,
+                                "env_seed": eval_seed,
+                                **result,
+                            }
+                        )
+                    _append_rows(metrics_path, eval_rows)
+                    eval_metrics = {
+                        "team_return": float(
+                            np.mean([row["team_return"] for row in eval_rows])
+                        ),
+                        "collision": float(
+                            np.mean([row["collision"] for row in eval_rows])
+                        ),
+                    }
+                if terminal or any_flag(truncated):
+                    break
 
+            episode_metrics = _episode_metrics(
+                team_return, collision, speeds, episode_steps
+            )
             row = {
                 "algorithm": algorithm,
                 "seed": run_seed,
                 "episode": episode,
+                "total_steps": total_steps,
                 "epsilon": epsilon,
                 "loss": float(np.mean(losses)) if losses else "",
                 "eval": 0,
@@ -392,47 +435,12 @@ def _run_training(
                 **episode_metrics,
             }
             _append_rows(metrics_path, [row])
-
-            eval_metrics: dict[str, Any] | None = None
-            is_eval = (
-                (episode + 1) % args.eval_interval == 0
-                or episode == args.episodes - 1
-            )
-            if is_eval:
-                eval_rows = []
-                for eval_seed in eval_seeds:
-                    result = _eval_episode(
-                        env,
-                        lambda obs, masks: learner.act(obs, masks, epsilon=0.0),
-                        eval_seed,
-                    )
-                    eval_rows.append(
-                        {
-                            "algorithm": algorithm,
-                            "seed": run_seed,
-                            "episode": episode,
-                            "epsilon": 0.0,
-                            "loss": "",
-                            "eval": 1,
-                            "env_seed": eval_seed,
-                            **result,
-                        }
-                    )
-                _append_rows(metrics_path, eval_rows)
-                eval_metrics = {
-                    "team_return": float(
-                        np.mean([row["team_return"] for row in eval_rows])
-                    ),
-                    "collision": float(
-                        np.mean([row["collision"] for row in eval_rows])
-                    ),
-                }
-
             learner.save(resume_path)
             _save_buffer(replay, buffer_path)
             state_path.write_text(
                 json.dumps(
                     {
+                        "next_step": total_steps,
                         "next_episode": episode + 1,
                         "learner_rng": learner.rng.bit_generator.state,
                     },
@@ -450,16 +458,19 @@ def _run_training(
                 else ""
             )
             print(
-                f"{algorithm} seed={run_seed} ep={episode + 1}/{args.episodes} "
+                f"{algorithm} seed={run_seed} ep={episode + 1} "
+                f"total_steps={total_steps}/{budget} "
                 f"return={episode_metrics['team_return']:.3f} "
                 f"collision={episode_metrics['collision']} "
                 f"speed={episode_metrics['mean_speed']:.3f} "
-                f"steps={episode_metrics['steps']} eps={epsilon:.3f} "
+                f"steps={episode_steps} eps={epsilon:.3f} "
                 f"loss={loss_text}{eval_text} elapsed={elapsed:.1f}s",
                 flush=True,
             )
+            episode += 1
     finally:
         env.close()
+        eval_env.close()
 
 
 def _run_random_baseline(
@@ -471,7 +482,7 @@ def _run_random_baseline(
     if args.resume and baseline_path.exists() and baseline_path.stat().st_size > 0:
         print("random baseline: already present, skipping", flush=True)
         return
-    _truncate_metrics(baseline_path, 0)
+    _clear_metrics(baseline_path)
     env = make_env(args.obs_layout, args.background_vehicles, args.duration)
     try:
         for eval_seed in eval_seeds:
@@ -488,6 +499,7 @@ def _run_random_baseline(
                         "algorithm": "random",
                         "seed": 0,
                         "episode": 0,
+                        "total_steps": 0,
                         "epsilon": 1.0,
                         "loss": "",
                         "eval": 1,
@@ -514,15 +526,15 @@ def _parse_args() -> argparse.Namespace:
         "--eval-seeds",
         nargs="+",
         type=int,
-        default=(7001, 7002, 7003, 7004, 7005),
+        default=(7001, 7002, 7003),
     )
     parser.add_argument("--test-seeds", nargs="+", type=int, default=None)
-    parser.add_argument("--episodes", type=int, default=300)
+    parser.add_argument("--total-steps", type=int, default=15_000)
     parser.add_argument("--obs-layout", default="contract56")
     parser.add_argument("--duration", type=float, default=60.0)
     parser.add_argument("--background-vehicles", type=int, default=0)
-    parser.add_argument("--eval-interval", type=int, default=20)
-    parser.add_argument("--replay-capacity", type=int, default=20_000)
+    parser.add_argument("--eval-interval", type=int, default=3_000)
+    parser.add_argument("--replay-capacity", type=int, default=5_000)
     parser.add_argument("--warmup", type=int, default=1_000)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--hidden-dim", type=int, default=128)
@@ -544,8 +556,10 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
 
-    if args.episodes <= 0 or args.duration <= 0 or args.batch_size <= 0:
-        parser.error("episodes, duration, and batch-size must be positive.")
+    if args.total_steps <= 0 or args.duration <= 0 or args.batch_size <= 0:
+        parser.error("total-steps, duration, and batch-size must be positive.")
+    if args.total_steps >= 100_000:
+        parser.error("total-steps must be below 100000.")
     if args.eval_interval <= 0 or args.torch_threads <= 0:
         parser.error("eval-interval and torch-threads must be positive.")
     if args.warmup <= 0 or args.replay_capacity < args.warmup:
@@ -562,19 +576,12 @@ def main() -> None:
     torch.set_num_threads(args.torch_threads)
     eval_seeds = sorted(set(args.eval_seeds))
     test_seeds = sorted(set(args.test_seeds))
-    train_seeds = {
-        seed * 100_000 + episode
-        for seed in args.seeds
-        for episode in range(args.episodes)
-    }
     eval_set = set(eval_seeds)
     test_set = set(test_seeds)
-    if train_seeds & eval_set:
-        raise ValueError("Training episode seeds overlap evaluation seeds.")
-    if train_seeds & test_set:
-        raise ValueError("Training episode seeds overlap test seeds.")
     if eval_set & test_set:
         raise ValueError("Evaluation seeds overlap test seeds.")
+    if any(seed < 0 or seed >= 100_000 for seed in eval_set | test_set):
+        raise ValueError("Evaluation and test seeds must be in [0, 100000).")
 
     output = Path(args.out)
     output.mkdir(parents=True, exist_ok=True)
@@ -602,7 +609,7 @@ def main() -> None:
         "test_seeds": test_seeds,
         "background_vehicles": effective_background,
         "duration": args.duration,
-        "episodes": args.episodes,
+        "total_steps": args.total_steps,
         "eval_interval": args.eval_interval,
         "double_q": bool(args.double_q),
         "state_norm": bool(args.state_norm),
@@ -616,7 +623,7 @@ def main() -> None:
         f"run config: obs_layout={args.obs_layout} obs_dim={obs_dim} "
         f"state_dim={state_dim} n_actions={n_actions} "
         f"train_seeds={args.seeds} eval_seeds={eval_seeds} "
-        f"test_seeds={len(test_seeds)} episodes={args.episodes} "
+        f"test_seeds={len(test_seeds)} total_steps={args.total_steps} "
         f"eval_interval={args.eval_interval} "
         f"background_vehicles={effective_background} duration={args.duration} "
         f"double_q={args.double_q} state_norm={args.state_norm} "
