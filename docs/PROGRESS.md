@@ -8,6 +8,7 @@ Branch: `feat/marl-audit-mappo`
 | 1 audit doc | `6a2dc26` docs: QMIX/VDN audit | N/A (doc only) | 2 fix and green |
 | 2 fix + green | `d179014` fix(qmix,vdn): audit fixes, mse loss, double_q, masks | `test_qmix.py`+`test_vdn.py` 20 passed; `tests -k "not carla and not toy"` 84 passed, 4 skipped; contract highway 5 passed/4 skipped; CONTRACT_STRICT=1 9 passed | 3 correctness |
 | 3 correctness | `47996e3` test: QMIX/VDN correctness | `test_qmix_correctness.py` 11 passed; `tests -k "not carla and not toy"` 95 passed, 4 skipped | 4 trainer |
+| 4 trainer | `8ad131d` feat: qmix/vdn comparison trainer | tests 95 passed, 4 skipped; contract56 smoke 2 seeds x 5 eps for QMIX+VDN populated CSVs (see `results/raw/smoke_stage4/`) | 5 measure + budget |
 
 ## Stage 1 summary
 
@@ -39,7 +40,19 @@ Branch: `feat/marl-audit-mappo`
   bootstrap vs termination, checkpoint Q-value round trip, 2-agent matrix game
   convergence for QMIX and VDN, and one update at `obs_dim=56`.
 
+## Stage 4 summary
+
+- Rewrote `scripts/train_qmix_highway.py` for contract56: prints/asserts config,
+  disjoint train/eval/test seeds, greedy eval on fixed seeds, random baseline,
+  per-episode CSV rows (flushed), per-episode resumable learner+buffer+state in
+  `results/raw/`, and sequential algorithms/seeds in one process.
+- CSV columns: algorithm, seed, episode, team_return, collision, mean_speed,
+  steps, epsilon, loss, eval, env_seed.
+- Smoke: 2 seeds x 5 episodes, contract56, QMIX and VDN, losses and eval rows
+  populated (`results/raw/smoke_stage4/`). Resume was also exercised.
+
 ## Resume instructions
 
 A fresh session should read this file plus `docs/qmix_audit.md`, then continue at
-stage 4 (comparison trainer). Do not redo stages 0-3.
+stage 5 (measure timing, propose budget, WAIT for user OK before launching).
+Do not redo stages 0-4.
