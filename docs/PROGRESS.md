@@ -12,6 +12,7 @@ Branch: `feat/marl-audit-mappo`
 | 5 measure | `64ce2c0` docs: progress stage 5 timing | timing below; budget proposed | A survivability |
 | A env fix | `a55d771` fix(env): contract56 car-following safety speed | `tests/test_contract.py`+`test_highway_adapter.py` 26 passed/17 skipped; strict highway 9 passed; `tests` 114 passed/17 skipped | B step budget + launch |
 | B step budget + launch | `0e94ae6` feat(trainer): step-based budget and eval cadence | `tests` 114 passed/17 skipped; smoke+resume verified; 6/6 runs hit 15000 steps with eval at 3000/6000/9000/12000/15000 | C plots |
+| C plots | `8b1e817` feat(plots): partial-data QMIX vs VDN curves | `tests` 114 passed/17 skipped; partial smoke + full 4 PNGs | D held-out test |
 
 ## Stage 1 summary
 
@@ -108,6 +109,26 @@ Command (launched in background with `Start-Process`, PID 11344):
   smoke and resume exercised under `results/raw/smoke_stageB/`.
 - Raw results only; no plots yet.
 
+## Stage C summary (plots, completed)
+
+- `scripts/plot_comparison.py` reads `runs/*/metrics.csv`, skips missing runs,
+  eval points, or seeds, and prefixes every figure with `PRELIMINARY - ` unless
+  `run_metadata.json` shows all expected runs reached the total step budget and
+  the final eval.
+- Command: `python scripts/plot_comparison.py --input results/raw/comparison
+  --output results/raw/plots`.
+- Partial smoke: first 3000 steps of `qmix_seed0` and `vdn_seed0` under
+  `results/raw/plot_smoke_input/` produced all four PNGs under
+  `results/raw/plot_smoke/` with a PRELIMINARY title.
+- Full run: 4107 rows, 6 run dirs, complete -> `results/raw/plots/`:
+  `eval_return_curve.png`, `eval_collision_curve.png`,
+  `training_return_curve.png`, `final_eval_bars.png`.
+- Final eval at 15000 steps (3 seeds): QMIX mean return -90.94, collision 1.00;
+  VDN mean return -113.58, collision 0.67. Random baseline (3 eval seeds at
+  step 0): mean return -24.68, collision 1.00. Variance is high; these are raw
+  observations, not evidence of success.
+- `pytest tests -q`: 114 passed, 17 skipped.
+
 ## Stage B budget (mandated, step-based; target ~2 h)
 
 - algorithms: QMIX and VDN; seeds: 0, 1, 2; ~15,000 env steps/seed/algo.
@@ -123,8 +144,9 @@ Command (launched in background with `Start-Process`, PID 11344):
 
 ## Resume instructions
 
-A fresh session should read this file plus `docs/qmix_audit.md`. Stages A and B
-are complete (`a55d771`, `0e94ae6`); raw runs are under
-`results/raw/comparison/`. Stage C is next: write `scripts/plot_comparison.py`
-so it tolerates partial CSVs, write PNGs under `results/raw/plots/`, test it on
-the first CSV rows, report the paths, and stop. Do not redo stages 0-B.
+A fresh session should read this file plus `docs/qmix_audit.md`. Stages A-C are
+complete (`a55d771`, `0e94ae6`, `8b1e817`); raw runs are under
+`results/raw/comparison/` and plots under `results/raw/plots/`. Stage D is next:
+evaluate the final QMIX/VDN checkpoints on the held-out test seeds 9001-9030,
+report mean and 95% CI, and write the final comparison summary. Do not redo
+stages 0-C.
