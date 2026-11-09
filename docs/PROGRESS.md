@@ -9,7 +9,8 @@ Branch: `feat/marl-audit-mappo`
 | 2 fix + green | `d179014` fix(qmix,vdn): audit fixes, mse loss, double_q, masks | `test_qmix.py`+`test_vdn.py` 20 passed; `tests -k "not carla and not toy"` 84 passed, 4 skipped; contract highway 5 passed/4 skipped; CONTRACT_STRICT=1 9 passed | 3 correctness |
 | 3 correctness | `47996e3` test: QMIX/VDN correctness | `test_qmix_correctness.py` 11 passed; `tests -k "not carla and not toy"` 95 passed, 4 skipped | 4 trainer |
 | 4 trainer | `8ad131d` feat: qmix/vdn comparison trainer | tests 95 passed, 4 skipped; contract56 smoke 2 seeds x 5 eps for QMIX+VDN populated CSVs (see `results/raw/smoke_stage4/`) | 5 measure + budget |
-| 5 measure | pending | timing below; budget proposed, waiting for user OK | 5 launch after OK |
+| 5 measure | `64ce2c0` docs: progress stage 5 timing | timing below; budget proposed | A survivability |
+| A env fix | `a55d771` fix(env): contract56 car-following safety speed | `tests/test_contract.py`+`test_highway_adapter.py` 26 passed/17 skipped; strict highway 9 passed; `tests` 114 passed/17 skipped | B step budget + launch |
 
 ## Stage 1 summary
 
@@ -66,19 +67,43 @@ Branch: `feat/marl-audit-mappo`
 - Episode length is short early due to collisions (3-12 steps); max is duration*5.
 - Buffer save: capacity 5000 -> 0.02 s / ~11 MB; capacity 20000 -> 0.08 s / ~44 MB.
 
-## Proposed budget (target ~2 h total; user target hours were not filled in)
+## Stage A summary (contract56 survivability)
 
-- algorithms: QMIX and VDN; seeds: 3 (0,1,2); episodes/seed: 200.
-- eval interval: 20 (10 eval points); eval seeds: 5 (7001-7005).
+- Baseline before fix (20 seeds, 300 max steps): keep-speed median 6.5 steps,
+  100% collisions (21 CAV-background events); random median 5.0, 100%.
+  CAVs are pure speed controllers at 25 m/s while IDM background traffic spawns
+  at 21-24 m/s; median same-lane bumper gap at reset is ~2.5 m.
+- Spacing/density alone did not fix it (keep-speed still 100% collisions) and
+  lowering density pushed candidates below 6, so spawn settings were kept.
+- Fix in `envs/highway_env.py` only: contract56 CAVs use a car-following safe
+  target speed from the nearest lead in the current/target lane
+  (`CAR_FOLLOW_MIN_GAP_M=15`, `CAR_FOLLOW_HEADWAY_S=1`). Spawn, density,
+  observations, actions, and non-contract layouts are unchanged.
+- After fix (20 seeds): keep-speed median 300/300 steps, 0% collisions; random
+  median 9.5 steps, 100% collisions (19 CAV-background, 1 CAV-CAV); candidate
+  minimum at reset remains 6; no episode seed diverges.
+- `pytest tests/test_contract.py tests/test_highway_adapter.py -q`: 26 passed,
+  17 skipped. `CONTRACT_STRICT=1 pytest tests/test_contract.py -k highway`:
+  9 passed. `pytest tests -q`: 114 passed, 17 skipped. (`pytest -q` at repo root
+  still collects `scripts/test_env.py` and `scripts/test_termination.py`, which
+  import CARLA and fail without the CARLA package; unchanged.)
+
+## Stage B budget (mandated, step-based; target ~2 h)
+
+- algorithms: QMIX and VDN; seeds: 0, 1, 2; ~15,000 env steps/seed/algo.
+- eval every 3,000 steps on fixed greedy eval seeds 7001-7003.
+- warmup and epsilon schedule expressed in env steps (not episodes).
+- reserved held-out test seeds: 9001-9030 (never used for training/eval).
 - background vehicles: 12 (contract56 minimum; lower values are ignored).
-- duration: 20 s (max 100 steps); replay 5000; warmup 200; batch 128.
-- hidden 128, mixing 32, hypernet 64; lr 3e-4, gamma 0.99, tau 0.01, reward scale 0.1.
-- epsilon fraction 0.7, end 0.05; double_q False; state_norm False.
-- Reserved test seeds: 9001-9030 (disjoint from train episode seeds and eval seeds).
-- Estimate: ~0.5-3 h depending on how long episodes survive (collisions shorten them).
+- replay 5000; batch 128; hidden 128, mixing 32, hypernet 64;
+  lr 3e-4, gamma 0.99, tau 0.01, reward scale 0.1.
+- epsilon end 0.05; double_q False; state_norm False.
+- The current trainer budgets in episodes; Stage B must convert it to the
+  step-based budget above and launch in the background without waiting.
 
 ## Resume instructions
 
-A fresh session should read this file plus `docs/qmix_audit.md`. Stage 5 is waiting
-for user approval of the budget; after approval, commit and launch the background
-training command recorded here. Do not redo stages 0-4.
+A fresh session should read this file plus `docs/qmix_audit.md`. Stage A is
+complete (`a55d771`). Stage B is next: convert the trainer to the step-based
+budget above, run the gates, commit, and launch the background training command
+immediately (pre-approved; do not wait for another OK). Do not redo stages 0-A.
