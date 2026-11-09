@@ -7,6 +7,7 @@ Branch: `feat/marl-audit-mappo`
 | 0 inspect | (none) | `pytest tests/test_qmix.py -q` -> 7 failed, 2 passed (pre-fix) | 1 audit |
 | 1 audit doc | `6a2dc26` docs: QMIX/VDN audit | N/A (doc only) | 2 fix and green |
 | 2 fix + green | `d179014` fix(qmix,vdn): audit fixes, mse loss, double_q, masks | `test_qmix.py`+`test_vdn.py` 20 passed; `tests -k "not carla and not toy"` 84 passed, 4 skipped; contract highway 5 passed/4 skipped; CONTRACT_STRICT=1 9 passed | 3 correctness |
+| 3 correctness | `47996e3` test: QMIX/VDN correctness | `test_qmix_correctness.py` 11 passed; `tests -k "not carla and not toy"` 95 passed, 4 skipped | 4 trainer |
 
 ## Stage 1 summary
 
@@ -31,7 +32,14 @@ Branch: `feat/marl-audit-mappo`
 - Added `tests/test_vdn.py` (acts, update, checkpoint round trip, mismatch) and
   QMIX state-normalization tests.
 
+## Stage 3 summary
+
+- Added `tests/test_qmix_correctness.py`: mixer monotonicity, VDN sum, masked
+  epsilon-greedy, masked target max (both `double_q` branches), truncation
+  bootstrap vs termination, checkpoint Q-value round trip, 2-agent matrix game
+  convergence for QMIX and VDN, and one update at `obs_dim=56`.
+
 ## Resume instructions
 
 A fresh session should read this file plus `docs/qmix_audit.md`, then continue at
-stage 3 (correctness tests). Do not redo stages 0-2.
+stage 4 (comparison trainer). Do not redo stages 0-3.
