@@ -37,6 +37,8 @@ CONTRACT56_LAYOUT = "contract56"
 OBS_LAYOUTS = (KINEMATICS25_LAYOUT, CONTRACT56_LAYOUT)
 CONTRACT_MIN_VEHICLES = 12
 CONTRACT_VEHICLES_DENSITY = 3.0
+CAR_FOLLOW_MIN_GAP_M = 15.0
+CAR_FOLLOW_HEADWAY_S = 1.0
 ROUTE_LOOKAHEAD_M = min(10.0, ROUTE_FRAME_MAX)
 
 
@@ -352,11 +354,20 @@ class HighwayV2XEnv:
                 self.goal_distance_m is not None
                 and self._goal_reached.get(agent_id, False)
             )
-            vehicle.target_speed = (
-                0.0
-                if agent_id in emergency_brakes or frozen
-                else self._targets[agent_id]
+            if agent_id in emergency_brakes or frozen:
+                vehicle.target_speed = 0.0
+                continue
+            desired_speed = self._targets[agent_id]
+            if self.obs_layout != CONTRACT56_LAYOUT:
+                vehicle.target_speed = desired_speed
+                continue
+            action = int(actions[agent_id])
+            native_delta = 5.0 if action == 1 else -5.0 if action == 2 else 0.0
+            safe_speed = self._follow_safe_speed(
+                vehicle,
+                desired_speed + native_delta,
             )
+            vehicle.target_speed = max(0.0, safe_speed - native_delta)
         observations, _native_reward, native_terminated, native_truncated, native_info = (
             self.env.step(tuple(native_actions))
         )
@@ -460,6 +471,33 @@ class HighwayV2XEnv:
             truncated,
             infos,
         )
+
+    def _follow_safe_speed(self, vehicle: Any, aimed_speed: float) -> float:
+        gap = None
+        lead_speed = 0.0
+        lanes = {tuple(vehicle.lane_index)}
+        target_lane = getattr(vehicle, "target_lane_index", None)
+        if target_lane is not None:
+            lanes.add(tuple(target_lane))
+        for other in self.env.unwrapped.road.vehicles:
+            if other is vehicle:
+                continue
+            if tuple(other.lane_index) not in lanes:
+                continue
+            other_gap = (
+                float(other.position[0])
+                - float(vehicle.position[0])
+                - 0.5 * (float(vehicle.LENGTH) + float(other.LENGTH))
+            )
+            if other_gap <= 0.0:
+                continue
+            if gap is None or other_gap < gap:
+                gap = other_gap
+                lead_speed = float(other.speed)
+        if gap is None:
+            return aimed_speed
+        safe = lead_speed + (gap - CAR_FOLLOW_MIN_GAP_M) / CAR_FOLLOW_HEADWAY_S
+        return max(0.0, min(aimed_speed, safe))
 
     def _lead_ttc(self, ego: Any) -> float:
         best = MAX_TTC_S
