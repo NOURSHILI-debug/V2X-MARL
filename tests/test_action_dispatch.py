@@ -3,6 +3,7 @@ import sys
 from types import ModuleType, SimpleNamespace
 
 import pytest
+import numpy as np
 
 
 @pytest.mark.parametrize("action", range(6))
@@ -124,6 +125,106 @@ def test_close_restores_async_modes_before_destroying_actors(monkeypatch):
             ("traffic_manager_sync", False),
             ("destroy_actors", [("destroy", 42)]),
         ]
+    finally:
+        sys.modules.pop("envs.carla_env", None)
+        if previous_module is not None:
+            sys.modules["envs.carla_env"] = previous_module
+
+
+def _step_env(carla_env, masks=None):
+    env = object.__new__(carla_env.CarlaMultiAgentEnv)
+    env.agents = ["cav_0", "cav_1"]
+    env.reached = dict.fromkeys(env.agents, False)
+    class FakeLocation:
+        x = y = z = 0.0
+
+        def distance(self, _other):
+            return 0.0
+
+    class FakeVector:
+        x = y = z = 0.0
+
+        def length(self):
+            return 0.0
+
+    fake_location = FakeLocation()
+    fake_vector = FakeVector()
+    fake_vehicle = SimpleNamespace(
+        get_location=lambda: fake_location,
+        get_acceleration=lambda: fake_vector,
+        get_velocity=lambda: fake_vector,
+        is_at_traffic_light=lambda: False,
+        get_transform=lambda: SimpleNamespace(rotation=SimpleNamespace(yaw=0.0)),
+    )
+    env.vehicles = {agent: fake_vehicle for agent in env.agents}
+    env.action_masks = lambda: masks or {
+        "cav_0": np.array([1, 1, 1, 1, 0, 1], dtype=bool),
+        "cav_1": np.array([1, 1, 1, 1, 1, 1], dtype=bool),
+    }
+    env._apply_action = lambda agent, action: env.dispatched.append((agent, action))
+    env.dispatched = []
+    env.world = SimpleNamespace(tick=lambda: None, get_map=lambda: SimpleNamespace(
+        get_waypoint=lambda *args, **kwargs: object()
+    ))
+    env.monitor = SimpleNamespace(is_collided=lambda agent: False)
+    env._update_goal_and_stuck = lambda: None
+    env._measure_min_ttc = lambda: 10.0
+    env.off_road_steps = dict.fromkeys(env.agents, 0)
+    env.stuck_steps = dict.fromkeys(env.agents, 0)
+    env.step_count = 0
+    env.max_steps = 300
+    env.route_applied = dict.fromkeys(env.agents, True)
+    env.finished = dict.fromkeys(env.agents, False)
+    env.stop_reason = dict.fromkeys(env.agents, "none")
+    env._get_obs = lambda: {agent: np.zeros(56, dtype=np.float32) for agent in env.agents}
+    env._step_vehicle_location = lambda vehicle: SimpleNamespace()
+    env.town, env.seed = "Town03", 0
+    env.min_ttc, env.jerk_samples = 10.0, []
+    env.previous_longitudinal_acceleration = dict.fromkeys(env.agents)
+    env.previous_velocity = dict.fromkeys(env.agents)
+    env.previous_route_arc = dict.fromkeys(env.agents, 0.0)
+    env.arrival_step = dict.fromkeys(env.agents)
+    waypoint = SimpleNamespace(transform=SimpleNamespace(location=fake_location))
+    env.route = {agent: [waypoint] for agent in env.agents}
+    env.reward_calculator = carla_env.RewardCalculator(env.agents)
+    env._measure_agent_ttc = lambda _agent: 10.0
+    return env
+
+
+def test_step_invalid_lane_change_becomes_keep_and_is_counted(monkeypatch):
+    previous_module = sys.modules.pop("envs.carla_env", None)
+    try:
+        fake_carla = ModuleType("carla")
+        fake_carla.LaneType = SimpleNamespace(Driving=1)
+        monkeypatch.setitem(sys.modules, "carla", fake_carla)
+        carla_env = importlib.import_module("envs.carla_env")
+        env = _step_env(carla_env)
+        env.max_steps = 1
+        _, _, _, _, info = env.step({"cav_0": carla_env.LANE_LEFT, "cav_1": carla_env.KEEP})
+        assert env.dispatched == [("cav_0", carla_env.KEEP), ("cav_1", carla_env.KEEP)]
+        assert info["invalid_action"] == 1
+    finally:
+        sys.modules.pop("envs.carla_env", None)
+        if previous_module is not None:
+            sys.modules["envs.carla_env"] = previous_module
+
+
+@pytest.mark.parametrize("actions", [
+    {"cav_0": 0},
+    {"cav_0": 0, "wrong": 1},
+    {"cav_0": 6, "cav_1": 0},
+    {"cav_0": True, "cav_1": 0},
+])
+def test_step_rejects_bad_agent_keys_or_action_ids(actions, monkeypatch):
+    previous_module = sys.modules.pop("envs.carla_env", None)
+    try:
+        fake_carla = ModuleType("carla")
+        fake_carla.LaneType = SimpleNamespace(Driving=1)
+        monkeypatch.setitem(sys.modules, "carla", fake_carla)
+        carla_env = importlib.import_module("envs.carla_env")
+        env = _step_env(carla_env)
+        with pytest.raises(ValueError):
+            env.step(actions)
     finally:
         sys.modules.pop("envs.carla_env", None)
         if previous_module is not None:

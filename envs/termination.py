@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 
-OFF_ROAD_STEP_LIMIT = 10
+OFF_ROAD_STEP_LIMIT = 51
 
 
 @dataclass(frozen=True)
@@ -26,6 +26,13 @@ def update_off_road_steps(previous_steps: int, is_off_road: bool) -> int:
 def is_off_road(waypoint: object | None) -> bool:
     """A CARLA map lookup with project_to_road=False returns None off-road."""
     return waypoint is None
+
+
+def is_goal_reached(vehicle: object, goal: object, radius_m: float) -> bool:
+    """Check a vehicle's distance to its goal, including the radius boundary."""
+    if radius_m < 0:
+        raise ValueError("radius_m cannot be negative")
+    return vehicle.get_location().distance(goal) <= radius_m
 
 
 def evaluate_termination(
@@ -62,7 +69,11 @@ def evaluate_termination(
         raise ValueError("consecutive step counts cannot be negative")
 
     stuck_by_agent = {
-        agent_id: step_count > stuck_grace_steps and count > stuck_step_limit
+        agent_id: (
+            not reached[agent_id]
+            and step_count >= stuck_grace_steps
+            and count > stuck_step_limit
+        )
         for agent_id, count in stuck_steps.items()
     }
 
@@ -72,7 +83,9 @@ def evaluate_termination(
         reason = "goal"
     elif any(count >= off_road_step_limit for count in off_road_steps.values()):
         reason = "off_road"
-    elif any(stuck_by_agent.values()):
+    elif any(not reached[agent_id] for agent_id in agents) and all(
+        reached[agent_id] or stuck_by_agent[agent_id] for agent_id in agents
+    ):
         reason = "stuck"
     elif step_count >= max_steps:
         reason = "timeout"
@@ -101,6 +114,12 @@ def build_step_info(
     success: bool,
     town: str,
     seed: int,
+    min_ttc: float = 10.0,
+    jerk: float = 0.0,
+    invalid_action: int = 0,
+    stop_reason: Mapping[str, str] | None = None,
+    arrival_step: Mapping[str, int | None] | None = None,
+    ending_reason: str | None = None,
 ) -> dict[str, object]:
     """Build per-step info, adding episode metadata only on the final step."""
     per_agent = {
@@ -110,6 +129,12 @@ def build_step_info(
             "stuck": bool(stuck[agent_id]),
             "off_road": bool(off_road[agent_id]),
             "route_applied": bool(route_applied[agent_id]),
+            "stop_reason": (
+                stop_reason[agent_id] if stop_reason is not None else "none"
+            ),
+            "arrival_step": (
+                arrival_step[agent_id] if arrival_step is not None else None
+            ),
         }
         for agent_id in agents
     }
@@ -117,11 +142,39 @@ def build_step_info(
         "steps": steps,
         "collision": bool(any(collided.values())),
         "goal_reached": bool(all(reached.values())),
-        "stuck": bool(any(stuck.values())),
+        "stuck": bool(
+            any(not reached[agent_id] for agent_id in agents)
+            and all(reached[agent_id] or stuck[agent_id] for agent_id in agents)
+        ),
         "off_road": bool(any(off_road.values())),
         "route_applied": bool(all(route_applied.values())),
         "per_agent": per_agent,
     }
     if episode_ended:
-        info.update({"success": bool(success), "town": town, "seed": seed})
+        if ending_reason is None:
+            if info["collision"]:
+                ending_reason = "collision"
+            elif all(reached.values()):
+                ending_reason = "goal"
+            elif info["off_road"]:
+                ending_reason = "off_road"
+            elif info["stuck"]:
+                ending_reason = "stuck"
+            else:
+                ending_reason = "timeout"
+        info.update({
+            "collision": ending_reason == "collision",
+            "goal_reached": ending_reason == "goal",
+            "off_road": ending_reason == "off_road",
+            "stuck": ending_reason == "stuck",
+        })
+        info.update({
+            "success": bool(success),
+            "min_ttc": float(min_ttc),
+            "jerk": float(jerk),
+            "scenario_id": "free_drive",
+            "town": town,
+            "seed": seed,
+        })
+    info["invalid_action"] = int(invalid_action)
     return info

@@ -3,6 +3,8 @@ import math
 import pytest
 
 from envs.reward import RewardCalculator
+from envs.reward_integration import compute_agent_step_reward
+from envs.metrics import DECISION_DT_SECONDS, longitudinal_dynamics
 
 
 @pytest.fixture
@@ -148,3 +150,95 @@ def test_team_reward_is_mean_plus_team_collision_penalty(calc):
     assert calc.team_reward(rewards) == pytest.approx(1.5)
     assert calc.team_reward(rewards, collision=True) == pytest.approx(-8.5)
     assert calc.team_reward({}) == pytest.approx(0.0)
+
+
+def test_step_reward_progress_normalization_and_backward_jitter(calc):
+    reward, terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=6.0, speed=2.0
+    )
+    assert reward == pytest.approx(1.0)
+    assert terms["progress"] == pytest.approx(1.0)
+    jitter_reward, jitter_terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=-0.4, speed=2.0
+    )
+    assert jitter_reward == pytest.approx(0.0)
+    assert jitter_terms["progress"] == pytest.approx(0.0)
+
+
+def test_step_reward_pays_goal_once_and_zeroes_finished_agents(calc):
+    arrivals = [True, False]
+    values = [
+        compute_agent_step_reward(
+            calc, "vehicle_0", distance_travelled=0.0,
+            goal_reached=arrived, speed=2.0,
+        )[0]
+        for arrived in arrivals
+    ]
+    assert values == [10.0, 0.0]
+    reward, terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=8.0, finished=True,
+        collision=True, goal_reached=True, acceleration=3.0, jerk=4.0,
+    )
+    assert reward == 0.0
+    assert all(value == 0.0 for value in terms.values())
+
+
+def test_step_reward_red_light_stop_is_not_idle(calc):
+    reward, terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=0.0, speed=0.0,
+        at_red_light=True,
+    )
+    assert terms["idle"] == 0.0
+    assert reward == 0.0
+
+
+def test_step_reward_individual_terms_and_team_collision(calc):
+    expected = {
+        "progress": 1.0,
+        "collision": -10.0,
+        "safety": pytest.approx(-0.5 * (1.0 - 1.0 / 3.0)),
+        "comfort": -0.25,
+        "goal": 10.0,
+        "idle": -0.1,
+    }
+    _, actual = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=6.0, collision=True, ttc=1.0,
+        acceleration=3.0, jerk=2.0, goal_reached=True, speed=0.0,
+    )
+    assert actual == expected
+    assert calc.team_reward({"vehicle_0": 1.0, "vehicle_1": 2.0}, collision=True) == -8.5
+
+
+def test_velocity_based_dynamics_match_comfort_units(calc):
+    constant_speed, constant_jerk = longitudinal_dynamics(
+        (10.0, 0.0), (10.0, 0.0), 0.0, 0.0
+    )
+    constant_reward, constant_terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=0.0, acceleration=constant_speed,
+        jerk=constant_jerk, speed=10.0,
+    )
+    assert constant_reward == pytest.approx(0.0)
+    assert constant_terms["comfort"] == pytest.approx(0.0)
+
+    dt = DECISION_DT_SECONDS
+    first = longitudinal_dynamics((0.0, 0.0), None, None, 0.0, dt)
+    steady = longitudinal_dynamics((2.0 * dt, 0.0), (0.0, 0.0), first[0], 0.0, dt)
+    next_steady = longitudinal_dynamics(
+        (4.0 * dt, 0.0), (2.0 * dt, 0.0), steady[0], 0.0, dt
+    )
+    assert steady[0] == pytest.approx(2.0)
+    assert next_steady == pytest.approx((2.0, 0.0))
+    reward, terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=0.0,
+        acceleration=next_steady[0], jerk=next_steady[1], speed=2.0,
+    )
+    assert terms["comfort"] == pytest.approx(-0.05 * 2.0)
+    assert reward == pytest.approx(-0.05 * 2.0)
+
+
+def test_comfort_inputs_are_clipped_to_documented_limits(calc):
+    _, terms = compute_agent_step_reward(
+        calc, "vehicle_0", distance_travelled=0.0,
+        acceleration=100.0, jerk=100.0, speed=5.0,
+    )
+    assert terms["comfort"] == pytest.approx(-0.05 * (8.0 + 20.0))
