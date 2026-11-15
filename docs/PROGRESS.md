@@ -14,6 +14,7 @@ Branch: `feat/marl-audit-mappo`
 | B step budget + launch | `0e94ae6` feat(trainer): step-based budget and eval cadence | `tests` 114 passed/17 skipped; smoke+resume verified; 6/6 runs hit 15000 steps with eval at 3000/6000/9000/12000/15000 | C plots |
 | C plots | `8b1e817` feat(plots): partial-data QMIX vs VDN curves | `tests` 114 passed/17 skipped; partial smoke + full 4 PNGs | D held-out test |
 | 1 MAPPO | (this commit) feat: MAPPO | `tests/test_mappo.py` 11 passed; `tests -k "not carla and not toy"` 136 passed, 4 skipped | 2 MAPPO trainer |
+| 2 MAPPO trainer | (this commit) feat: MAPPO trainer | trainer smoke + resume verified; timing 0.0714 s/step | 3 launch background |
 
 ## Stage 1 summary
 
@@ -148,6 +149,43 @@ Command (launched in background with `Start-Process`, PID 11344):
   `obs_dim=56`, and rollout buffer round trip.
 - Gate: `pytest tests -k "not carla and not toy" -q` -> 136 passed, 4 skipped.
 - No env files or partner files changed; `marl/` imports neither `highway_env`
+  nor `carla`.
+
+## Stage MAPPO-2 preflight (read-only checks, no runs changed)
+
+- Consistency: QMIX and VDN share `results/raw/comparison/run_metadata.json`;
+  env config and budget are identical (contract56, 12 background vehicles,
+  duration 60, 15,000 steps, eval every 3,000 on 7001-7003, test 9001-9030).
+- `reward_scale=0.1` is applied only inside the learner updates (QMIX
+  `td_target`, VDN `td_target`); the trainer logs `info["team_reward"]`
+  directly, so the logged `team_return` is unscaled and comparable across
+  QMIX/VDN. No between-algorithm config confound found. MAPPO reuses
+  `reward_scale=0.1` so its logged returns stay on the same scale.
+- Read-only 20-seed diagnostic (contract56, duration 60, 12 vehicles):
+  keep-speed median 300/300 steps and 0% collision; random median 8 steps
+  (mean 10.9), 100% collision, nearest-vehicle cause background 21 / CAV 0.
+  Limitation: the scenario is crash-dominated for a random policy, and
+  keep-speed survives only because it is degenerate/slow. This is a scenario
+  limitation, not a fix, and Stage 4 must state it.
+
+## Stage MAPPO-2 summary (trainer)
+
+- Added `scripts/train_mappo_highway.py`, mirroring
+  `scripts/train_qmix_highway.py`: same env (`contract56`, duration 60,
+  effective 12 background vehicles), same eval seeds 7001-7003, same test
+  seeds 9001-9030, same 15,000-step budget and 3,000-step eval cadence, and the
+  same CSV columns (algorithm, seed, episode, total_steps, team_return,
+  collision, mean_speed, steps, epsilon, loss, eval, env_seed).
+- Per-episode flushed CSV rows, resumable learner + rollout + state
+  (`resume.pt`, `rollout.npz`, `state.json`), start-of-run config print,
+  `timing.json` per run, and metadata merge that appends `mappo` without
+  overwriting the shared QMIX/VDN `train_seeds`.
+- Smoke: 256-step and 2048-step runs populated CSVs and updates; resume from
+  step 256 to 384 restored the learner and continued (`mappo_train_seeds`).
+- Timing smoke (2,048 steps, rollout 1,024, 4 epochs, minibatch 256,
+  2 threads): 146.3 s, 0.0714 s/step, 14.0 steps/s, 2 updates -> about
+  18 min per 15,000-step seed.
+- No partner or env files changed; `marl/` still imports neither `highway_env`
   nor `carla`.
 
 ## Stage B budget (mandated, step-based; target ~2 h)
