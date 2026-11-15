@@ -13,6 +13,7 @@ Branch: `feat/marl-audit-mappo`
 | A env fix | `a55d771` fix(env): contract56 car-following safety speed | `tests/test_contract.py`+`test_highway_adapter.py` 26 passed/17 skipped; strict highway 9 passed; `tests` 114 passed/17 skipped | B step budget + launch |
 | B step budget + launch | `0e94ae6` feat(trainer): step-based budget and eval cadence | `tests` 114 passed/17 skipped; smoke+resume verified; 6/6 runs hit 15000 steps with eval at 3000/6000/9000/12000/15000 | C plots |
 | C plots | `8b1e817` feat(plots): partial-data QMIX vs VDN curves | `tests` 114 passed/17 skipped; partial smoke + full 4 PNGs | D held-out test |
+| 1 MAPPO | (this commit) feat: MAPPO | `tests/test_mappo.py` 11 passed; `tests -k "not carla and not toy"` 136 passed, 4 skipped | 2 MAPPO trainer |
 
 ## Stage 1 summary
 
@@ -128,6 +129,26 @@ Command (launched in background with `Start-Process`, PID 11344):
   step 0): mean return -24.68, collision 1.00. Variance is high; these are raw
   observations, not evidence of success.
 - `pytest tests -q`: 114 passed, 17 skipped.
+
+## Stage MAPPO-1 summary (MAPPO learner)
+
+- Added `marl/mappo.py`: shared masked actor (local obs + agent one-hot),
+  centralized team-value critic, `RolloutBuffer` (obs, state, actions,
+  log-probs, values, team reward, masks, terminated, truncated, next state),
+  pure `compute_gae`, PPO update (advantage normalization, clipped surrogate,
+  MSE value loss with optional clipping, entropy bonus, grad clip, epochs and
+  minibatches), and `act`/`save`/`load`/`from_checkpoint`.
+- GAE: no bootstrap after true termination; bootstrap from `V(next_state)` on
+  truncation; episode boundaries reset the recursion.
+- State normalization stays opt-in with explicit scales, matching QMIX.
+- Added `tests/test_mappo.py` (11 tests): hand-computed GAE terminal and
+  truncation cases, ratio 1 / clip fraction 0 before the first update, zero
+  probability for masked actions, no invalid actions from `act`, checkpoint
+  round trip, seeded determinism, 2-agent matrix game solved, one update at
+  `obs_dim=56`, and rollout buffer round trip.
+- Gate: `pytest tests -k "not carla and not toy" -q` -> 136 passed, 4 skipped.
+- No env files or partner files changed; `marl/` imports neither `highway_env`
+  nor `carla`.
 
 ## Stage B budget (mandated, step-based; target ~2 h)
 
