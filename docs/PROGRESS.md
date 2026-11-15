@@ -15,6 +15,7 @@ Branch: `feat/marl-audit-mappo`
 | C plots | `8b1e817` feat(plots): partial-data QMIX vs VDN curves | `tests` 114 passed/17 skipped; partial smoke + full 4 PNGs | D held-out test |
 | 1 MAPPO | (this commit) feat: MAPPO | `tests/test_mappo.py` 11 passed; `tests -k "not carla and not toy"` 136 passed, 4 skipped | 2 MAPPO trainer |
 | 2 MAPPO trainer | (this commit) feat: MAPPO trainer | trainer smoke + resume verified; timing 0.0714 s/step | 3 launch background |
+| 2b MAPPO run | (this commit) docs: MAPPO run results | 5/5 seeds hit 15000 steps, 15 updates, 15 eval rows; stderr log empty | 3 comparison (new session) |
 
 ## Stage 1 summary
 
@@ -187,6 +188,31 @@ Command (launched in background with `Start-Process`, PID 11344):
   18 min per 15,000-step seed.
 - No partner or env files changed; `marl/` still imports neither `highway_env`
   nor `carla`.
+
+## Stage MAPPO-2 launch results (completed)
+
+- Command (background `Start-Process`, PID 11368; log
+  `results/raw/mappo_train.log`, stderr `results/raw/mappo_train.err.log`
+  empty, record `results/raw/mappo_launch.txt`):
+  `python scripts/train_mappo_highway.py --seeds 0 1 2 3 4 --total-steps 15000
+  --eval-interval 3000 --eval-seeds 7001 7002 7003
+  --out results/raw/comparison --torch-threads 2`
+- 5/5 runs reached exactly 15000 steps with 15 PPO updates and 15 eval rows
+  each; per-seed wall time 1218-1434 s (~0.081-0.096 s/step, 10.5-12.3
+  steps/s); total ~1.83 h. CSV columns match QMIX/VDN exactly.
+- Per-seed training mean steps 7.8/14.6/8.5/9.9/12.3, training collision
+  0.999 for all seeds. Final eval (15000 steps, 3 eval seeds): seeds 0/2/3
+  return -10.2/-8.5/-9.3, collision 1.00; seeds 1/4 return +206.864,
+  collision 0.00.
+- Honest reading: seeds 1 and 4 collapsed to the degenerate keep-speed
+  survival policy (identical final eval return), which is the same
+  crash-dominated scenario limitation noted above. The high variance and the
+  collapse are raw observations, not evidence of competence; Stage 3 must
+  evaluate final checkpoints on held-out test seeds 9001-9030 and compare
+  every learner against the random baseline.
+- `run_metadata.json` now lists algorithms `qmix`, `vdn`, `mappo`, keeps the
+  shared `train_seeds` `[0, 1, 2]`, and records `mappo_train_seeds`
+  `[0, 1, 2, 3, 4]` plus `mappo_config`. No existing run was modified.
 
 ## Stage B budget (mandated, step-based; target ~2 h)
 
