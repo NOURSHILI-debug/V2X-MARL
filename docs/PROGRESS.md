@@ -16,6 +16,7 @@ Branch: `feat/marl-audit-mappo`
 | 1 MAPPO | (this commit) feat: MAPPO | `tests/test_mappo.py` 11 passed; `tests -k "not carla and not toy"` 136 passed, 4 skipped | 2 MAPPO trainer |
 | 2 MAPPO trainer | (this commit) feat: MAPPO trainer | trainer smoke + resume verified; timing 0.0714 s/step | 3 launch background |
 | 2b MAPPO run | (this commit) docs: MAPPO run results | 5/5 seeds hit 15000 steps, 15 updates, 15 eval rows; stderr log empty | 3 comparison (new session) |
+| 3 comparison | (this commit) feat: comparison plots; docs: three-way results | 420 held-out episodes; all required plots; `tests -k "not carla and not toy"` 136 passed, 4 skipped | final report |
 
 ## Stage 1 summary
 
@@ -214,6 +215,33 @@ Command (launched in background with `Start-Process`, PID 11344):
   shared `train_seeds` `[0, 1, 2]`, and records `mappo_train_seeds`
   `[0, 1, 2, 3, 4]` plus `mappo_config`. No existing run was modified.
 
+## Stage 3 comparison summary (completed)
+
+- Held-out evaluation: 420 episodes = 14 groups x 30 test seeds
+  (QMIX/VDN 0-2, MAPPO 0-4, random, keep_speed, accelerate). Source tables:
+  `results/raw/eval/heldout_episodes.csv`, `summary.csv`,
+  `paired_differences.csv`, `reference_comparison.csv`, `collapse_check.csv`.
+- `scripts/plot_comparison.py` now covers QMIX/VDN/MAPPO plus gray references
+  and writes training/eval curves, held-out per-seed panels, a held-out
+  summary, action histograms and a wall-clock/throughput panel under
+  `results/raw/plots/`. Every title is `PRELIMINARY` and shows the layout,
+  seeds, 15,000-step budget and date.
+- Results: QMIX return -63.32, VDN -118.95, MAPPO 0-2 +59.20, MAPPO 0-4
+  +73.21; random -21.40; keep_speed +199.74; accelerate -12.17. Keep-speed is
+  the bar to beat and no learner beats it. MAPPO is bimodal: seeds 1 and 4
+  are exact keep-speed clones (`a0=1.000`, return 199.7367, collision 0.0333),
+  seeds 0/2/3 crash with collision 1.000. QMIX/VDN do not collapse.
+- Paired return differences over seeds 0-2 exclude zero (QMIX-VDN +55.63
+  [14.19, 119.54]; MAPPO-VDN +178.15 [65.21, 328.26]; MAPPO-QMIX +122.52
+  [21.45, 295.09]), but the MAPPO advantage is the seed-1 collapse and the
+  MAPPO seed-level return CI includes zero. No learned winner is declared.
+- `docs/three_way_results.md` records setup, metrics, paired differences,
+  collapse flags, figures, honest reading and limitations. Final summary
+  figures are copied to `docs/figures/`.
+- Gate: `pytest tests -k "not carla and not toy" -q` -> 136 passed, 4 skipped,
+  33 deselected. No partner or environment files changed; no training or new
+  evaluation episodes were run in this stage.
+
 ## Stage B budget (mandated, step-based; target ~2 h)
 
 - algorithms: QMIX and VDN; seeds: 0, 1, 2; ~15,000 env steps/seed/algo.
@@ -229,9 +257,17 @@ Command (launched in background with `Start-Process`, PID 11344):
 
 ## Resume instructions
 
-A fresh session should read this file plus `docs/qmix_audit.md`. Stages A-C are
-complete (`a55d771`, `0e94ae6`, `8b1e817`); raw runs are under
-`results/raw/comparison/` and plots under `results/raw/plots/`. Stage D is next:
-evaluate the final QMIX/VDN checkpoints on the held-out test seeds 9001-9030,
-report mean and 95% CI, and write the final comparison summary. Do not redo
-stages 0-C.
+A fresh session should read this file plus `docs/qmix_audit.md` and
+`docs/three_way_results.md`. Stages 0-C, MAPPO and the three-way comparison are
+complete. Raw runs are under `results/raw/comparison/`, held-out tables under
+`results/raw/eval/`, and plots under `results/raw/plots/` (ignored by git).
+Do not retrain or rerun evaluation episodes. To regenerate the figures:
+
+```text
+python scripts/plot_comparison.py --input results/raw/comparison \
+  --eval results/raw/eval/heldout_episodes.csv --output results/raw/plots
+```
+
+Gate: `pytest tests -k "not carla and not toy" -q` -> 136 passed, 4 skipped.
+The next step is the final report, not another training or evaluation run.
+
