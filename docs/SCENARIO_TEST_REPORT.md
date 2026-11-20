@@ -56,3 +56,41 @@ The committed pre-change baseline confirms unchanged no-scenario observations,
 rewards and info (excluding the documented unseeded reset action field). No
 read-only listed file was edited. Unresolved: keep-speed gate still passes on all
 H1 profiles; relevance definition needs approval; no learner validation was run.
+
+## Batch 1 regression
+
+Scenario-specific tests were extended by `tests/test_scenario_suite.py`.
+The seed-reproducibility checks now require identical observations for the same
+seed and at least one differing observation for a different seed; they no longer
+require every CAV observation to differ and they do not assert on `state()`,
+which only contains CAV state and is seed-invariant by design.
+
+Commands and results (one process, single thread):
+
+```powershell
+python -m pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q
+```
+Result: `34 passed in 23.68s`.
+
+```powershell
+python -m pytest tests/test_contract.py -v -k highway
+```
+Result: `5 passed, 4 skipped, 18 deselected in 3.89s`.
+
+```powershell
+$env:CONTRACT_STRICT="1"; python -m pytest tests/test_contract.py -v -k highway
+```
+Result: `9 passed, 18 deselected in 7.19s`.
+
+```powershell
+python -m pytest tests/test_reward.py tests/test_highway_adapter.py -q
+```
+Result: `36 passed in 34.94s`.
+
+```powershell
+python -m pytest tests -k "not carla and not toy" -q
+```
+Result: `207 passed, 4 skipped, 33 deselected in 91.92s`.
+
+No read-only file was edited. No CARLA server or learner training was used.
+Gate measurements and their G6 failures are in `docs/SCENARIO_GATE_REPORT.md`.

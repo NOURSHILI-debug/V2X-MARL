@@ -88,7 +88,7 @@
 
 ## Stage D — regression
 - Branch: `feat/scenario-suite`.
-- Commit: pending.
+- Commit: `b2ac9d3`.
 - `pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
   → 34 passed in 23.68s.
 - `pytest tests/test_contract.py -v -k highway`
@@ -100,3 +100,15 @@
 - `pytest tests -k "not carla and not toy" -q`
   → 207 passed, 4 skipped, 33 deselected in 91.92s.
 - Next: write gate report, design/implementation/test doc updates, CARLA spec.
+
+## Stage E — documentation
+- Branch: `feat/scenario-suite`.
+- Commit: pending.
+- Added `docs/SCENARIO_GATE_REPORT.md` and `docs/SCENARIO_SPEC_FOR_CARLA.md`.
+- Updated `docs/SCENARIO_DESIGN.md`, `docs/SCENARIO_IMPLEMENTATION_LOG.md`,
+  `docs/SCENARIO_TEST_REPORT.md`.
+- Final decision: H1 and H2 pass G1-G5 and fail G6; neither is a fully validated
+  V2O selection benchmark. I2 and M1 remain unstarted.
+- Final command status: full non-CARLA/non-toy suite 207 passed, 4 skipped,
+  33 deselected in 91.92s.
+- Batch complete. Do not start I2 or M1 without a new instruction.
