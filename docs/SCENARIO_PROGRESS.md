@@ -74,7 +74,7 @@
 
 ## Stage C — H2 lane-change
 - Branch: `feat/scenario-suite`.
-- Commit: pending.
+- Commit: `b13019f`.
 - Single pre-measurement layout fix: move fast approacher close behind lane-2
   CAV, add protected lane-3 escape corridor, move slow blocker ahead of
   stacked lane-1 CAVs.
@@ -85,3 +85,18 @@
   G6 FAIL (oracle 1.00, nearest 1.00, none 1.00, all6 0.00).
 - Raw: `results/raw/scenarios/h2_lane_change_20261120T221349Z.json` (gitignored).
 - Next: Stage D full regression tests, then docs; do not tune gates.
+
+## Stage D — regression
+- Branch: `feat/scenario-suite`.
+- Commit: pending.
+- `pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
+  → 34 passed in 23.68s.
+- `pytest tests/test_contract.py -v -k highway`
+  → 5 passed, 4 skipped, 18 deselected in 3.89s.
+- `CONTRACT_STRICT=1 pytest tests/test_contract.py -v -k highway`
+  → 9 passed, 18 deselected in 7.19s.
+- `pytest tests/test_reward.py tests/test_highway_adapter.py -q`
+  → 36 passed in 34.94s.
+- `pytest tests -k "not carla and not toy" -q`
+  → 207 passed, 4 skipped, 33 deselected in 91.92s.
+- Next: write gate report, design/implementation/test doc updates, CARLA spec.
