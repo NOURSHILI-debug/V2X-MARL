@@ -16,3 +16,19 @@ profiles:
       lanes: [0, 1, 2, 3]
       start_x_m: [80.0, 80.0, 80.0, 80.0]
       speed_mps: 22.0
+  h1_dense:
+    scenario_id: h1_dense
+    lanes_count: 4
+    background_vehicles: 20
+    vehicles_density: 4.0
+    duration_s: 60.0
+    spacing_m: 15.0
+    spacing_jitter_m: 0.5
+    speeds_mps:
+      mode: uniform
+      min: 18.0
+      max: 25.0
+    cav:
+      lanes: [0, 1, 2, 3]
+      start_x_m: [100.0, 100.0, 100.0, 100.0]
+      speed_mps: 22.0
