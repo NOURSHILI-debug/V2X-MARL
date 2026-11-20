@@ -1,0 +1,6080 @@
+[
+  {
+    "reset_seed": 7,
+    "ended": false,
+    "steps": 20,
+    "success": false,
+    "collision": false,
+    "goal_reached": false,
+    "off_road": false,
+    "stuck": false,
+    "ending_reason": null,
+    "team_reward_total": -6.651484704897936,
+    "team_reward_mean_step": -0.3325742352448968,
+    "arrival_steps": [],
+    "arrival_step_mean": null,
+    "min_ttc": null,
+    "jerk": null,
+    "v2x": {
+      "total_sent": 240,
+      "total_delivered": 214,
+      "total_dropped_by_range": 26,
+      "total_dropped_by_loss": 0,
+      "delivery_ratio": 0.8916666666666667,
+      "mean_received_per_agent_step": 2.675,
+      "episode_cumulative": {
+        "sent": 240,
+        "delivered": 214,
+        "dropped_by_range": 26,
+        "dropped_by_loss": 0,
+        "dropped": 26,
+        "mean_age": 0.0,
+        "in_flight": 0
+      }
+    },
+    "selection": {
+      "mean_pool_size": 2.675,
+      "mean_missing_slots": 0.025,
+      "selected_id_counts": {
+        "110": 28,
+        "111": 59,
+        "109": 53,
+        "112": 18
+      }
+    },
+    "observation_validity": {
+      "steps_with_violations": 0,
+      "steps_with_non_finite": 0,
+      "all_shape_56": true
+    },
+    "spawn": {
+      "seed": 7,
+      "town": "Town03",
+      "spawn_mode": "cluster",
+      "spawn_cluster_max_distance": 45.0,
+      "route_applied": true,
+      "per_agent": {
+        "cav_0": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_1": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_2": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_3": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        }
+      },
+      "v2x": {
+        "step_index": 0,
+        "sent": 0,
+        "delivered": 0,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 0,
+        "dropped": 0,
+        "mean_age": 0.0,
+        "in_flight": 0
+      }
+    },
+    "step_records": [
+      {
+        "step": 1,
+        "v2x": {
+          "step_index": 1,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 12,
+            "delivered": 12,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.07500000000000001,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.0,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.1,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "blocked",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.1,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "blocked",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.1,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "blocked",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 2,
+        "v2x": {
+          "step_index": 2,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 24,
+            "delivered": 24,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -1.4000000000000001,
+        "per_agent": {
+          "cav_0": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 3,
+        "v2x": {
+          "step_index": 3,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 36,
+            "delivered": 36,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6257796164216783,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.7550916621879682,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.7228687220073455,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.5825022842773387,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.44265579721406106,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 4,
+        "v2x": {
+          "step_index": 4,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 48,
+            "delivered": 48,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6001252466379406,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.5029377480607341,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.4895287622803768,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.6338723031067777,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.7741621731038739,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 5,
+        "v2x": {
+          "step_index": 5,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 60,
+            "delivered": 60,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.04742004153129803,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.008482071884743259,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.018967358542498425,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.033770383940739834,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.18335921261169397,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 6,
+        "v2x": {
+          "step_index": 6,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 72,
+            "delivered": 72,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6490342360711929,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.956031012242126,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.7475839386149791,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.4543237497085233,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.43819824371914307,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 7,
+        "v2x": {
+          "step_index": 7,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 84,
+            "delivered": 84,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6200786406947897,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.3015290988142828,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.5123249940871109,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.6118058597771062,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -1.0546546101006589,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 8,
+        "v2x": {
+          "step_index": 8,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 96,
+            "delivered": 96,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.15242943844696505,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.5281194662143027,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.36395674281037227,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.27494765265310933,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              112,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.4989328245386814,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 9,
+        "v2x": {
+          "step_index": 9,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 108,
+            "delivered": 108,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.19305864826028102,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.27935688010744286,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              110,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.6369233995818917,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.5468401931048428,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.4027945064566323,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              111
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 10,
+        "v2x": {
+          "step_index": 10,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 120,
+            "delivered": 118,
+            "dropped_by_range": 2,
+            "dropped_by_loss": 0,
+            "dropped": 2,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.1066016699289793,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.2799218292000433,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.43293936173112446,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.31954467841837153,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.6059991896336221,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 11,
+        "v2x": {
+          "step_index": 11,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 132,
+            "delivered": 128,
+            "dropped_by_range": 4,
+            "dropped_by_loss": 0,
+            "dropped": 4,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.00012882930305721518,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.050607430240418916,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.24431364004712025,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.2501576074481896,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.4433485000426621,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 12,
+        "v2x": {
+          "step_index": 12,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 144,
+            "delivered": 138,
+            "dropped_by_range": 6,
+            "dropped_by_loss": 0,
+            "dropped": 6,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.8122565561978259,
+        "per_agent": {
+          "cav_0": {
+            "reward": -1.2177819690413987,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.5895169366546714,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -1.1931668741589168,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.24856044493631685,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 13,
+        "v2x": {
+          "step_index": 13,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 156,
+            "delivered": 148,
+            "dropped_by_range": 8,
+            "dropped_by_loss": 0,
+            "dropped": 8,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.02178234502635262,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.46075908853920355,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.46634945904109537,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.7537737372005799,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.0862054302743085,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 14,
+        "v2x": {
+          "step_index": 14,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 168,
+            "delivered": 158,
+            "dropped_by_range": 10,
+            "dropped_by_loss": 0,
+            "dropped": 10,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.19221222193006582,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.402385728706099,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.27861315945988835,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.52138542957777,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.6092354291320459,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 15,
+        "v2x": {
+          "step_index": 15,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 180,
+            "delivered": 168,
+            "dropped_by_range": 12,
+            "dropped_by_loss": 0,
+            "dropped": 12,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.40775260194092455,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.4986306712138593,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.5214386006467046,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.5357105713399097,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -1.1181077658566336,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 16,
+        "v2x": {
+          "step_index": 16,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 192,
+            "delivered": 178,
+            "dropped_by_range": 14,
+            "dropped_by_loss": 0,
+            "dropped": 14,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.12608108085228809,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.3426703944214923,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.2701395625823317,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.7172988648230197,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.14044370957470675,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 17,
+        "v2x": {
+          "step_index": 17,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 204,
+            "delivered": 188,
+            "dropped_by_range": 16,
+            "dropped_by_loss": 0,
+            "dropped": 16,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.21151256741949337,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.2008095382595692,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.5889310633640737,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.3067671551404604,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.9274046396420177,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 18,
+        "v2x": {
+          "step_index": 18,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 216,
+            "delivered": 198,
+            "dropped_by_range": 18,
+            "dropped_by_loss": 0,
+            "dropped": 18,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.25710204582406265,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.24161476501376278,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.0275423424456247,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.4769615127409679,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.2822895630958953,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 19,
+        "v2x": {
+          "step_index": 19,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 228,
+            "delivered": 208,
+            "dropped_by_range": 20,
+            "dropped_by_loss": 0,
+            "dropped": 20,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.2970598269292377,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.5837704710664162,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              110,
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              111,
+              112
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -1.2649062548220087,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              111,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.9674248588607348,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              109,
+              110,
+              112
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              109,
+              110
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.46032133489937654,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              111
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              109,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 20,
+        "v2x": {
+          "step_index": 20,
+          "sent": 12,
+          "delivered": 6,
+          "dropped_by_range": 6,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 240,
+            "delivered": 214,
+            "dropped_by_range": 26,
+            "dropped_by_loss": 0,
+            "dropped": 26,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.005268476797080708,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.19479184269393787,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              111,
+              112
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              112,
+              111
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.004646136770958376,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 1,
+            "received_sender_ids": [
+              111
+            ],
+            "received_ages": [
+              0
+            ],
+            "pool_size": 1,
+            "selected_ids": [
+              111,
+              null
+            ],
+            "missing_slots": 1,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.5448504541868345,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              109,
+              110
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              110,
+              109
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.3336308410755322,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 1,
+            "received_sender_ids": [
+              109
+            ],
+            "received_ages": [
+              0
+            ],
+            "pool_size": 1,
+            "selected_ids": [
+              109,
+              null
+            ],
+            "missing_slots": 1,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      }
+    ],
+    "selection_mode": "nearest_k",
+    "base_seed": 7,
+    "episode_index": 0,
+    "selection_seed": 1007,
+    "v2x_seed": 2007
+  },
+  {
+    "reset_seed": 7,
+    "ended": false,
+    "steps": 20,
+    "success": false,
+    "collision": false,
+    "goal_reached": false,
+    "off_road": false,
+    "stuck": false,
+    "ending_reason": null,
+    "team_reward_total": -6.651484704897936,
+    "team_reward_mean_step": -0.3325742352448968,
+    "arrival_steps": [],
+    "arrival_step_mean": null,
+    "min_ttc": null,
+    "jerk": null,
+    "v2x": {
+      "total_sent": 240,
+      "total_delivered": 214,
+      "total_dropped_by_range": 26,
+      "total_dropped_by_loss": 0,
+      "delivery_ratio": 0.8916666666666667,
+      "mean_received_per_agent_step": 2.675,
+      "episode_cumulative": {
+        "sent": 240,
+        "delivered": 214,
+        "dropped_by_range": 26,
+        "dropped_by_loss": 0,
+        "dropped": 26,
+        "mean_age": 0.0,
+        "in_flight": 0
+      }
+    },
+    "selection": {
+      "mean_pool_size": 2.675,
+      "mean_missing_slots": 0.025,
+      "selected_id_counts": {
+        "119": 44,
+        "120": 39,
+        "117": 41,
+        "118": 34
+      }
+    },
+    "observation_validity": {
+      "steps_with_violations": 0,
+      "steps_with_non_finite": 0,
+      "all_shape_56": true
+    },
+    "spawn": {
+      "seed": 7,
+      "town": "Town03",
+      "spawn_mode": "cluster",
+      "spawn_cluster_max_distance": 45.0,
+      "route_applied": true,
+      "per_agent": {
+        "cav_0": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "random_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_1": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "random_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_2": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "random_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_3": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "random_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        }
+      },
+      "v2x": {
+        "step_index": 0,
+        "sent": 0,
+        "delivered": 0,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 0,
+        "dropped": 0,
+        "mean_age": 0.0,
+        "in_flight": 0
+      }
+    },
+    "step_records": [
+      {
+        "step": 1,
+        "v2x": {
+          "step_index": 1,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 12,
+            "delivered": 12,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.07500000000000001,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.0,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.1,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "blocked",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.1,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "blocked",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.1,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "blocked",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 2,
+        "v2x": {
+          "step_index": 2,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 24,
+            "delivered": 24,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -1.4000000000000001,
+        "per_agent": {
+          "cav_0": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -1.4000000000000001,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 3,
+        "v2x": {
+          "step_index": 3,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 36,
+            "delivered": 36,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6257796164216783,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.7550916621879682,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.7228687220073455,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.5825022842773387,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.44265579721406106,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 4,
+        "v2x": {
+          "step_index": 4,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 48,
+            "delivered": 48,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6001252466379406,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.5029377480607341,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.4895287622803768,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.6338723031067777,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.7741621731038739,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 5,
+        "v2x": {
+          "step_index": 5,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 60,
+            "delivered": 60,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.04742004153129803,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.008482071884743259,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.018967358542498425,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.033770383940739834,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.18335921261169397,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 6,
+        "v2x": {
+          "step_index": 6,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 72,
+            "delivered": 72,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6490342360711929,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.956031012242126,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.7475839386149791,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.4543237497085233,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.43819824371914307,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 7,
+        "v2x": {
+          "step_index": 7,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 84,
+            "delivered": 84,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.6200786406947897,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.3015290988142828,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.5123249940871109,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.6118058597771062,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -1.0546546101006589,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 8,
+        "v2x": {
+          "step_index": 8,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 96,
+            "delivered": 96,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.15242943844696505,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.5281194662143027,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.36395674281037227,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.27494765265310933,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.4989328245386814,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 9,
+        "v2x": {
+          "step_index": 9,
+          "sent": 12,
+          "delivered": 12,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 108,
+            "delivered": 108,
+            "dropped_by_range": 0,
+            "dropped_by_loss": 0,
+            "dropped": 0,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.19305864826028102,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.27935688010744286,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.6369233995818917,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.5468401931048428,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.4027945064566323,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              119
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 10,
+        "v2x": {
+          "step_index": 10,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 120,
+            "delivered": 118,
+            "dropped_by_range": 2,
+            "dropped_by_loss": 0,
+            "dropped": 2,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.1066016699289793,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.2799218292000433,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.43293936173112446,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.31954467841837153,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.6059991896336221,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 11,
+        "v2x": {
+          "step_index": 11,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 132,
+            "delivered": 128,
+            "dropped_by_range": 4,
+            "dropped_by_loss": 0,
+            "dropped": 4,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.00012882930305721518,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.050607430240418916,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.24431364004712025,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.2501576074481896,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.4433485000426621,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 12,
+        "v2x": {
+          "step_index": 12,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 144,
+            "delivered": 138,
+            "dropped_by_range": 6,
+            "dropped_by_loss": 0,
+            "dropped": 6,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.8122565561978259,
+        "per_agent": {
+          "cav_0": {
+            "reward": -1.2177819690413987,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.5895169366546714,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -1.1931668741589168,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.24856044493631685,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 13,
+        "v2x": {
+          "step_index": 13,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 156,
+            "delivered": 148,
+            "dropped_by_range": 8,
+            "dropped_by_loss": 0,
+            "dropped": 8,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.02178234502635262,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.46075908853920355,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.46634945904109537,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.7537737372005799,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.0862054302743085,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 14,
+        "v2x": {
+          "step_index": 14,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 168,
+            "delivered": 158,
+            "dropped_by_range": 10,
+            "dropped_by_loss": 0,
+            "dropped": 10,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.19221222193006582,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.402385728706099,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.27861315945988835,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.52138542957777,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.6092354291320459,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 15,
+        "v2x": {
+          "step_index": 15,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 180,
+            "delivered": 168,
+            "dropped_by_range": 12,
+            "dropped_by_loss": 0,
+            "dropped": 12,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.40775260194092455,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.4986306712138593,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.5214386006467046,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.5357105713399097,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -1.1181077658566336,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 16,
+        "v2x": {
+          "step_index": 16,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 192,
+            "delivered": 178,
+            "dropped_by_range": 14,
+            "dropped_by_loss": 0,
+            "dropped": 14,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.12608108085228809,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.3426703944214923,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.2701395625823317,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.7172988648230197,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              117,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.14044370957470675,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 17,
+        "v2x": {
+          "step_index": 17,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 204,
+            "delivered": 188,
+            "dropped_by_range": 16,
+            "dropped_by_loss": 0,
+            "dropped": 16,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.21151256741949337,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.2008095382595692,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.5889310633640737,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.3067671551404604,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.9274046396420177,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 18,
+        "v2x": {
+          "step_index": 18,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 216,
+            "delivered": 198,
+            "dropped_by_range": 18,
+            "dropped_by_loss": 0,
+            "dropped": 18,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.25710204582406265,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.24161476501376278,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              120,
+              118
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -0.0275423424456247,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.4769615127409679,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.2822895630958953,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 19,
+        "v2x": {
+          "step_index": 19,
+          "sent": 12,
+          "delivered": 10,
+          "dropped_by_range": 2,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 228,
+            "delivered": 208,
+            "dropped_by_range": 20,
+            "dropped_by_loss": 0,
+            "dropped": 20,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": -0.2970598269292377,
+        "per_agent": {
+          "cav_0": {
+            "reward": 0.5837704710664162,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              118,
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              119,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": -1.2649062548220087,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              119,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": -0.9674248588607348,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 3,
+            "received_sender_ids": [
+              117,
+              118,
+              120
+            ],
+            "received_ages": [
+              0,
+              0,
+              0
+            ],
+            "pool_size": 3,
+            "selected_ids": [
+              118,
+              120
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": 0.46032133489937654,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              119
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              117,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      },
+      {
+        "step": 20,
+        "v2x": {
+          "step_index": 20,
+          "sent": 12,
+          "delivered": 6,
+          "dropped_by_range": 6,
+          "dropped_by_loss": 0,
+          "in_flight": 0,
+          "episode": {
+            "sent": 240,
+            "delivered": 214,
+            "dropped_by_range": 26,
+            "dropped_by_loss": 0,
+            "dropped": 26,
+            "mean_age": 0.0,
+            "in_flight": 0
+          }
+        },
+        "team_reward": 0.005268476797080708,
+        "per_agent": {
+          "cav_0": {
+            "reward": -0.19479184269393787,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              119,
+              120
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              120,
+              119
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_1": {
+            "reward": 0.004646136770958376,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 1,
+            "received_sender_ids": [
+              119
+            ],
+            "received_ages": [
+              0
+            ],
+            "pool_size": 1,
+            "selected_ids": [
+              119,
+              null
+            ],
+            "missing_slots": 1,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_2": {
+            "reward": 0.5448504541868345,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 2,
+            "received_sender_ids": [
+              117,
+              118
+            ],
+            "received_ages": [
+              0,
+              0
+            ],
+            "pool_size": 2,
+            "selected_ids": [
+              118,
+              117
+            ],
+            "missing_slots": 0,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          },
+          "cav_3": {
+            "reward": -0.3336308410755322,
+            "goal_reached": false,
+            "collision": false,
+            "off_road": false,
+            "stuck": false,
+            "stop_reason": "none",
+            "arrival_step": null,
+            "received_count": 1,
+            "received_sender_ids": [
+              117
+            ],
+            "received_ages": [
+              0
+            ],
+            "pool_size": 1,
+            "selected_ids": [
+              117,
+              null
+            ],
+            "missing_slots": 1,
+            "obs_shape": [
+              56
+            ],
+            "obs_dtype": "float32",
+            "obs_finite": true
+          }
+        }
+      }
+    ],
+    "selection_mode": "random_k",
+    "base_seed": 7,
+    "episode_index": 0,
+    "selection_seed": 1007,
+    "v2x_seed": 2007
+  }
+]

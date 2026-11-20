@@ -1,0 +1,4163 @@
+{
+  "name": "C_loss_10pct",
+  "config": {
+    "town": "Town03",
+    "n_agents": 4,
+    "env_seed": 7,
+    "spawn_mode": "cluster",
+    "spawn_cluster_max_distance": 45.0,
+    "candidate_source": "v2x",
+    "v2x_broadcasters": "cavs_and_background",
+    "communication_range_m": 50.0,
+    "candidate_observation_range_m": 50.0,
+    "packet_loss_prob": 0.1,
+    "delay_steps": 0,
+    "selection_mode": "nearest_k",
+    "selection_k": 2,
+    "selection_seed": 42,
+    "v2x_seed": 7,
+    "decision_steps": 30
+  },
+  "timestamp_utc": "2026-11-20T14:37:32.365441+00:00",
+  "spawn": {
+    "agents": [
+      "cav_0",
+      "cav_1",
+      "cav_2",
+      "cav_3"
+    ],
+    "positions": {
+      "cav_0": {
+        "actor_id": 141,
+        "x": 2.35427188873291,
+        "y": 189.21514892578125,
+        "z": -0.01972772553563118,
+        "vx": 1.9796601691268734e-07,
+        "vy": -1.5456544488756663e-08,
+        "yaw_deg": -90.36254119873047
+      },
+      "cav_1": {
+        "actor_id": 142,
+        "x": -5.705279350280762,
+        "y": 185.72886657714844,
+        "z": -0.02348463051021099,
+        "vx": -5.6983488150308403e-08,
+        "vy": -3.3313978242688336e-09,
+        "yaw_deg": 89.63746643066406
+      },
+      "cav_2": {
+        "actor_id": 143,
+        "x": -9.261773109436035,
+        "y": 155.70883178710938,
+        "z": -0.024157924577593803,
+        "vx": -2.5623631927373935e-07,
+        "vy": -8.57298854128885e-09,
+        "yaw_deg": 89.63746643066406
+      },
+      "cav_3": {
+        "actor_id": 144,
+        "x": 5.684788703918457,
+        "y": 153.81900024414062,
+        "z": -0.01680772751569748,
+        "vx": -5.37845266990189e-07,
+        "vy": 7.640478116854865e-08,
+        "yaw_deg": -90.36254119873047
+      }
+    },
+    "pairwise": [
+      {
+        "a": "cav_0",
+        "b": "cav_1",
+        "distance_m": 8.78126020504321
+      },
+      {
+        "a": "cav_0",
+        "b": "cav_2",
+        "distance_m": 35.46273804427321
+      },
+      {
+        "a": "cav_0",
+        "b": "cav_3",
+        "distance_m": 35.552491948512454
+      },
+      {
+        "a": "cav_1",
+        "b": "cav_2",
+        "distance_m": 30.229970834489173
+      },
+      {
+        "a": "cav_1",
+        "b": "cav_3",
+        "distance_m": 33.881753491661485
+      },
+      {
+        "a": "cav_2",
+        "b": "cav_3",
+        "distance_m": 15.065562495347672
+      }
+    ],
+    "distance_summary": {
+      "min_m": 8.78126020504321,
+      "max_m": 35.552491948512454,
+      "mean_m": 26.4956295032212
+    }
+  },
+  "reset_info": {
+    "seed": 7,
+    "town": "Town03",
+    "spawn_mode": "cluster",
+    "spawn_cluster_max_distance": 45.0,
+    "v2x": {
+      "step_index": 0,
+      "sent": 0,
+      "delivered": 0,
+      "dropped_by_range": 0,
+      "dropped_by_loss": 0,
+      "dropped": 0,
+      "mean_age": 0.0,
+      "in_flight": 0
+    }
+  },
+  "reset_observations_valid": {
+    "cav_0": {
+      "shape": [
+        56
+      ],
+      "dtype": "float32",
+      "finite": true,
+      "valid": true
+    },
+    "cav_1": {
+      "shape": [
+        56
+      ],
+      "dtype": "float32",
+      "finite": true,
+      "valid": true
+    },
+    "cav_2": {
+      "shape": [
+        56
+      ],
+      "dtype": "float32",
+      "finite": true,
+      "valid": true
+    },
+    "cav_3": {
+      "shape": [
+        56
+      ],
+      "dtype": "float32",
+      "finite": true,
+      "valid": true
+    }
+  },
+  "steps": [
+    {
+      "step": 1,
+      "channel": {
+        "step_index": 1,
+        "sent": 12,
+        "delivered": 11,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 12,
+        "delivered": 11,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 1,
+        "dropped": 1,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            144,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 2,
+      "channel": {
+        "step_index": 2,
+        "sent": 12,
+        "delivered": 11,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 24,
+        "delivered": 22,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 2,
+        "dropped": 2,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 3,
+      "channel": {
+        "step_index": 3,
+        "sent": 12,
+        "delivered": 10,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 2,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 36,
+        "delivered": 32,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 4,
+        "dropped": 4,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            144,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 4,
+      "channel": {
+        "step_index": 4,
+        "sent": 12,
+        "delivered": 10,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 2,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 48,
+        "delivered": 42,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 6,
+        "dropped": 6,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 5,
+      "channel": {
+        "step_index": 5,
+        "sent": 12,
+        "delivered": 11,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 60,
+        "delivered": 53,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 7,
+        "dropped": 7,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 6,
+      "channel": {
+        "step_index": 6,
+        "sent": 12,
+        "delivered": 11,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 72,
+        "delivered": 64,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 8,
+        "dropped": 8,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            144,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 7,
+      "channel": {
+        "step_index": 7,
+        "sent": 12,
+        "delivered": 12,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 84,
+        "delivered": 76,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 8,
+        "dropped": 8,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            144,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 8,
+      "channel": {
+        "step_index": 8,
+        "sent": 12,
+        "delivered": 11,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 96,
+        "delivered": 87,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 9,
+        "dropped": 9,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            144,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 9,
+      "channel": {
+        "step_index": 9,
+        "sent": 12,
+        "delivered": 10,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 2,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 108,
+        "delivered": 97,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 11,
+        "dropped": 11,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 10,
+      "channel": {
+        "step_index": 10,
+        "sent": 12,
+        "delivered": 9,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 120,
+        "delivered": 106,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 12,
+        "dropped": 14,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 11,
+      "channel": {
+        "step_index": 11,
+        "sent": 12,
+        "delivered": 9,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 132,
+        "delivered": 115,
+        "dropped_by_range": 4,
+        "dropped_by_loss": 13,
+        "dropped": 17,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 12,
+      "channel": {
+        "step_index": 12,
+        "sent": 12,
+        "delivered": 10,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 144,
+        "delivered": 125,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 13,
+        "dropped": 19,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 13,
+      "channel": {
+        "step_index": 13,
+        "sent": 12,
+        "delivered": 9,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 156,
+        "delivered": 134,
+        "dropped_by_range": 8,
+        "dropped_by_loss": 14,
+        "dropped": 22,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 14,
+      "channel": {
+        "step_index": 14,
+        "sent": 12,
+        "delivered": 10,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 168,
+        "delivered": 144,
+        "dropped_by_range": 10,
+        "dropped_by_loss": 14,
+        "dropped": 24,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 15,
+      "channel": {
+        "step_index": 15,
+        "sent": 12,
+        "delivered": 9,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 180,
+        "delivered": 153,
+        "dropped_by_range": 12,
+        "dropped_by_loss": 15,
+        "dropped": 27,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 16,
+      "channel": {
+        "step_index": 16,
+        "sent": 12,
+        "delivered": 9,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 192,
+        "delivered": 162,
+        "dropped_by_range": 14,
+        "dropped_by_loss": 16,
+        "dropped": 30,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            141,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 17,
+      "channel": {
+        "step_index": 17,
+        "sent": 12,
+        "delivered": 7,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 3,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 204,
+        "delivered": 169,
+        "dropped_by_range": 16,
+        "dropped_by_loss": 19,
+        "dropped": 35,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 18,
+      "channel": {
+        "step_index": 18,
+        "sent": 12,
+        "delivered": 8,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 2,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 216,
+        "delivered": 177,
+        "dropped_by_range": 18,
+        "dropped_by_loss": 21,
+        "dropped": 39,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            142,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            142
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            141,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 19,
+      "channel": {
+        "step_index": 19,
+        "sent": 12,
+        "delivered": 9,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 228,
+        "delivered": 186,
+        "dropped_by_range": 20,
+        "dropped_by_loss": 22,
+        "dropped": 42,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 3,
+          "received_sender_ids": [
+            141,
+            142,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 20,
+      "channel": {
+        "step_index": 20,
+        "sent": 12,
+        "delivered": 7,
+        "dropped_by_range": 4,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 240,
+        "delivered": 193,
+        "dropped_by_range": 24,
+        "dropped_by_loss": 23,
+        "dropped": 47,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 1,
+          "received_sender_ids": [
+            142
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            142,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 21,
+      "channel": {
+        "step_index": 21,
+        "sent": 12,
+        "delivered": 8,
+        "dropped_by_range": 4,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 252,
+        "delivered": 201,
+        "dropped_by_range": 28,
+        "dropped_by_loss": 23,
+        "dropped": 51,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            143,
+            144
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 22,
+      "channel": {
+        "step_index": 22,
+        "sent": 12,
+        "delivered": 7,
+        "dropped_by_range": 4,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 264,
+        "delivered": 208,
+        "dropped_by_range": 32,
+        "dropped_by_loss": 24,
+        "dropped": 56,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 3,
+          "received_sender_ids": [
+            142,
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0,
+            0
+          ],
+          "eligible_candidate_count": 3,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            143
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            143,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 1,
+          "received_sender_ids": [
+            142
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            142,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 23,
+      "channel": {
+        "step_index": 23,
+        "sent": 12,
+        "delivered": 5,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 276,
+        "delivered": 213,
+        "dropped_by_range": 38,
+        "dropped_by_loss": 25,
+        "dropped": 63,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 1,
+          "received_sender_ids": [
+            144
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            144,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 24,
+      "channel": {
+        "step_index": 24,
+        "sent": 12,
+        "delivered": 6,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 288,
+        "delivered": 219,
+        "dropped_by_range": 44,
+        "dropped_by_loss": 25,
+        "dropped": 69,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 25,
+      "channel": {
+        "step_index": 25,
+        "sent": 12,
+        "delivered": 6,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 300,
+        "delivered": 225,
+        "dropped_by_range": 50,
+        "dropped_by_loss": 25,
+        "dropped": 75,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 26,
+      "channel": {
+        "step_index": 26,
+        "sent": 12,
+        "delivered": 6,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 312,
+        "delivered": 231,
+        "dropped_by_range": 56,
+        "dropped_by_loss": 25,
+        "dropped": 81,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 27,
+      "channel": {
+        "step_index": 27,
+        "sent": 12,
+        "delivered": 4,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 2,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 324,
+        "delivered": 235,
+        "dropped_by_range": 62,
+        "dropped_by_loss": 27,
+        "dropped": 89,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 0,
+          "received_sender_ids": [],
+          "received_ages": [],
+          "eligible_candidate_count": 0,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 1,
+          "received_sender_ids": [
+            142
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            142,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 28,
+      "channel": {
+        "step_index": 28,
+        "sent": 12,
+        "delivered": 5,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 336,
+        "delivered": 240,
+        "dropped_by_range": 68,
+        "dropped_by_loss": 28,
+        "dropped": 96,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 1,
+          "received_sender_ids": [
+            144
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            144,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 29,
+      "channel": {
+        "step_index": 29,
+        "sent": 12,
+        "delivered": 6,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 0,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 348,
+        "delivered": 246,
+        "dropped_by_range": 74,
+        "dropped_by_loss": 28,
+        "dropped": 102,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 2,
+          "received_sender_ids": [
+            141,
+            142
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            142,
+            141
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    },
+    {
+      "step": 30,
+      "channel": {
+        "step_index": 30,
+        "sent": 12,
+        "delivered": 5,
+        "dropped_by_range": 6,
+        "dropped_by_loss": 1,
+        "in_flight": 0
+      },
+      "episode_cumulative": {
+        "sent": 360,
+        "delivered": 251,
+        "dropped_by_range": 80,
+        "dropped_by_loss": 29,
+        "dropped": 109,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "agents": {
+        "cav_0": {
+          "received_count": 2,
+          "received_sender_ids": [
+            143,
+            144
+          ],
+          "received_ages": [
+            0,
+            0
+          ],
+          "eligible_candidate_count": 2,
+          "selected_ids": [
+            144,
+            143
+          ],
+          "selected_count": 2,
+          "missing_slots": 0,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_1": {
+          "received_count": 1,
+          "received_sender_ids": [
+            143
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            143,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_2": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        },
+        "cav_3": {
+          "received_count": 1,
+          "received_sender_ids": [
+            141
+          ],
+          "received_ages": [
+            0
+          ],
+          "eligible_candidate_count": 1,
+          "selected_ids": [
+            141,
+            null
+          ],
+          "selected_count": 1,
+          "missing_slots": 1,
+          "selection_strategy": "nearest_k"
+        }
+      },
+      "observations_valid": {
+        "cav_0": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_1": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_2": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        },
+        "cav_3": {
+          "shape": [
+            56
+          ],
+          "dtype": "float32",
+          "finite": true,
+          "valid": true
+        }
+      }
+    }
+  ],
+  "totals": {
+    "sent": 360,
+    "delivered": 251,
+    "dropped_by_range": 80,
+    "dropped_by_loss": 29
+  },
+  "summary": {
+    "steps_run": 30,
+    "all_observations_valid": true,
+    "steps_with_any_delivery": 30,
+    "per_agent_total_received": {
+      "cav_0": 75,
+      "cav_1": 54,
+      "cav_2": 69,
+      "cav_3": 53
+    },
+    "per_agent_mean_eligible_candidates": {
+      "cav_0": 2.5,
+      "cav_1": 1.8,
+      "cav_2": 2.3,
+      "cav_3": 1.7666666666666666
+    },
+    "message_age_min": 0,
+    "message_age_max": 0,
+    "message_age_mean": 0.0
+  }
+}
