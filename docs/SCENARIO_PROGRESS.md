@@ -103,7 +103,7 @@
 
 ## Stage E — documentation
 - Branch: `feat/scenario-suite`.
-- Commit: pending.
+- Commit: `6446fe1`.
 - Added `docs/SCENARIO_GATE_REPORT.md` and `docs/SCENARIO_SPEC_FOR_CARLA.md`.
 - Updated `docs/SCENARIO_DESIGN.md`, `docs/SCENARIO_IMPLEMENTATION_LOG.md`,
   `docs/SCENARIO_TEST_REPORT.md`.
