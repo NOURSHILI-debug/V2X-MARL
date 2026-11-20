@@ -45,6 +45,29 @@ def _jsonable(value):
     return value
 
 
+def _candidate_ttc(ego, other, candidate, lanes=None):
+    if other is None:
+        return None
+    if lanes is not None and tuple(other.lane_index) not in lanes:
+        return None
+    dx = float(candidate["x"]) - float(ego.position[0])
+    half_lengths = 0.5 * (float(ego.LENGTH) + float(other.LENGTH))
+    ego_vx = float(ego.velocity[0])
+    other_vx = float(candidate["vx"])
+    values = []
+    if abs(dx) <= half_lengths:
+        return 0.0
+    front_gap = dx - half_lengths
+    front_closing = ego_vx - other_vx
+    if front_gap > 0.0 and front_closing > 0.0:
+        values.append(min(front_gap / front_closing, MAX_TTC_S))
+    rear_gap = -dx - half_lengths
+    rear_closing = other_vx - ego_vx
+    if rear_gap > 0.0 and rear_closing > 0.0:
+        values.append(min(rear_gap / rear_closing, MAX_TTC_S))
+    return min(values) if values else None
+
+
 def _risk_info(env, agent_id):
     candidates = env.get_candidates(agent_id)
     if not candidates:
@@ -58,16 +81,7 @@ def _risk_info(env, agent_id):
     scored = []
     for rank, candidate in enumerate(candidates):
         other = reverse.get(candidate["actor_id"])
-        ttc = None
-        if other is not None and tuple(other.lane_index) in relevant_lanes:
-            gap = (
-                float(candidate["x"])
-                - float(ego.position[0])
-                - 0.5 * (float(ego.LENGTH) + float(other.LENGTH))
-            )
-            closing = float(ego.velocity[0]) - float(candidate["vx"])
-            if gap > 0.0 and closing > 0.0:
-                ttc = min(gap / closing, MAX_TTC_S)
+        ttc = _candidate_ttc(ego, other, candidate, relevant_lanes)
         scored.append({"rank": rank, "actor_id": candidate["actor_id"], "ttc": ttc})
     closers = [item for item in scored if item["ttc"] is not None]
     if not closers:
@@ -109,17 +123,8 @@ def _oracle_ranks(env, agent_id, valid_indices):
             for vehicle in env.env.unwrapped.road.vehicles
         }
         other = reverse.get(candidate["actor_id"])
-        ttc = MAX_TTC_S
-        if other is not None:
-            gap = (
-                float(candidate["x"])
-                - float(ego.position[0])
-                - 0.5 * (float(ego.LENGTH) + float(other.LENGTH))
-            )
-            closing = float(ego.velocity[0]) - float(candidate["vx"])
-            if gap > 0.0 and closing > 0.0:
-                ttc = min(gap / closing, MAX_TTC_S)
-        risks.append((ttc, rank, candidate["actor_id"]))
+        ttc = _candidate_ttc(ego, other, candidate)
+        risks.append((ttc if ttc is not None else MAX_TTC_S, rank, candidate["actor_id"]))
     ordered = sorted(risks, key=lambda item: (item[0], item[1]))[:2]
     keep = [valid_indices[item[1]] for item in ordered]
     for index in valid_indices:

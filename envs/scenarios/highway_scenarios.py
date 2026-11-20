@@ -25,6 +25,7 @@ MIN_BACKGROUND_VEHICLES = 12
 HIGHWAY_LANES = 4
 MIN_SAFE_CLEARANCE_M = 8.0
 MIN_CAV_SEPARATION_M = 12.0
+PROTECTED_TARGET_GAP_M = 20.0
 
 
 @dataclass(frozen=True)
@@ -383,12 +384,17 @@ def _add_background_vehicle(
     x: float,
     speed: float,
     name: str | None = None,
+    randomize_behavior: bool = True,
+    vehicle_class: Any | None = None,
 ) -> Any:
     road = native_env.road
-    vehicle = other_class.make_on_lane(
+    vehicle = (vehicle_class or other_class).make_on_lane(
         road, _lane_index(road, int(lane_id)), float(x), float(speed)
     )
-    vehicle.randomize_behavior()
+    if randomize_behavior:
+        vehicle.randomize_behavior()
+    elif hasattr(vehicle, "target_speed"):
+        vehicle.target_speed = float(speed)
     if name is not None:
         vehicle.scenario_role = name
     road.vehicles.append(vehicle)
@@ -428,7 +434,7 @@ def _spawn_forced_background(
         target = base + int(lane_id < extra)
         positions = []
         offset_index = 0
-        offsets = _offsets(target + len(occupied[lane_id]) + 8)
+        offsets = _offsets(target * 10 + 64)
         while len(positions) < target:
             offset = offsets[offset_index]
             offset_index += 1
@@ -439,7 +445,18 @@ def _spawn_forced_background(
             )
             if x < MIN_SAFE_CLEARANCE_M:
                 continue
-            if any(abs(x - other) < MIN_SAFE_CLEARANCE_M for other in occupied[lane_id]):
+            blocked = False
+            for other_lane, occupied_x in occupied.items():
+                if other_lane == lane_id:
+                    radius = MIN_SAFE_CLEARANCE_M
+                elif abs(other_lane - lane_id) == 1:
+                    radius = PROTECTED_TARGET_GAP_M
+                else:
+                    continue
+                if any(abs(x - other) < radius for other in occupied_x):
+                    blocked = True
+                    break
+            if blocked:
                 continue
             positions.append(x)
             occupied[lane_id].append(x)
@@ -466,6 +483,8 @@ def create_scenario_vehicles(native_env: Any, profile: ScenarioProfile) -> None:
                 role.x_m,
                 role.speed_mps,
                 role.name,
+                randomize_behavior=False,
+                vehicle_class=Vehicle if role.name == "fast_approacher" else None,
             )
             native_env._scenario_roles[role.name] = vehicle
             occupied[role.lane].append(role.x_m)

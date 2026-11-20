@@ -49,9 +49,25 @@
 
 ## Stage A — shared forcing layer
 - Branch: `feat/scenario-suite` from `feat/scenario-h1-dense-highway`.
-- Commit: pending.
+- Commit: `37b92a3`.
 - Added: staggered CAV starts, seeded blocker/approacher/alongside roles,
   scheduled hazard hook, shared scripted policies, G1-G6 evaluator.
 - Test command: `python -m pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
   → 34 passed in 25.11s.
 - Next: verify old same-x random crashes, add h1_forcing, run full gate.
+
+## Stage B — revised H1
+- Branch: `feat/scenario-suite`.
+- Commit: pending.
+- Verified old same-x starts: seed 100 CAVs all at x=100; random lane changes
+  collide at step 3 (`cav_1`, `cav_2`, `cav_3`).
+- Pre-measurement fixes: role speeds no longer randomized, constant-speed
+  fast approacher, protected target-lane gaps, rear-hazard detection and
+  corrected lane-change direction in shared competent controller.
+- Test command: `python -m pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
+  → 34 passed in 24.02s.
+- Gate command: `python scripts/evaluate_scenario_gate.py --scenario h1_forcing`
+  → G1 PASS 1.00; G2 PASS 0.90; G3 PASS median 8; G4 PASS; G5 PASS headroom 0.777;
+  G6 FAIL (oracle 1.00, nearest 1.00, none 1.00, all6 0.10).
+- Raw: `results/raw/scenarios/h1_forcing_20261120T220706Z.json` (gitignored).
+- Next: add H2 lane-change scenario and run full gate; do not tune gates.

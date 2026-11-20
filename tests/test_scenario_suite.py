@@ -112,7 +112,10 @@ def test_new_profile_seed_reproducibility(profile_id):
     try:
         for agent_id in env_a.agents:
             assert np.array_equal(obs_a[agent_id], obs_b[agent_id])
-            assert not np.array_equal(obs_a[agent_id], obs_c[agent_id])
+        assert any(
+            not np.array_equal(obs_a[agent_id], obs_c[agent_id])
+            for agent_id in env_a.agents
+        )
         assert np.array_equal(env_a.state(), env_b.state())
     finally:
         env_a.close()

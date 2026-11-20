@@ -179,7 +179,7 @@ def test_config_file_defines_expected_profiles():
     assert profiles["h1_dense"].background_vehicles == 20
     assert profiles["h1_mixed_speed"].background_vehicles == 17
     assert profiles["h1_mixed_speed"].speeds.mode == "groups"
-    assert len(profiles["h1_forcing"].forcing.roles) == 5
+    assert len(profiles["h1_forcing"].forcing.roles) == 6
     assert len(profiles["h2_lane_change"].forcing.roles) == 7
 
 
@@ -252,7 +252,10 @@ def test_profile_seed_reproducibility(profile_id):
     try:
         for agent_id in env_a.agents:
             assert np.array_equal(obs_a[agent_id], obs_b[agent_id])
-            assert not np.array_equal(obs_a[agent_id], obs_c[agent_id])
+        assert any(
+            not np.array_equal(obs_a[agent_id], obs_c[agent_id])
+            for agent_id in env_a.agents
+        )
         states_a = env_a.state()
         states_b = env_b.state()
         assert np.array_equal(states_a, states_b)

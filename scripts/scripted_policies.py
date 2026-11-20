@@ -44,6 +44,7 @@ def competent_action(observation: Any, mask: Any) -> int:
     """Return a safe action computed only from one observation and its mask."""
     speed_norm = float(observation[0])
     ego_ttc = float("inf")
+    rear_ttc = float("inf")
     front_clearance = float("inf")
     target_clearance = {1: float("inf"), -1: float("inf")}
 
@@ -57,8 +58,18 @@ def competent_action(observation: Any, mask: Any) -> int:
         gap = rel_x - VEHICLE_LENGTH_M
         closing = -rel_vx
 
-        if abs(rel_y) <= LANE_WIDTH_M / 2.0 and gap > 0.0 and closing > 0.0:
-            ego_ttc = min(ego_ttc, min(gap / closing, MAX_TTC_S))
+        rear_gap = -rel_x - VEHICLE_LENGTH_M
+        rear_closing = rel_vx
+        rear_ttc_candidate = (
+            rear_gap / rear_closing
+            if rel_x < 0.0 and rear_gap > 0.0 and rear_closing > 0.0
+            else float("inf")
+        )
+        if abs(rel_y) <= LANE_WIDTH_M / 2.0:
+            if gap > 0.0 and closing > 0.0:
+                ego_ttc = min(ego_ttc, min(gap / closing, MAX_TTC_S))
+            if rear_ttc_candidate < float("inf"):
+                rear_ttc = min(rear_ttc, min(rear_ttc_candidate, MAX_TTC_S))
         if gap > 0.0:
             front_clearance = min(front_clearance, gap)
         for direction in (1, -1):
@@ -68,17 +79,21 @@ def competent_action(observation: Any, mask: Any) -> int:
                     if rel_x >= 0.0
                     else -rel_x - VEHICLE_LENGTH_M
                 )
+                if rear_ttc_candidate < TTC_WARNING_S:
+                    clearance = 0.0
                 target_clearance[direction] = min(target_clearance[direction], clearance)
 
-    if ego_ttc < TTC_WARNING_S:
+    if ego_ttc < TTC_WARNING_S or rear_ttc < TTC_WARNING_S:
         options = []
         if mask[LANE_LEFT]:
-            options.append((target_clearance[1], LANE_LEFT))
+            options.append((target_clearance[-1], LANE_LEFT))
         if mask[LANE_RIGHT]:
-            options.append((target_clearance[-1], LANE_RIGHT))
+            options.append((target_clearance[1], LANE_RIGHT))
         safe_options = [option for option in options if option[0] >= SAFE_LANE_GAP_M]
         if safe_options:
             return int(max(safe_options)[1])
+        if rear_ttc < TTC_WARNING_S and front_clearance > CLEAR_AHEAD_M and mask[ACCEL]:
+            return ACCEL
         if ego_ttc < TTC_BRAKE_S:
             return EMERGENCY_BRAKE
         return DECEL
