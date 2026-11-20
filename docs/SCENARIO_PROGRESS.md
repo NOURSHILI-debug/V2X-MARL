@@ -26,3 +26,14 @@
 - `python -m pytest tests/test_highway_adapter.py -q` → 16 passed.
 - `python -m pytest tests -k "not carla and not toy" -q` → 192 passed, 4 skipped, 33 deselected.
 - Next: run dev-seed scripted-policy measurements and relevance check.
+
+## Stage E — scripted-policy measurements
+- Commit: `665b6b4`
+- Commands: `python scripts/evaluate_h1_scenarios.py --profile h1_moderate`,
+  `--profile h1_dense`, `--profile h1_mixed_speed` (seeds 100-109; 3 policies).
+- Result: keep_speed survived all three profiles (300 steps, 0 collision episodes);
+  random and accelerate collided in all 10 episodes on all profiles.
+- Relevance differ fraction (keep_speed): 0.116 / 0.314 / 0.026 for
+  moderate / dense / mixed; lowest-TTC definition still needs approval.
+- Raw outputs: `scenario_results/h1_h1_*_20261120T*.json`.
+- Next: write design, implementation, test and evaluation reports.
