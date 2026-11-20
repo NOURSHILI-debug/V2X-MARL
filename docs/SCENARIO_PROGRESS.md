@@ -37,3 +37,10 @@
   moderate / dense / mixed; lowest-TTC definition still needs approval.
 - Raw outputs: `scenario_results/h1_h1_*_20261120T*.json`.
 - Next: write design, implementation, test and evaluation reports.
+
+## Stage F — documentation
+- Commits: `4829d98` (design), `3136295` (implementation log),
+  `280c96f` (test report), `34ea173` (evaluation report).
+- Result: four concise factual reports written; raw episode JSON preserved.
+- Final status: H1 technically implemented and contract-verified, but keep-speed
+  gate fails on all three profiles. H2 not started. Await approval.
