@@ -180,7 +180,7 @@ def test_config_file_defines_expected_profiles():
     assert profiles["h1_mixed_speed"].background_vehicles == 17
     assert profiles["h1_mixed_speed"].speeds.mode == "groups"
     assert len(profiles["h1_forcing"].forcing.roles) == 6
-    assert len(profiles["h2_lane_change"].forcing.roles) == 7
+    assert len(profiles["h2_lane_change"].forcing.roles) == 6
 
 
 @pytest.mark.parametrize("profile_id", PROFILE_IDS)

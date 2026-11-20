@@ -58,7 +58,7 @@
 
 ## Stage B — revised H1
 - Branch: `feat/scenario-suite`.
-- Commit: pending.
+- Commit: `99c6eb7`.
 - Verified old same-x starts: seed 100 CAVs all at x=100; random lane changes
   collide at step 3 (`cav_1`, `cav_2`, `cav_3`).
 - Pre-measurement fixes: role speeds no longer randomized, constant-speed
@@ -71,3 +71,17 @@
   G6 FAIL (oracle 1.00, nearest 1.00, none 1.00, all6 0.10).
 - Raw: `results/raw/scenarios/h1_forcing_20261120T220706Z.json` (gitignored).
 - Next: add H2 lane-change scenario and run full gate; do not tune gates.
+
+## Stage C — H2 lane-change
+- Branch: `feat/scenario-suite`.
+- Commit: pending.
+- Single pre-measurement layout fix: move fast approacher close behind lane-2
+  CAV, add protected lane-3 escape corridor, move slow blocker ahead of
+  stacked lane-1 CAVs.
+- Test command: `python -m pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
+  → 34 passed in 24.11s.
+- Gate command: `python scripts/evaluate_scenario_gate.py --scenario h2_lane_change`
+  → G1 PASS 1.00; G2 PASS 1.00; G3 PASS median 7.5; G4 PASS; G5 PASS headroom 0.697;
+  G6 FAIL (oracle 1.00, nearest 1.00, none 1.00, all6 0.00).
+- Raw: `results/raw/scenarios/h2_lane_change_20261120T221349Z.json` (gitignored).
+- Next: Stage D full regression tests, then docs; do not tune gates.
