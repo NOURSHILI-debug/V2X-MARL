@@ -22,7 +22,13 @@ from envs.scenarios.highway_scenarios import (
 
 
 BASELINE_PATH = Path(__file__).with_name("data") / "highway_no_scenario_baseline.json"
-PROFILE_IDS = ("h1_moderate", "h1_dense", "h1_mixed_speed")
+PROFILE_IDS = (
+    "h1_moderate",
+    "h1_dense",
+    "h1_mixed_speed",
+    "h1_forcing",
+    "h2_lane_change",
+)
 VALID_PROFILE = {
     "scenario_id": "unit_profile",
     "lanes_count": 4,
@@ -166,13 +172,15 @@ def test_profile_validation_rejects_contract_violations():
         parse_profile(bad_cav)
 
 
-def test_config_file_defines_three_h1_profiles():
+def test_config_file_defines_expected_profiles():
     profiles = load_profiles()
     assert set(profiles) == set(PROFILE_IDS)
     assert profiles["h1_moderate"].background_vehicles == 12
     assert profiles["h1_dense"].background_vehicles == 20
     assert profiles["h1_mixed_speed"].background_vehicles == 17
     assert profiles["h1_mixed_speed"].speeds.mode == "groups"
+    assert len(profiles["h1_forcing"].forcing.roles) == 5
+    assert len(profiles["h2_lane_change"].forcing.roles) == 7
 
 
 @pytest.mark.parametrize("profile_id", PROFILE_IDS)

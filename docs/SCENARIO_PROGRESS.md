@@ -44,3 +44,14 @@
 - Result: four concise factual reports written; raw episode JSON preserved.
 - Final status: H1 technically implemented and contract-verified, but keep-speed
   gate fails on all three profiles. H2 not started. Await approval.
+
+# Scenario suite batch
+
+## Stage A — shared forcing layer
+- Branch: `feat/scenario-suite` from `feat/scenario-h1-dense-highway`.
+- Commit: pending.
+- Added: staggered CAV starts, seeded blocker/approacher/alongside roles,
+  scheduled hazard hook, shared scripted policies, G1-G6 evaluator.
+- Test command: `python -m pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
+  → 34 passed in 25.11s.
+- Next: verify old same-x random crashes, add h1_forcing, run full gate.
