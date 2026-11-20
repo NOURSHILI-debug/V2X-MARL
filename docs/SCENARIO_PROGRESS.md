@@ -16,3 +16,13 @@
 - Result: all three initialize at seed 100 with 12/20/17 background vehicles,
   no collision at reset, 56-D observations, and `scenario_id` from config.
 - Next: add contract tests for the profiles.
+
+## Stage D — tests
+- Commit: `faf8ef6`
+- Result: `python -m pytest tests/test_highway_scenarios.py -q` → 19 passed.
+- `python -m pytest tests/test_contract.py -v -k highway` → 5 passed, 4 skipped.
+- `CONTRACT_STRICT=1 python -m pytest tests/test_contract.py -v -k highway` → 9 passed.
+- `python -m pytest tests/test_reward.py -q` → 20 passed.
+- `python -m pytest tests/test_highway_adapter.py -q` → 16 passed.
+- `python -m pytest tests -k "not carla and not toy" -q` → 192 passed, 4 skipped, 33 deselected.
+- Next: run dev-seed scripted-policy measurements and relevance check.
