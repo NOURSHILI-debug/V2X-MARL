@@ -11,7 +11,7 @@ Design principle: **keep the env generic and put the research in the grouping mo
 | Traffic Manager | Sync mode, `set_random_device_seed(seed)` | Paired evaluation needs this |
 | Agents | N = 4 CAVs (scale to 6 later), plus 0 to 6 scripted background vehicles | Enough for teammate selection to matter |
 | Sensors | **Collision sensor only**, no cameras | Fits 4 GB GPU, fast |
-| Rendering | `-quality-level=Low -RenderOffScreen` | Training speed |
+| Rendering | Windowed, **default quality, no graphics flags** (`CarlaUE4.exe`) | Required: `-quality-level=Low` triggers fatal Town03 shader-cache failures on this install |
 
 ## 2. Control layer (key choice)
 

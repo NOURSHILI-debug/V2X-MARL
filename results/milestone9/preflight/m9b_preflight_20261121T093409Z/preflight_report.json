@@ -1,0 +1,520 @@
+{
+  "meta": {
+    "timestamp_utc": "2026-11-21T09:34:10.264379+00:00",
+    "script": "m9b_preflight_smoke.py",
+    "scope": "bounded_operational_smoke_check_only",
+    "not_pilot": true,
+    "not_m9c": true,
+    "not_scientific_experiment": true,
+    "args": {
+      "host": "localhost",
+      "port": 2000,
+      "tm_port": 8000,
+      "town": "Town03",
+      "seed": 7,
+      "steps": 2,
+      "max_steps": 5,
+      "out_dir": "C:\\Users\\souro\\AppData\\Local\\Temp\\opencode\\m9b_preflight_20261121T093409Z"
+    },
+    "completed_utc": "2026-11-21T09:34:27.075073+00:00"
+  },
+  "checks": {
+    "A_connectivity_version_map": {
+      "status": "PARTIAL",
+      "details": {
+        "server_version": "f06817e84",
+        "server_version_error": null,
+        "server_version_is_semver": false,
+        "client_version_dist": "0.9.16",
+        "client_version_dist_error": null,
+        "client_version_attr": null,
+        "client_version_attr_error": null,
+        "client_version_effective": "0.9.16",
+        "client_is_0_9_16": true,
+        "provenance_note": "Client version read from installed dist-info; server reports a build hash (not a semver), so server semver cannot be independently API-verified.",
+        "town_requested": "Town03",
+        "map_name": "Carla/Maps/Town03",
+        "world_settings": {
+          "synchronous_mode": false,
+          "fixed_delta_seconds": null,
+          "no_rendering_mode": false,
+          "substepping": true,
+          "max_substep_delta_time": 0.01,
+          "max_substeps": 10
+        },
+        "tm": {
+          "tm_port": 8000,
+          "note": "TM settings read-back limited; recorded where API permits"
+        },
+        "tm_ok": true,
+        "tm_state_pre": {
+          "available": true,
+          "port": 8000,
+          "synchronous_mode": {
+            "not_exposed": true
+          },
+          "random_device_seed": {
+            "not_exposed": true
+          },
+          "global_distance_to_leading_vehicle": {
+            "not_exposed": true
+          },
+          "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+        },
+        "actor_counts_pre": {
+          "total": 85,
+          "vehicles": 0,
+          "traffic_lights": 38,
+          "sensors": 0,
+          "walkers": 0
+        },
+        "partial_reason": "connection/map/TM/client 0.9.16 OK; server semver only hash-evidenced"
+      },
+      "updated_utc": "2026-11-21T09:34:17.472391+00:00"
+    },
+    "A2_town_preload_gate": {
+      "status": "PASS",
+      "details": {
+        "town_requested": "Town03",
+        "map_name_before_env": "Carla/Maps/Town03",
+        "requirement": "map must already be the target town before CarlaMultiAgentEnv is constructed",
+        "note": "target town already loaded; env will skip its own load_world call"
+      },
+      "updated_utc": "2026-11-21T09:34:17.481559+00:00"
+    },
+    "B_route_spawn_reset1": {
+      "status": "PASS",
+      "details": {
+        "overall_route_applied": true,
+        "per_agent_ok": true,
+        "n_agents": 4,
+        "n_vehicles": 4
+      },
+      "updated_utc": "2026-11-21T09:34:22.033063+00:00"
+    },
+    "C_snapshot_fidelity_reset1": {
+      "status": "PASS",
+      "details": {
+        "errors_or_gaps": [],
+        "capture_notes": {
+          "vehicles_sample_is_list": true,
+          "vehicles_sample_len": 4,
+          "traffic_lights_sample_is_list": true,
+          "traffic_lights_sample_len": 20,
+          "note": "Empty lists may mean none observed; *_error fields indicate API/capture issues."
+        }
+      },
+      "updated_utc": "2026-11-21T09:34:22.033063+00:00"
+    },
+    "D_bounded_stepping": {
+      "status": "PASS",
+      "details": {
+        "steps_executed": 2,
+        "records": [
+          {
+            "step_index": 1,
+            "steps_env": 1,
+            "terminated_any": false,
+            "truncated_any": false,
+            "has_v2x": true,
+            "has_team_reward": true
+          },
+          {
+            "step_index": 2,
+            "steps_env": 2,
+            "terminated_any": false,
+            "truncated_any": false,
+            "has_v2x": true,
+            "has_team_reward": true
+          }
+        ]
+      },
+      "updated_utc": "2026-11-21T09:34:22.183062+00:00"
+    },
+    "E_cleanup_reset1": {
+      "status": "PARTIAL",
+      "details": {
+        "close_error": null,
+        "residual_project_actor_ids": [],
+        "post_world_settings": {
+          "synchronous_mode": false,
+          "fixed_delta_seconds": null,
+          "no_rendering_mode": false,
+          "substepping": true,
+          "max_substep_delta_time": 0.01,
+          "max_substeps": 10
+        },
+        "tm_after_close": {
+          "available": true,
+          "port": 8000,
+          "synchronous_mode": {
+            "not_exposed": true
+          },
+          "random_device_seed": {
+            "not_exposed": true
+          },
+          "global_distance_to_leading_vehicle": {
+            "not_exposed": true
+          },
+          "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+        }
+      },
+      "updated_utc": "2026-11-21T09:34:22.271603+00:00"
+    },
+    "B_route_spawn_reset2": {
+      "status": "PASS",
+      "details": {
+        "overall_route_applied": true,
+        "per_agent_ok": true,
+        "n_agents": 4,
+        "n_vehicles": 4
+      },
+      "updated_utc": "2026-11-21T09:34:26.826856+00:00"
+    },
+    "C_snapshot_fidelity_reset2": {
+      "status": "PASS",
+      "details": {
+        "errors_or_gaps": [],
+        "capture_notes": {
+          "vehicles_sample_is_list": true,
+          "vehicles_sample_len": 4,
+          "traffic_lights_sample_is_list": true,
+          "traffic_lights_sample_len": 20,
+          "note": "Empty lists may mean none observed; *_error fields indicate API/capture issues."
+        }
+      },
+      "updated_utc": "2026-11-21T09:34:26.826856+00:00"
+    },
+    "E_cleanup_reset2": {
+      "status": "PARTIAL",
+      "details": {
+        "close_error": null,
+        "residual_project_actor_ids": [],
+        "post_world_settings": {
+          "synchronous_mode": false,
+          "fixed_delta_seconds": null,
+          "no_rendering_mode": false,
+          "substepping": true,
+          "max_substep_delta_time": 0.01,
+          "max_substeps": 10
+        },
+        "tm_after_close": {
+          "available": true,
+          "port": 8000,
+          "synchronous_mode": {
+            "not_exposed": true
+          },
+          "random_device_seed": {
+            "not_exposed": true
+          },
+          "global_distance_to_leading_vehicle": {
+            "not_exposed": true
+          },
+          "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+        }
+      },
+      "updated_utc": "2026-11-21T09:34:27.012433+00:00"
+    },
+    "F_sequential_isolation_probe_observational": {
+      "status": "PARTIAL",
+      "details": {
+        "notes": "Observational comparison only; not proof of simulator isolation.",
+        "map_name_1": "Carla/Maps/Town03",
+        "map_name_2": "Carla/Maps/Town03",
+        "map_equal": true,
+        "world_settings_1": {
+          "synchronous_mode": true,
+          "fixed_delta_seconds": 0.05,
+          "no_rendering_mode": false,
+          "substepping": true,
+          "max_substep_delta_time": 0.01,
+          "max_substeps": 10
+        },
+        "world_settings_2": {
+          "synchronous_mode": true,
+          "fixed_delta_seconds": 0.05,
+          "no_rendering_mode": false,
+          "substepping": true,
+          "max_substep_delta_time": 0.01,
+          "max_substeps": 10
+        },
+        "world_settings_equal_core": true,
+        "weather_1": {
+          "cloudiness": 10.0,
+          "precipitation": 0.0,
+          "precipitation_deposits": 0.0,
+          "wind_intensity": 10.0,
+          "sun_azimuth_angle": 180.0,
+          "sun_altitude_angle": 30.0,
+          "fog_density": 2.0,
+          "fog_distance": 0.75,
+          "wetness": 0.0,
+          "fog_falloff": 0.10000000149011612,
+          "scattering_intensity": 1.0,
+          "mie_scattering_scale": 0.029999999329447746,
+          "rayleigh_scattering_scale": 0.03310000151395798,
+          "dust_storm": 0.0
+        },
+        "weather_2": {
+          "cloudiness": 10.0,
+          "precipitation": 0.0,
+          "precipitation_deposits": 0.0,
+          "wind_intensity": 10.0,
+          "sun_azimuth_angle": 180.0,
+          "sun_altitude_angle": 30.0,
+          "fog_density": 2.0,
+          "fog_distance": 0.75,
+          "wetness": 0.0,
+          "fog_falloff": 0.10000000149011612,
+          "scattering_intensity": 1.0,
+          "mie_scattering_scale": 0.029999999329447746,
+          "rayleigh_scattering_scale": 0.03310000151395798,
+          "dust_storm": 0.0
+        },
+        "weather_equal": true,
+        "actor_counts_1": {
+          "total": 89,
+          "vehicles": 4,
+          "traffic_lights": 38,
+          "sensors": 0,
+          "walkers": 0
+        },
+        "actor_counts_2": {
+          "total": 89,
+          "vehicles": 4,
+          "traffic_lights": 38,
+          "sensors": 0,
+          "walkers": 0
+        },
+        "actor_counts_equal": true,
+        "traffic_light_states_1": {
+          "66": "Red",
+          "67": "Red",
+          "68": "Red",
+          "69": "Red",
+          "70": "Green",
+          "71": "Red",
+          "72": "Red",
+          "73": "Red",
+          "74": "Green",
+          "75": "Red",
+          "76": "Red",
+          "77": "Red",
+          "78": "Green",
+          "79": "Red",
+          "80": "Red",
+          "81": "Green",
+          "82": "Red",
+          "83": "Red",
+          "84": "Red",
+          "85": "Red"
+        },
+        "traffic_light_states_2": {
+          "66": "Red",
+          "67": "Red",
+          "68": "Red",
+          "69": "Red",
+          "70": "Green",
+          "71": "Red",
+          "72": "Red",
+          "73": "Red",
+          "74": "Green",
+          "75": "Red",
+          "76": "Red",
+          "77": "Red",
+          "78": "Green",
+          "79": "Red",
+          "80": "Red",
+          "81": "Green",
+          "82": "Red",
+          "83": "Red",
+          "84": "Red",
+          "85": "Red"
+        },
+        "traffic_light_states_equal": true,
+        "traffic_light_changed_ids": [],
+        "vehicle_ids_1": [
+          141,
+          142,
+          143,
+          144
+        ],
+        "vehicle_ids_2": [
+          152,
+          151,
+          150,
+          149
+        ],
+        "vehicle_ids_equal": false,
+        "tm_after_reset_1": {
+          "available": true,
+          "port": 8000,
+          "synchronous_mode": {
+            "not_exposed": true
+          },
+          "random_device_seed": {
+            "not_exposed": true
+          },
+          "global_distance_to_leading_vehicle": {
+            "not_exposed": true
+          },
+          "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+        },
+        "tm_after_reset_2": {
+          "available": true,
+          "port": 8000,
+          "synchronous_mode": {
+            "not_exposed": true
+          },
+          "random_device_seed": {
+            "not_exposed": true
+          },
+          "global_distance_to_leading_vehicle": {
+            "not_exposed": true
+          },
+          "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+        },
+        "tm_readback_available": false,
+        "controlled_agents": {
+          "cav_0": {
+            "pos1": {
+              "x": 2.35427188873291,
+              "y": 189.21514892578125,
+              "z": -0.01972772553563118
+            },
+            "pos2": {
+              "x": 2.35427188873291,
+              "y": 189.21514892578125,
+              "z": -0.01972772553563118
+            },
+            "abs_delta_m": {
+              "dx": 0.0,
+              "dy": 0.0,
+              "dz": 0.0
+            },
+            "route_len1": 31,
+            "route_len2": 31,
+            "route_applied1": true,
+            "route_applied2": true,
+            "destination1": {
+              "x": -72.08596801757812,
+              "y": 121.95474243164062,
+              "z": 0.06717248260974884
+            },
+            "destination2": {
+              "x": -72.08596801757812,
+              "y": 121.95474243164062,
+              "z": 0.06717248260974884
+            }
+          },
+          "cav_1": {
+            "pos1": {
+              "x": -5.705279350280762,
+              "y": 185.72886657714844,
+              "z": -0.02348463051021099
+            },
+            "pos2": {
+              "x": -5.705279350280762,
+              "y": 185.72886657714844,
+              "z": -0.02348463051021099
+            },
+            "abs_delta_m": {
+              "dx": 0.0,
+              "dy": 0.0,
+              "dz": 0.0
+            },
+            "route_len1": 31,
+            "route_len2": 31,
+            "route_applied1": true,
+            "route_applied2": true,
+            "destination1": {
+              "x": -84.03670501708984,
+              "y": 138.30003356933594,
+              "z": 0.0
+            },
+            "destination2": {
+              "x": -84.03670501708984,
+              "y": 138.30003356933594,
+              "z": 0.0
+            }
+          },
+          "cav_2": {
+            "pos1": {
+              "x": -9.261773109436035,
+              "y": 155.70883178710938,
+              "z": -0.024157924577593803
+            },
+            "pos2": {
+              "x": -9.261773109436035,
+              "y": 155.70883178710938,
+              "z": -0.024157924577593803
+            },
+            "abs_delta_m": {
+              "dx": 0.0,
+              "dy": 0.0,
+              "dz": 0.0
+            },
+            "route_len1": 31,
+            "route_len2": 31,
+            "route_applied1": true,
+            "route_applied2": true,
+            "destination1": {
+              "x": -73.59127044677734,
+              "y": 161.87750244140625,
+              "z": 0.0
+            },
+            "destination2": {
+              "x": -73.59127044677734,
+              "y": 161.87750244140625,
+              "z": 0.0
+            }
+          },
+          "cav_3": {
+            "pos1": {
+              "x": 5.684788703918457,
+              "y": 153.81900024414062,
+              "z": -0.01680772751569748
+            },
+            "pos2": {
+              "x": 5.684788703918457,
+              "y": 153.81900024414062,
+              "z": -0.01680772751569748
+            },
+            "abs_delta_m": {
+              "dx": 0.0,
+              "dy": 0.0,
+              "dz": 0.0
+            },
+            "route_len1": 31,
+            "route_len2": 31,
+            "route_applied1": true,
+            "route_applied2": true,
+            "destination1": {
+              "x": 12.131248474121094,
+              "y": 22.450756072998047,
+              "z": 0.0
+            },
+            "destination2": {
+              "x": 12.131248474121094,
+              "y": 22.450756072998047,
+              "z": 0.0
+            }
+          }
+        },
+        "controlled_spawn_positions_equal": true,
+        "conclusion": "observational_only_not_proof_of_isolation"
+      },
+      "updated_utc": "2026-11-21T09:34:27.075073+00:00"
+    },
+    "G_persistence_reporting": {
+      "status": "PASS",
+      "details": {
+        "out_dir": "C:\\Users\\souro\\AppData\\Local\\Temp\\opencode\\m9b_preflight_20261121T093409Z",
+        "note": "artifacts written to new unique output dir; no existing milestone results targeted",
+        "earlier_check_failures_present": false
+      },
+      "updated_utc": "2026-11-21T09:34:27.075073+00:00"
+    }
+  },
+  "errors": []
+}
