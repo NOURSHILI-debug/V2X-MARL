@@ -1,0 +1,279 @@
+{
+  "config": {
+    "town": "Town03",
+    "n_agents": 4,
+    "spawn_mode": "cluster",
+    "spawn_cluster_max_distance": 45.0,
+    "candidate_source": "v2x",
+    "v2x_config": {
+      "range_m": 50.0,
+      "delay_steps": 0,
+      "loss_prob": 0.0
+    },
+    "selection_k": 2,
+    "obs_dim": 56,
+    "steps": 20,
+    "seed": 7,
+    "host": "localhost",
+    "port": 2000,
+    "tm_port": 8000,
+    "controller": "marl.heuristic_controller.HeuristicController",
+    "timestamp_utc": "2026-11-20T15:40:03.637743+00:00"
+  },
+  "runs": [
+    {
+      "selection_mode": "nearest_k",
+      "reset_seed": 7,
+      "agents_expected": 4,
+      "agents_observed": 4,
+      "steps_executed": 20,
+      "ended": false,
+      "ending_reason": null,
+      "success": false,
+      "collision": false,
+      "off_road": false,
+      "stuck": false,
+      "timeout": false,
+      "team_reward_total": 0.005268476797080708,
+      "min_ttc": null,
+      "jerk": null,
+      "v2x_episode": {
+        "sent": 240,
+        "delivered": 214,
+        "dropped_by_range": 26,
+        "dropped_by_loss": 0,
+        "dropped": 26,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "reset_info": {
+        "seed": 7,
+        "town": "Town03",
+        "spawn_mode": "cluster",
+        "spawn_cluster_max_distance": 45.0,
+        "route_applied": true,
+        "per_agent": {
+          "cav_0": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "nearest_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          },
+          "cav_1": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "nearest_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          },
+          "cav_2": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "nearest_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          },
+          "cav_3": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "nearest_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          }
+        },
+        "v2x": {
+          "step_index": 0,
+          "sent": 0,
+          "delivered": 0,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "dropped": 0,
+          "mean_age": 0.0,
+          "in_flight": 0
+        }
+      },
+      "all_obs_shape_56": true,
+      "all_obs_float32": true,
+      "all_obs_finite": true,
+      "all_actions_valid": true,
+      "all_masks_respected": true,
+      "v2x_metadata_populated": true
+    },
+    {
+      "selection_mode": "random_k",
+      "reset_seed": 7,
+      "agents_expected": 4,
+      "agents_observed": 4,
+      "steps_executed": 10,
+      "ended": false,
+      "ending_reason": null,
+      "success": false,
+      "collision": false,
+      "off_road": false,
+      "stuck": false,
+      "timeout": false,
+      "team_reward_total": -0.1066016699289793,
+      "min_ttc": null,
+      "jerk": null,
+      "v2x_episode": {
+        "sent": 120,
+        "delivered": 118,
+        "dropped_by_range": 2,
+        "dropped_by_loss": 0,
+        "dropped": 2,
+        "mean_age": 0.0,
+        "in_flight": 0
+      },
+      "reset_info": {
+        "seed": 7,
+        "town": "Town03",
+        "spawn_mode": "cluster",
+        "spawn_cluster_max_distance": 45.0,
+        "route_applied": true,
+        "per_agent": {
+          "cav_0": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "random_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          },
+          "cav_1": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "random_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          },
+          "cav_2": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "random_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          },
+          "cav_3": {
+            "route_applied": true,
+            "selection": {
+              "strategy": "random_k",
+              "k": 2,
+              "candidate_source": "v2x",
+              "pool_size": 0,
+              "selected_count": 0,
+              "missing_slots": 2,
+              "selected_ids": [
+                null,
+                null
+              ],
+              "selected_scores": [
+                null,
+                null
+              ]
+            }
+          }
+        },
+        "v2x": {
+          "step_index": 0,
+          "sent": 0,
+          "delivered": 0,
+          "dropped_by_range": 0,
+          "dropped_by_loss": 0,
+          "dropped": 0,
+          "mean_age": 0.0,
+          "in_flight": 0
+        }
+      },
+      "all_obs_shape_56": true,
+      "all_obs_float32": true,
+      "all_obs_finite": true,
+      "all_actions_valid": true,
+      "all_masks_respected": true,
+      "v2x_metadata_populated": true
+    }
+  ]
+}

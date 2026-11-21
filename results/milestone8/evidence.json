@@ -1,0 +1,34 @@
+{
+  "nearest_k": {
+    "steps_executed": 20,
+    "all_obs_shape_56": true,
+    "all_obs_float32": true,
+    "all_obs_finite": true,
+    "all_actions_valid": true,
+    "all_masks_respected": true,
+    "v2x_metadata_populated": true,
+    "ending_reason": null
+  },
+  "random_k_same_controller": {
+    "steps_executed": 10,
+    "all_obs_shape_56": true,
+    "all_obs_float32": true,
+    "all_obs_finite": true,
+    "all_actions_valid": true,
+    "all_masks_respected": true,
+    "v2x_metadata_populated": true,
+    "ending_reason": null
+  },
+  "outputs": {
+    "config": "results\\milestone8\\config.json",
+    "summary_json": "results\\milestone8\\smoke_summary.json",
+    "per_step_csv": "results\\milestone8\\per_step_log.csv",
+    "action_distribution_png": "results\\milestone8\\figures\\action_distribution.png",
+    "ego_speed_png": "results\\milestone8\\figures\\ego_speed_over_steps.png",
+    "candidate_availability_png": "results\\milestone8\\figures\\candidate_availability.png",
+    "v2x_reception_png": "results\\milestone8\\figures\\v2x_reception.png",
+    "selected_candidate_counts_png": "results\\milestone8\\figures\\selected_candidate_counts.png",
+    "safety_responses_png": "results\\milestone8\\figures\\safety_responses.png",
+    "figures_dir": "results\\milestone8\\figures"
+  }
+}

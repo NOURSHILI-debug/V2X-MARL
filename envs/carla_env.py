@@ -12,12 +12,16 @@ TODO:
 import logging
 import math
 import random
+from itertools import combinations
 
 import numpy as np
 import carla
 
 from envs.base import MultiAgentEnv
 from envs.control import speed_limit_difference, update_target_speed
+from envs.v2x_adapter import received_to_candidates
+from envs.v2x_channel import V2XChannel, V2XConfig
+from grouping import make_selector
 from envs.obs_builder import (
     CANDIDATE_RANGE,
     MAX_LANES,
@@ -75,7 +79,12 @@ logger = logging.getLogger(__name__)
 class CarlaMultiAgentEnv(MultiAgentEnv):
     def __init__(self, town="Town03", n_agents=N_AGENTS, host="localhost",
                  port=2000, tm_port=8000, seed=0, reset_traffic_lights=True,
-                 light_cycle=True):
+                 light_cycle=True, selection_mode="legacy", selection_k=2,
+                 selection_seed=None, candidate_source="ground_truth",
+                 v2x_config=None, v2x_seed=None,
+                 v2x_broadcasters="cavs_and_background",
+                 spawn_mode="default", spawn_cluster_max_distance=45.0,
+                 max_steps=None):
         self.town = town
         self.n_agents = n_agents
         self.agents = [f"cav_{i}" for i in range(n_agents)]
@@ -83,9 +92,40 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         self.tm_port = tm_port
         self.obs_dim = OBS_DIM
         self.n_actions = N_ACTIONS
-        self.max_steps = MAX_STEPS
+        # Backward compatible: default preserves existing MAX_STEPS behavior.
+        if max_steps is None:
+            self.max_steps = MAX_STEPS
+        else:
+            if isinstance(max_steps, bool) or not isinstance(max_steps, (int, np.integer)):
+                raise ValueError("max_steps must be a positive integer or None")
+            max_steps = int(max_steps)
+            if max_steps < 1:
+                raise ValueError("max_steps must be a positive integer or None")
+            self.max_steps = max_steps
         self.light_cycle = bool(light_cycle)
         self.reset_traffic_lights = bool(reset_traffic_lights)
+
+        # ---- teammate selection configuration -----------------------------
+        self._configure_selection(
+            selection_mode=selection_mode,
+            selection_k=selection_k,
+            selection_seed=selection_seed,
+        )
+
+        # ---- candidate source configuration --------------------------------
+        self._configure_candidate_source(
+            candidate_source=candidate_source,
+            v2x_config=v2x_config,
+            v2x_seed=v2x_seed,
+            v2x_broadcasters=v2x_broadcasters,
+            seed=seed,
+        )
+
+        # ---- spawn configuration (experimental, default unchanged) ---------
+        self._configure_spawn(
+            spawn_mode=spawn_mode,
+            spawn_cluster_max_distance=spawn_cluster_max_distance,
+        )
 
         self.client = carla.Client(host, port)
         self.client.set_timeout(30)
@@ -129,6 +169,162 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         s.synchronous_mode = enabled
         s.fixed_delta_seconds = SIM_DT if enabled else None
         self.world.apply_settings(s)
+
+    # ---- configuration helpers (also used by CARLA-free tests) -----------
+    def _configure_selection(self, selection_mode, selection_k, selection_seed):
+        """Validate and store the teammate-selection configuration.
+
+        ``selection_mode="legacy"`` (default) keeps the existing behaviour: the
+        full eligible candidate pool is passed straight to build_observation.
+        Any other mode routes candidates through a grouping selector first.
+        """
+        self.selection_mode = selection_mode
+        self.selection_k = int(selection_k)
+        if self.selection_k < 1:
+            raise ValueError("selection_k must be >= 1")
+        self._selector = make_selector(selection_mode)
+        # Explicit Generator for reproducible random selection; never the
+        # global NumPy RNG. reset(seed=...) controls CARLA/background
+        # randomness separately from selection_seed.
+        self._selection_rng = np.random.default_rng(selection_seed)
+        # Selection result per agent from the most recent _get_obs() call,
+        # used to write per-agent selection metadata into info.
+        self._last_selection = {}
+
+    def _configure_candidate_source(
+        self,
+        candidate_source,
+        v2x_config,
+        v2x_seed,
+        v2x_broadcasters,
+        seed,
+    ):
+        """Validate and store the candidate-source configuration.
+
+        ``candidate_source="ground_truth"`` (default) keeps the existing
+        behaviour: candidates come from CARLA world state via get_candidates().
+        ``"v2x"`` routes candidates through the V2X channel instead.
+
+        Seed policy: ``v2x_seed`` owns all channel randomness. When it is None
+        the environment seed captured here is used, so runs stay reproducible
+        by default. ``reset()`` replays the same channel seed and never consults
+        ``reset(seed=...)``.
+        """
+        self.candidate_source = candidate_source
+        if self.candidate_source not in ("ground_truth", "v2x"):
+            raise ValueError(
+                f"candidate_source {candidate_source!r} must be 'ground_truth' or 'v2x'"
+            )
+        self.v2x_broadcasters = v2x_broadcasters
+        if self.v2x_broadcasters not in ("cavs_only", "cavs_and_background"):
+            raise ValueError(
+                f"v2x_broadcasters {v2x_broadcasters!r} must be 'cavs_only' "
+                "or 'cavs_and_background'"
+            )
+        # The V2X channel is CARLA-independent (pure NumPy). It is only created
+        # when v2x mode is active, so ground_truth mode has zero V2X overhead.
+        self._v2x_channel = None
+        self._v2x_stats = None
+        self._v2x_seed = seed if v2x_seed is None else v2x_seed
+        if self.candidate_source == "v2x":
+            if v2x_config is None:
+                v2x_config = V2XConfig()
+            if not isinstance(v2x_config, V2XConfig):
+                raise TypeError("v2x_config must be a V2XConfig instance or None")
+            self._v2x_channel = V2XChannel(config=v2x_config, seed=self._v2x_seed)
+        # Last action per agent, used as the V2X message "intent" field.
+        self._last_action = {agent_id: KEEP for agent_id in self.agents}
+        # Last received messages per agent, cached from _get_obs() for metadata.
+        self._last_received = {}
+        # Per-agent candidate-source metadata from the most recent _get_obs().
+        self._last_candidate_meta = {}
+
+    def _reset_v2x_state(self):
+        """Clear V2X channel state and cached per-agent V2X metadata.
+
+        Called by ``reset()`` so no in-flight message from a previous episode
+        can be delivered, and so a fresh episode starts with an empty inbox.
+        The channel replays its own documented seed (``v2x_seed``, or the
+        environment seed captured at construction when ``v2x_seed`` is None).
+        """
+        if getattr(self, "_v2x_channel", None) is not None:
+            self._v2x_channel.reset()
+            self._v2x_stats = None
+        self._last_received = {}
+        self._last_candidate_meta = {}
+        self._last_action = {agent_id: KEEP for agent_id in self.agents}
+
+    # ---- spawn configuration (experimental) --------------------------------
+    def _configure_spawn(self, spawn_mode, spawn_cluster_max_distance):
+        """Configure optional experimental spawn selection.
+
+        ``spawn_mode="default"`` preserves the existing shuffled scan over all
+        CARLA spawn points. ``spawn_mode="cluster"`` tries groups of spawn
+        points whose pairwise 2D distances are all within
+        ``spawn_cluster_max_distance`` meters, preferring nearby/compatible
+        placements while still subject to the existing route validation.
+        """
+        if spawn_mode not in ("default", "cluster"):
+            raise ValueError(
+                f"spawn_mode {spawn_mode!r} must be 'default' or 'cluster'"
+            )
+        self.spawn_mode = spawn_mode
+        self.spawn_cluster_max_distance = float(spawn_cluster_max_distance)
+        if self.spawn_mode == "cluster" and self.spawn_cluster_max_distance <= 0.0:
+            raise ValueError("spawn_cluster_max_distance must be > 0 in cluster mode")
+
+    @staticmethod
+    def _pairwise_spawn_distance(spawn_a, spawn_b):
+        a = spawn_a.location
+        b = spawn_b.location
+        return math.hypot(float(a.x) - float(b.x), float(a.y) - float(b.y))
+
+    def _find_spawn_clusters(self, spawn_points, n_agents, max_distance):
+        """Return deterministic clusters of spawn-point indices.
+
+        Each cluster is a tuple of ``n_agents`` indices such that every pair of
+        spawn points is within ``max_distance`` meters in the XY plane. Clusters
+        are unique (as sorted index sets) and returned in deterministic order.
+        """
+        n = len(spawn_points)
+        # Precompute neighbors within radius for pruning.
+        neighbors = [set() for _ in range(n)]
+        for i in range(n):
+            for j in range(i + 1, n):
+                if self._pairwise_spawn_distance(spawn_points[i], spawn_points[j]) <= max_distance:
+                    neighbors[i].add(j)
+                    neighbors[j].add(i)
+
+        clusters = []
+        seen = set()
+        # Deterministic enumeration by index order.
+        for a in range(n):
+            if len(neighbors[a]) < n_agents - 1:
+                continue
+            # Candidate pool: a and its neighbors, in index order.
+            pool = [a] + sorted(neighbors[a])
+            # Search combinations of n_agents from pool that include a and form a clique.
+            for combo in combinations(pool, n_agents):
+                if a not in combo:
+                    continue
+                key = tuple(sorted(combo))
+                if key in seen:
+                    continue
+                ok = True
+                for i in range(n_agents):
+                    for j in range(i + 1, n_agents):
+                        if self._pairwise_spawn_distance(
+                            spawn_points[combo[i]], spawn_points[combo[j]]
+                        ) > max_distance:
+                            ok = False
+                            break
+                    if not ok:
+                        break
+                if ok:
+                    seen.add(key)
+                    clusters.append(combo)
+        clusters.sort()
+        return clusters
 
     # ---- teardown ---------------------------------------------------------
     def _destroy_actors(self):
@@ -279,6 +475,119 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             "green=10.0s yellow=2.0s red=5.0s" if self.light_cycle else "unchanged",
         )
 
+    # ---- spawn helpers -----------------------------------------------------
+    def _try_spawn_at_transform(
+        self, agent_id, agent_index, spawn_transform, bp, carla_map
+    ):
+        """Try to spawn and validate one agent at ``spawn_transform``.
+
+        Returns ``None`` if CARLA cannot spawn the actor at the transform.
+        Otherwise returns ``(vehicle, route, goal, accepted, rejection_count)``
+        where ``accepted`` is False if the spawn was rejected by route
+        validation (the caller is responsible for destroying the vehicle).
+        """
+        v = self.world.try_spawn_actor(bp, spawn_transform)
+        if v is None:
+            return None
+        v.set_autopilot(True, self.tm_port)
+        self.world.tick()
+        start_waypoint = carla_map.get_waypoint(v.get_location())
+        agent_rng = random.Random(self.seed + agent_index)
+        route = self._plan_route(start_waypoint, agent_rng)
+        path = self._tm_path(route)
+        goal = self._goal_before_route_end(path)
+        goal_distance_at_reset = v.get_location().distance(goal)
+        route_length = self._path_length_from_spawn(v.get_location(), path)
+        logger.info(
+            "Reset route for %s: distance_to_goal=%.2f m "
+            "route_length=%.2f m goal_radius=%.2f m",
+            agent_id, goal_distance_at_reset, route_length, GOAL_RADIUS,
+        )
+        start_to_goal_distance = v.get_location().distance(path[-1])
+        if start_to_goal_distance > route_length:
+            logger.warning(
+                "Rejecting spawn for %s: Euclidean start-to-goal distance "
+                "%.2f m exceeds planned route length %.2f m",
+                agent_id,
+                start_to_goal_distance,
+                route_length,
+            )
+            return (v, route, goal, False, 1)
+        assert start_to_goal_distance <= route_length
+        start_distance, start_index = self._nearest_route_point(
+            v.get_location(), route
+        )
+        if not self._route_start_is_valid(v.get_location(), route):
+            logger.warning(
+                "Rejecting spawn for %s: route start misaligned "
+                "distance=%.2f m nearest_waypoint=%d",
+                agent_id, start_distance, start_index,
+            )
+            return (v, route, goal, False, 1)
+        return (v, route, goal, True, 0)
+
+    def _spawn_agents_clustered(self, spawn_points, bp, carla_map, rng):
+        """Spawn all agents from a nearby cluster of valid CARLA spawn points.
+
+        Tries clusters whose pairwise XY distances are within
+        ``spawn_cluster_max_distance`` in a seed-deterministic order. Each
+        cluster attempt must pass the existing per-agent route validation for
+        every agent; if any agent fails, the attempt is abandoned and the next
+        cluster is tried.
+        """
+        clusters = self._find_spawn_clusters(
+            spawn_points, self.n_agents, self.spawn_cluster_max_distance
+        )
+        if not clusters:
+            raise RuntimeError(
+                f"no spawn-point clusters found for {self.n_agents} agents "
+                f"within {self.spawn_cluster_max_distance} m in {self.town}"
+            )
+        rng.shuffle(clusters)
+        route_rejections = dict.fromkeys(self.agents, 0)
+
+        for cluster in clusters:
+            accepted_routes = {}
+            cluster_ok = True
+            for agent_index, agent_id in enumerate(self.agents):
+                spawn_transform = spawn_points[cluster[agent_index]]
+                result = self._try_spawn_at_transform(
+                    agent_id, agent_index, spawn_transform, bp, carla_map
+                )
+                if result is None:
+                    cluster_ok = False
+                    break
+                vehicle, route, goal, ok, rejection_count = result
+                route_rejections[agent_id] += rejection_count
+                if not ok:
+                    vehicle.destroy()
+                    cluster_ok = False
+                    break
+                self.vehicles[agent_id] = vehicle
+                self.target_speed[agent_id] = CRUISE_SPEED_MPS
+                self._set_tm_target_speed(agent_id)
+                self.tm.auto_lane_change(vehicle, False)
+                self.tm.ignore_lights_percentage(vehicle, 0)
+                accepted_routes[agent_id] = (route, goal)
+            if cluster_ok:
+                return accepted_routes, route_rejections
+            # Cluster attempt failed: destroy any vehicles placed in this attempt.
+            for vehicle in list(self.vehicles.values()):
+                try:
+                    vehicle.destroy()
+                except RuntimeError:
+                    pass
+            self.vehicles = {}
+            self.target_speed = {}
+            self.world.tick()
+
+        self._destroy_actors()
+        raise RuntimeError(
+            f"could not find a valid clustered spawn+route for all agents "
+            f"(tried {len(clusters)} clusters, max_distance="
+            f"{self.spawn_cluster_max_distance} m)"
+        )
+
     # ---- API --------------------------------------------------------------
     def reset(self, seed=None, town=None):
         if seed is not None:
@@ -307,73 +616,48 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             rng = random.Random(self.seed)
 
             spawn_points = self.world.get_map().get_spawn_points()
-            rng.shuffle(spawn_points)
             bp = self.world.get_blueprint_library().filter("vehicle.tesla.model3")[0]
             self._configure_traffic_lights()
             carla_map = self.world.get_map()
-            spawn_cursor = 0
             accepted_routes = {}
             route_rejections = dict.fromkeys(self.agents, 0)
-            for agent_index, agent_id in enumerate(self.agents):
-                accepted = False
-                while spawn_cursor < len(spawn_points):
-                    spawn_transform = spawn_points[spawn_cursor]
-                    spawn_cursor += 1
-                    v = self.world.try_spawn_actor(bp, spawn_transform)
-                    if v is None:
-                        continue
-                    v.set_autopilot(True, self.tm_port)
-                    self.world.tick()
-                    start_waypoint = carla_map.get_waypoint(v.get_location())
-                    agent_rng = random.Random(self.seed + agent_index)
-                    route = self._plan_route(start_waypoint, agent_rng)
-                    path = self._tm_path(route)
-                    goal = self._goal_before_route_end(path)
-                    goal_distance_at_reset = v.get_location().distance(goal)
-                    route_length = self._path_length_from_spawn(v.get_location(), path)
-                    logger.info(
-                        "Reset route for %s: distance_to_goal=%.2f m "
-                        "route_length=%.2f m goal_radius=%.2f m",
-                        agent_id, goal_distance_at_reset, route_length, GOAL_RADIUS,
-                    )
-                    start_to_goal_distance = v.get_location().distance(path[-1])
-                    if start_to_goal_distance > route_length:
-                        logger.warning(
-                            "Rejecting spawn for %s: Euclidean start-to-goal distance "
-                            "%.2f m exceeds planned route length %.2f m",
-                            agent_id,
-                            start_to_goal_distance,
-                            route_length,
+
+            if getattr(self, "spawn_mode", "default") == "cluster":
+                accepted_routes, route_rejections = self._spawn_agents_clustered(
+                    spawn_points, bp, carla_map, rng
+                )
+            else:
+                rng.shuffle(spawn_points)
+                spawn_cursor = 0
+                for agent_index, agent_id in enumerate(self.agents):
+                    accepted = False
+                    while spawn_cursor < len(spawn_points):
+                        spawn_transform = spawn_points[spawn_cursor]
+                        spawn_cursor += 1
+                        result = self._try_spawn_at_transform(
+                            agent_id, agent_index, spawn_transform, bp, carla_map
                         )
-                        v.destroy()
-                        route_rejections[agent_id] += 1
-                        continue
-                    assert start_to_goal_distance <= route_length
-                    start_distance, start_index = self._nearest_route_point(
-                        v.get_location(), route
-                    )
-                    if not self._route_start_is_valid(v.get_location(), route):
-                        logger.warning(
-                            "Rejecting spawn for %s: route start misaligned "
-                            "distance=%.2f m nearest_waypoint=%d",
-                            agent_id, start_distance, start_index,
+                        if result is None:
+                            # try_spawn_actor failed (occupied/invalid); not a route rejection
+                            continue
+                        vehicle, route, goal, ok, rejection_count = result
+                        route_rejections[agent_id] += rejection_count
+                        if not ok:
+                            vehicle.destroy()
+                            continue
+                        self.vehicles[agent_id] = vehicle
+                        self.target_speed[agent_id] = CRUISE_SPEED_MPS
+                        self._set_tm_target_speed(agent_id)
+                        self.tm.auto_lane_change(vehicle, False)
+                        self.tm.ignore_lights_percentage(vehicle, 0)
+                        accepted_routes[agent_id] = (route, goal)
+                        accepted = True
+                        break
+                    if not accepted:
+                        self._destroy_actors()
+                        raise RuntimeError(
+                            f"could not find a spawn with a valid route for {agent_id}"
                         )
-                        v.destroy()
-                        route_rejections[agent_id] += 1
-                        continue
-                    self.vehicles[agent_id] = v
-                    self.target_speed[agent_id] = CRUISE_SPEED_MPS
-                    self._set_tm_target_speed(agent_id)
-                    self.tm.auto_lane_change(v, False)      # lane changes only by action
-                    self.tm.ignore_lights_percentage(v, 0)
-                    accepted_routes[agent_id] = (route, goal)
-                    accepted = True
-                    break
-                if not accepted:
-                    self._destroy_actors()
-                    raise RuntimeError(
-                        f"could not find a spawn with a valid route for {agent_id}"
-                    )
             route_signatures = {
                 agent_id: tuple(
                     (round(wp.transform.location.x, 2),
@@ -401,9 +685,29 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 applied = self._follow_route(agent_id, v, route)
                 if not applied:
                     applied = self._follow_route(agent_id, v, route)
-                self.route_applied[agent_id] = applied
-                if not applied:
+                self.route_applied[agent_id] = bool(applied)
+                if not self.route_applied[agent_id]:
                     logger.warning("Route remains unapplied after retry for %s", agent_id)
+
+            failed_route_agents = [
+                agent_id for agent_id, applied in self.route_applied.items() if applied is not True
+            ]
+            if failed_route_agents:
+                failure_info = {
+                    "route_applied": False,
+                    "route_application_failure": {
+                        "reason": "traffic_manager_route_not_applied",
+                        "failed_agents": failed_route_agents,
+                        "per_agent": {
+                            agent_id: {"route_applied": bool(self.route_applied.get(agent_id, False))}
+                            for agent_id in self.agents
+                        },
+                    },
+                }
+                logger.error("Route application failed during reset: %s", failure_info)
+                raise RuntimeError(
+                    f"Route application failed for agents: {', '.join(failed_route_agents)}"
+                )
 
             for _ in range(5):                          # let physics settle
                 self.world.tick()
@@ -415,17 +719,50 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             self.previous_longitudinal_acceleration = {agent_id: None for agent_id in self.agents}
             self.previous_velocity = {agent_id: None for agent_id in self.agents}
             self.previous_route_arc = {agent_id: 0.0 for agent_id in self.agents}
+            self._last_selection = {}
+            # Reset the V2X channel at environment reset so stale in-flight
+            # messages from the previous episode are never reused.
+            self._reset_v2x_state()
             reset_info = {
                 "seed": self.seed,
                 "town": self.town,
+                "spawn_mode": getattr(self, "spawn_mode", "default"),
+                "spawn_cluster_max_distance": getattr(
+                    self, "spawn_cluster_max_distance", None
+                ),
                 "route_applied": bool(all(self.route_applied.values())),
                 "per_agent": {
                     agent_id: {"route_applied": applied}
                     for agent_id, applied in self.route_applied.items()
                 },
             }
+            # No channel step has happened yet at reset: the reset observation is
+            # built with an empty V2X inbox so reset never advances the channel.
+            observations = self._get_obs(advance_v2x=False)
+            if getattr(self, "_v2x_channel", None) is not None:
+                reset_info["v2x"] = {
+                    "step_index": self._v2x_channel.step_index,
+                    **self._v2x_channel.episode_stats(),
+                }
+            # _last_selection is now populated by _get_obs(); expose selection
+            # metadata in reset info so it is available before the first step.
+            candidate_source = getattr(self, "candidate_source", "ground_truth")
+            if self._selector is not None:
+                for agent_id in self.agents:
+                    selection = self._last_selection.get(agent_id)
+                    if selection is not None:
+                        reset_info["per_agent"][agent_id]["selection"] = {
+                            "strategy": selection.strategy,
+                            "k": selection.k,
+                            "candidate_source": candidate_source,
+                            "pool_size": selection.pool_size,
+                            "selected_count": selection.selected_count,
+                            "missing_slots": selection.missing_slots,
+                            "selected_ids": [i for i in selection.ids],
+                            "selected_scores": [s for s in selection.scores],
+                        }
             reset_complete = True
-            return self._get_obs(), reset_info
+            return observations, reset_info
         finally:
             if not reset_complete:
                 self._destroy_actors()
@@ -451,6 +788,10 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 # addition beyond spec §2, pending agreement
                 effective_actions[agent_id] = KEEP
                 invalid_action += 1
+        # V2X "intent" field: the action actually applied this decision step.
+        self._last_action = {
+            agent_id: int(effective_actions[agent_id]) for agent_id in self.agents
+        }
 
         for agent_id, a in effective_actions.items():
             if not self.reached[agent_id]:          # agents parked at their goal ignore actions
@@ -587,11 +928,45 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
             ending_reason=result.reason,
         )
         info["team_reward"] = float(team_reward)
+        candidate_source = getattr(self, "candidate_source", "ground_truth")
         for agent_id in self.agents:
             info["per_agent"][agent_id]["reward_terms"] = reward_terms[agent_id]
             acceleration_longitudinal, jerk = step_kinematics.get(agent_id, (0.0, 0.0))
             info["per_agent"][agent_id]["a_long"] = float(acceleration_longitudinal)
             info["per_agent"][agent_id]["jerk"] = float(jerk)
+            info["per_agent"][agent_id]["candidate_source"] = candidate_source
+            candidate_meta = getattr(self, "_last_candidate_meta", {}).get(agent_id)
+            if candidate_meta is not None:
+                info["per_agent"][agent_id]["v2x_received"] = {
+                    "count": candidate_meta["received_count"],
+                    "sender_ids": list(candidate_meta["received_ids"]),
+                    "ages": list(candidate_meta["received_ages"]),
+                }
+            if getattr(self, "_selector", None) is not None:
+                last_sel = getattr(self, "_last_selection", None)
+                if last_sel is not None:
+                    selection = last_sel.get(agent_id)
+                    if selection is not None:
+                        info["per_agent"][agent_id]["selection"] = {
+                            "strategy": selection.strategy,
+                            "k": selection.k,
+                            "candidate_source": candidate_source,
+                            "pool_size": selection.pool_size,
+                            "selected_count": selection.selected_count,
+                            "missing_slots": selection.missing_slots,
+                            "selected_ids": [i for i in selection.ids],
+                            "selected_scores": [s for s in selection.scores],
+                        }
+        if (
+            candidate_source == "v2x"
+            and getattr(self, "_v2x_stats", None) is not None
+        ):
+            # Channel-level diagnostics for this environment decision step.
+            info["v2x"] = {
+                "step_index": self._v2x_channel.step_index,
+                **self._v2x_stats,
+                "episode": self._v2x_channel.episode_stats(),
+            }
         return obs, rewards, terminated, truncated, info
 
     def _update_goal_and_stuck(self):
@@ -740,6 +1115,137 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         candidates.sort(key=lambda item: (item[0], item[1]))
         return [candidate for _, _, candidate in candidates]
 
+    # ---- V2X candidate source -------------------------------------------
+    def _v2x_finished_actor_ids(self):
+        return {
+            int(self.vehicles[agent_id].id)
+            for agent_id, done in self.finished.items()
+            if done and agent_id in self.vehicles
+        }
+
+    def _build_v2x_senders(self):
+        """Build one outgoing V2X message per broadcasting vehicle.
+
+        Message layout is the channel contract ``[x, y, vx, vy, heading, intent]``
+        in world coordinates. Sender ids are numeric CARLA actor ids so that
+        ``build_observation``'s actor-id tie-breaking stays meaningful.
+        Background vehicles are included only when ``v2x_broadcasters`` says so,
+        which keeps the candidate population equal to the ground-truth one.
+        """
+        finished_actor_ids = self._v2x_finished_actor_ids()
+        cav_actor_ids = {
+            int(vehicle.id) for vehicle in self.vehicles.values()
+        }
+        senders = []
+        for agent_id, vehicle in self.vehicles.items():
+            if self.finished.get(agent_id, False):
+                continue
+            location = vehicle.get_location()
+            velocity = vehicle.get_velocity()
+            transform = vehicle.get_transform()
+            senders.append((
+                int(vehicle.id),
+                np.array(
+                    [
+                        float(location.x),
+                        float(location.y),
+                        float(velocity.x),
+                        float(velocity.y),
+                        math.radians(float(transform.rotation.yaw)),
+                        float(self._last_action.get(agent_id, KEEP)),
+                    ],
+                    dtype=np.float64,
+                ),
+            ))
+        if self.v2x_broadcasters == "cavs_only":
+            return senders
+        for actor in self.world.get_actors().filter("vehicle.*"):
+            actor_id = int(actor.id)
+            if actor_id in cav_actor_ids or actor_id in finished_actor_ids:
+                continue
+            location = actor.get_location()
+            velocity = actor.get_velocity()
+            transform = actor.get_transform()
+            # Background vehicles have no controlled action; intent 0 ("keep")
+            # is a documented placeholder. build_observation ignores intent.
+            senders.append((
+                actor_id,
+                np.array(
+                    [
+                        float(location.x),
+                        float(location.y),
+                        float(velocity.x),
+                        float(velocity.y),
+                        math.radians(float(transform.rotation.yaw)),
+                        0.0,
+                    ],
+                    dtype=np.float64,
+                ),
+            ))
+        return senders
+
+    def _v2x_candidates(self, agent_id, received):
+        """Rebuild the eligible candidate pool for one agent from V2X messages.
+
+        Mirrors ``get_candidates`` eligibility (self and finished actors
+        excluded, 50 m candidate range) while sourcing positions from received
+        messages instead of CARLA world state. The channel already rejects
+        duplicate senders per step and delivers at most one message per sender
+        per step, so duplicates are impossible in practice; the freshest message
+        is kept defensively.
+        """
+        if self.finished.get(agent_id, False):
+            self._last_candidate_meta.pop(agent_id, None)
+            return []
+        vehicle = self.vehicles.get(agent_id)
+        if vehicle is None:
+            self._last_candidate_meta.pop(agent_id, None)
+            return []
+        ego_actor_id = int(vehicle.id)
+        ego_location = vehicle.get_location()
+        inbox = received.get(ego_actor_id, []) if received else []
+        self._last_candidate_meta[agent_id] = {
+            "received_count": len(inbox),
+            "received_ids": [int(message.sender_id) for message in inbox],
+            "received_ages": [int(message.age) for message in inbox],
+        }
+        if not inbox:
+            return []
+
+        records = received_to_candidates(
+            inbox,
+            {"x": float(ego_location.x), "y": float(ego_location.y)},
+        )
+        finished_actor_ids = self._v2x_finished_actor_ids()
+        # actor_id -> (age, distance, record)
+        freshest: dict[int, tuple[int, float, dict]] = {}
+        for record in records:
+            try:
+                numeric_id = int(record["actor_id"])
+            except (KeyError, TypeError, ValueError):
+                raise ValueError(
+                    f"V2X candidate is missing a numeric sender id: {record!r}"
+                ) from None
+            if numeric_id == ego_actor_id or numeric_id in finished_actor_ids:
+                continue
+            distance = math.hypot(
+                float(record["x"]) - float(ego_location.x),
+                float(record["y"]) - float(ego_location.y),
+            )
+            if distance > CANDIDATE_RANGE:
+                continue
+            age = int(record.get("age", 0))
+            previous = freshest.get(numeric_id)
+            if previous is None or age < previous[0]:
+                freshest[numeric_id] = (age, distance, record)
+
+        candidates = []
+        for numeric_id, (_, _, record) in sorted(
+            freshest.items(), key=lambda item: (item[1][1], item[0])
+        ):
+            candidates.append({**record, "actor_id": numeric_id})
+        return candidates
+
     def _measure_min_ttc(self):
         """Measure nearest same-lane lead TTC, capped when no lead is closing."""
         values = []
@@ -827,7 +1333,7 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
         gap, closing = min(leads, key=lambda pair: pair[0]) if leads else (None, None)
         return longitudinal_ttc(gap, closing)
 
-    def _extract_observation_inputs(self, agent_id):
+    def _extract_observation_inputs(self, agent_id, received=None):
         vehicle = self.vehicles[agent_id]
         transform = vehicle.get_transform()
         location = transform.location
@@ -895,6 +1401,36 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 traffic_light_state = "green"
 
         mask = make_action_mask(left_lane is not None, right_lane is not None)
+
+        # ---- teammate selection -------------------------------------------
+        # Selectors receive the *full eligible pool* and are never given a
+        # pre-truncated nearest-six pool. Eligibility rules are unchanged.
+        # Selected world-frame records are passed to the observation builder;
+        # the untouched pool is not modified.
+        if getattr(self, "candidate_source", "ground_truth") == "v2x":
+            raw_candidates = self._v2x_candidates(agent_id, received)
+        else:
+            self._last_candidate_meta.pop(agent_id, None)
+            raw_candidates = self.get_candidates(agent_id)
+        selector = getattr(self, "_selector", None)
+        if selector is not None:
+            ego_ref = {"x": float(location.x), "y": float(location.y)}
+            selection = selector.select(
+                raw_candidates,
+                k=getattr(self, "selection_k", 2),
+                ego=ego_ref,
+                rng=getattr(self, "_selection_rng", None),
+            )
+            last_sel = getattr(self, "_last_selection", None)
+            if last_sel is not None:
+                last_sel[agent_id] = selection
+            candidates_for_obs = selection.selected_records()
+        else:
+            last_sel = getattr(self, "_last_selection", None)
+            if last_sel is not None:
+                last_sel.pop(agent_id, None)
+            candidates_for_obs = raw_candidates
+
         return {
             "ego": {
                 "x": float(location.x),
@@ -920,17 +1456,31 @@ class CarlaMultiAgentEnv(MultiAgentEnv):
                 "traffic_light_state": traffic_light_state,
                 "distance_to_next": float(distance_to_next),
             },
-            "candidates": self.get_candidates(agent_id),
+            "candidates": candidates_for_obs,
             "action_mask": mask,
         }
 
-    def _get_obs(self):
+    def _get_obs(self, advance_v2x=True):
         observations = {}
+        # Step the V2X channel exactly once per decision step (not per agent,
+        # not per 20 Hz tick). All agents read from the same received mapping.
+        # reset() passes advance_v2x=False: no channel step has happened yet,
+        # so the reset observation is built with an empty inbox.
+        received = {}
+        if (
+            advance_v2x
+            and getattr(self, "candidate_source", "ground_truth") == "v2x"
+            and getattr(self, "_v2x_channel", None) is not None
+        ):
+            senders = self._build_v2x_senders()
+            received, self._v2x_stats = self._v2x_channel.step(senders)
+            self._last_received = received
         for agent_id in self.agents:
             if self.finished.get(agent_id, False):
                 observations[agent_id] = np.zeros(self.obs_dim, dtype=np.float32)
+                self._last_candidate_meta.pop(agent_id, None)
                 continue
-            data = self._extract_observation_inputs(agent_id)
+            data = self._extract_observation_inputs(agent_id, received=received)
             observations[agent_id] = build_observation(
                 data["ego"],
                 data["route"],

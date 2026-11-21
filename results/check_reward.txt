@@ -1,0 +1,16 @@
+git_sha=e044753321beabac79e8078c2050e8fa4d4ce8cc seeds=0..9 CARLA=live-server
+keep mean team return: 3.016209
+keep per-term sums: {'progress': 431.4273441632589, 'collision': 0.0, 'safety': 0.0, 'comfort': -533.5031704040299, 'goal': 170.0, 'idle': -7.600000000000001}
+keep comfort share of total |reward|: 57.3%
+keep comfort exceeds 30%: True
+crash mean team return: -17.500046
+crash per-term sums: {'progress': 156.21595454216003, 'collision': -200.0, 'safety': -18.84011366161912, 'comfort': -73.37675981887229, 'goal': 0.0, 'idle': -14.000000000000002, 'team_collision': -100.0}
+crash comfort share of total |reward|: 15.9%
+crash comfort exceeds 30%: False
+keep mean |a_long| per agent-step: 0.675158 m/s^2
+keep mean |jerk| per agent-step: 1.886067 m/s^3
+keep beats crash: True
+STATUS COMPLETE
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town10HD_Opt.bin 
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 

@@ -1,0 +1,193 @@
+git_sha=79b9e3c37e16bfa0b573862db1bc27f2d1e02d1c date=2026-11-09T13:17:51.325843+01:00 seeds=0..19 CARLA=f06817e84 episodes=20 max_steps=300
+policy=scripted_drive_on episode=01/20 steps=300 seconds_per_step=0.0707 reason=none
+policy=scripted_drive_on episode=02/20 steps=166 seconds_per_step=0.0624 reason=goal
+policy=scripted_drive_on episode=03/20 steps=300 seconds_per_step=0.0646 reason=red_light
+policy=scripted_drive_on episode=04/20 steps=114 seconds_per_step=0.0639 reason=goal
+policy=scripted_drive_on episode=05/20 steps=300 seconds_per_step=0.0661 reason=none
+policy=scripted_drive_on episode=06/20 steps=275 seconds_per_step=0.0700 reason=goal
+policy=scripted_drive_on episode=07/20 steps=300 seconds_per_step=0.0646 reason=red_light
+policy=scripted_drive_on episode=08/20 steps=300 seconds_per_step=0.0646 reason=red_light
+policy=scripted_drive_on episode=09/20 steps=300 seconds_per_step=0.0633 reason=none
+policy=scripted_drive_on episode=10/20 steps=300 seconds_per_step=0.0653 reason=none
+policy=scripted_drive_on episode=11/20 steps=182 seconds_per_step=0.0635 reason=goal
+policy=scripted_drive_on episode=12/20 steps=300 seconds_per_step=0.0646 reason=red_light
+policy=scripted_drive_on episode=13/20 steps=143 seconds_per_step=0.0645 reason=goal
+policy=scripted_drive_on episode=14/20 steps=300 seconds_per_step=0.0665 reason=none
+policy=scripted_drive_on episode=15/20 steps=300 seconds_per_step=0.0639 reason=none
+policy=scripted_drive_on episode=16/20 steps=300 seconds_per_step=0.0633 reason=red_light
+policy=scripted_drive_on episode=17/20 steps=300 seconds_per_step=0.0631 reason=red_light
+policy=scripted_drive_on episode=18/20 steps=300 seconds_per_step=0.0632 reason=none
+policy=scripted_drive_on episode=19/20 steps=300 seconds_per_step=0.0631 reason=none
+policy=scripted_drive_on episode=20/20 steps=300 seconds_per_step=0.0641 reason=red_light
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town10HD_Opt.bin 
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 
+INFO: INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+ streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  INFO: streaming client: connection failed:  streaming client: connection failed:No connection could be made because the target machine actively refused it  
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO: INFO:   streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused itNo connection could be made because the target machine actively refused it 
+ 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused itINFO: INFO:  streaming client: connection failed:  No connection could be made because the target machine actively refused it 
+streaming client: connection failed: INFO: No connection could be made because the target machine actively refused it 
+ streaming client: connection failed: No connection could be made because the target machine actively refused it 
+ 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO: INFO:  INFO:   streaming client: connection failed:streaming client: connection failed:streaming client: connection failed: No connection could be made because the target machine actively refused it 
+ No connection could be made because the target machine actively refused it  No connection could be made because the target machine actively refused it
+ 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO: INFO:   streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused itINFO:  
+ streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  INFO:  streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  INFO:  streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  INFO:  streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO: INFO: INFO: INFO:   INFO:    streaming client: connection failed: streaming client: connection failed: streaming client: connection failed: streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  INFO:  INFO:  INFO:  INFO:  streaming client: connection failed:streaming client: connection failed:  streaming client: connection failed: streaming client: connection failed: streaming client: connection failed: No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: INFO:  streaming client: connection failed: INFO:  streaming client: connection failed: INFO:  streaming client: connection failed: INFO:  streaming client: connection failed: No connection could be made because the target machine actively refused itNo connection could be made because the target machine actively refused itNo connection could be made because the target machine actively refused it  
+
+ No connection could be made because the target machine actively refused it
+ 
+No connection could be made because the target machine actively refused it 
+INFO: INFO:   streaming client: connection failed:streaming client: connection failed:  INFO: No connection could be made because the target machine actively refused itNo connection could be made because the target machine actively refused it  
+ 
+streaming client: connection failed: No connection could be made because the target machine actively refused it 
+INFO:  streaming client: connection failed: No connection could be made because the target machine actively 

@@ -1,0 +1,1729 @@
+{
+  "label": "reset1",
+  "seed": 7,
+  "reset_info": {
+    "seed": 7,
+    "town": "Town03",
+    "spawn_mode": "cluster",
+    "spawn_cluster_max_distance": 45.0,
+    "route_applied": true,
+    "per_agent": {
+      "cav_0": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      },
+      "cav_1": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      },
+      "cav_2": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      },
+      "cav_3": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      }
+    },
+    "v2x": {
+      "step_index": 0,
+      "sent": 0,
+      "delivered": 0,
+      "dropped_by_range": 0,
+      "dropped_by_loss": 0,
+      "dropped": 0,
+      "mean_age": 0.0,
+      "in_flight": 0
+    }
+  },
+  "world_after_reset": {
+    "map_name": "Carla/Maps/Town03",
+    "world_settings": {
+      "synchronous_mode": true,
+      "fixed_delta_seconds": 0.05,
+      "no_rendering_mode": false,
+      "substepping": true,
+      "max_substep_delta_time": 0.01,
+      "max_substeps": 10
+    },
+    "weather": {
+      "cloudiness": 10.0,
+      "precipitation": 0.0,
+      "precipitation_deposits": 0.0,
+      "wind_intensity": 10.0,
+      "sun_azimuth_angle": 180.0,
+      "sun_altitude_angle": 30.0,
+      "fog_density": 2.0,
+      "fog_distance": 0.75,
+      "wetness": 0.0,
+      "fog_falloff": 0.10000000149011612,
+      "scattering_intensity": 1.0,
+      "mie_scattering_scale": 0.029999999329447746,
+      "rayleigh_scattering_scale": 0.03310000151395798,
+      "dust_storm": 0.0
+    },
+    "actor_counts": {
+      "total": 89,
+      "vehicles": 4,
+      "traffic_lights": 38,
+      "sensors": 0,
+      "walkers": 0
+    },
+    "traffic_lights_sample": [
+      {
+        "id": 66,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 224.50999450683594,
+            "y": 80.86000061035156,
+            "z": 0.0
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 67,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 20.463359832763672,
+            "y": -187.89517211914062,
+            "z": 0.1484106481075287
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 90.00007629394531,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 68,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -136.09915161132812,
+            "y": -9.794123649597168,
+            "z": 0.15132293105125427
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 69,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -68.34632873535156,
+            "y": -12.373791694641113,
+            "z": 0.025548400357365608
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0001525878324173391,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 70,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": -93.98273468017578,
+            "y": 145.85897827148438,
+            "z": 0.17269408702850342
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.4500000476837158,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 71,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -67.82001495361328,
+            "y": 121.06434631347656,
+            "z": 0.0030340575613081455
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 72,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -66.78717803955078,
+            "y": 142.75335693359375,
+            "z": 0.14790527522563934
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99995422363281,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 73,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -96.88732147216797,
+            "y": 124.37127685546875,
+            "z": 0.15057799220085144
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -95.00008392333984,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 74,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": 10.34000015258789,
+            "y": 119.07999420166016,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.4500000476837158,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 75,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -18.010000228881836,
+            "y": 123.13999938964844,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -94.99994659423828,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 76,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 14.920000076293945,
+            "y": 142.09999084472656,
+            "z": 0.09999999403953552
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99993133544922,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 77,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -15.199999809265137,
+            "y": 143.45999145507812,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 78,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": 249.39999389648438,
+            "y": 46.06999969482422,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 5.00025749206543,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.4500000476837158,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 79,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 248.72999572753906,
+            "y": 73.43999481201172,
+            "z": 0.09999999403953552
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99990844726562,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 80,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -94.0577163696289,
+            "y": 28.359628677368164,
+            "z": 0.10909179598093033
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 81,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": 163.13726806640625,
+            "y": -123.77120971679688,
+            "z": 8.15240478515625
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99995422363281,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.4500000476837158,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 82,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 162.859375,
+            "y": -145.38931274414062,
+            "z": 7.89434814453125
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 83,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 143.33726501464844,
+            "y": -121.52120971679688,
+            "z": 8.15240478515625
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.7501220703125,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 84,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 94.09062194824219,
+            "y": -146.49794006347656,
+            "z": 8.151226997375488
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 85,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 95.87964630126953,
+            "y": -124.72196197509766,
+            "z": 8.142908096313477
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99993133544922,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      }
+    ],
+    "vehicles_sample": [
+      {
+        "id": 141,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": 2.35427188873291,
+            "y": 189.21514892578125,
+            "z": -0.01972772553563118
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -90.36254119873047,
+            "roll": 0.0
+          }
+        },
+        "velocity": {
+          "x": 1.9796601691268734e-07,
+          "y": -1.5456544488756663e-08,
+          "z": 0.08581001311540604
+        },
+        "attributes": {
+          "role_name": "autopilot",
+          "color": "17,37,103",
+          "base_type": "car",
+          "object_type": ""
+        }
+      },
+      {
+        "id": 142,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": -5.705279350280762,
+            "y": 185.72886657714844,
+            "z": -0.02348463051021099
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.63746643066406,
+            "roll": 0.0
+          }
+        },
+        "velocity": {
+          "x": -5.6983488150308403e-08,
+          "y": -3.3313978242688336e-09,
+          "z": 0.04932836443185806
+        },
+        "attributes": {
+          "role_name": "autopilot",
+          "color": "17,37,103",
+          "base_type": "car",
+          "object_type": ""
+        }
+      },
+      {
+        "id": 143,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": -9.261773109436035,
+            "y": 155.70883178710938,
+            "z": -0.024157924577593803
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.63746643066406,
+            "roll": 0.0
+          }
+        },
+        "velocity": {
+          "x": -2.5623631927373935e-07,
+          "y": -8.57298854128885e-09,
+          "z": -0.060333482921123505
+        },
+        "attributes": {
+          "role_name": "autopilot",
+          "color": "17,37,103",
+          "base_type": "car",
+          "object_type": ""
+        }
+      },
+      {
+        "id": 144,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": 5.684788703918457,
+            "y": 153.81900024414062,
+            "z": -0.01680772751569748
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -90.36254119873047,
+            "roll": 0.0
+          }
+        },
+        "velocity": {
+          "x": -5.37845266990189e-07,
+          "y": 7.640478116854865e-08,
+          "z": -0.3171846270561218
+        },
+        "attributes": {
+          "role_name": "autopilot",
+          "color": "17,37,103",
+          "base_type": "car",
+          "object_type": ""
+        }
+      }
+    ],
+    "vehicles_sample_note": "sample of current world vehicles (may include managed/unmanaged); empty list means none observed, errors recorded separately"
+  },
+  "env": {
+    "reset_info": {
+      "seed": 7,
+      "town": "Town03",
+      "spawn_mode": "cluster",
+      "spawn_cluster_max_distance": 45.0,
+      "route_applied": true,
+      "per_agent": {
+        "cav_0": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_1": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_2": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        },
+        "cav_3": {
+          "route_applied": true,
+          "selection": {
+            "strategy": "nearest_k",
+            "k": 2,
+            "candidate_source": "v2x",
+            "pool_size": 0,
+            "selected_count": 0,
+            "missing_slots": 2,
+            "selected_ids": [
+              null,
+              null
+            ],
+            "selected_scores": [
+              null,
+              null
+            ]
+          }
+        }
+      },
+      "v2x": {
+        "step_index": 0,
+        "sent": 0,
+        "delivered": 0,
+        "dropped_by_range": 0,
+        "dropped_by_loss": 0,
+        "dropped": 0,
+        "mean_age": 0.0,
+        "in_flight": 0
+      }
+    },
+    "agents": [
+      "cav_0",
+      "cav_1",
+      "cav_2",
+      "cav_3"
+    ],
+    "town": "Town03",
+    "max_steps": 5,
+    "candidate_source": "v2x",
+    "selection_mode": "nearest_k",
+    "spawn_mode": "cluster",
+    "controlled_agents": {
+      "cav_0": {
+        "vehicle_present": true,
+        "actor_id_diagnostic": 141,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": 2.35427188873291,
+            "y": 189.21514892578125,
+            "z": -0.01972772553563118
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -90.36254119873047,
+            "roll": 0.0
+          }
+        },
+        "velocity_mps": {
+          "x": 1.9796601691268734e-07,
+          "y": -1.5456544488756663e-08,
+          "z": 0.08581001311540604
+        },
+        "speed_mps": 0.08581001311563578,
+        "destination": {
+          "x": -72.08596801757812,
+          "y": 121.95474243164062,
+          "z": 0.06717248260974884
+        },
+        "route_length_points": 31,
+        "route_sample_points": [
+          {
+            "x": 2.354271411895752,
+            "y": 189.21514892578125,
+            "z": 0.0
+          },
+          {
+            "x": 2.32263445854187,
+            "y": 184.21524047851562,
+            "z": 0.0
+          },
+          {
+            "x": 2.2909977436065674,
+            "y": 179.21534729003906,
+            "z": 0.0
+          },
+          {
+            "x": 2.2593610286712646,
+            "y": 174.21543884277344,
+            "z": 0.0
+          },
+          {
+            "x": 2.227724075317383,
+            "y": 169.21554565429688,
+            "z": 0.0
+          },
+          {
+            "x": -73.58564758300781,
+            "y": 126.74526977539062,
+            "z": 0.016693297773599625
+          },
+          {
+            "x": -74.03125,
+            "y": 122.35556030273438,
+            "z": 0.05183396488428116
+          },
+          {
+            "x": -74.04488372802734,
+            "y": 117.35557556152344,
+            "z": 0.09826851636171341
+          },
+          {
+            "x": -74.05852508544922,
+            "y": 112.35559844970703,
+            "z": 0.15942887961864471
+          },
+          {
+            "x": -74.07215881347656,
+            "y": 107.3556137084961,
+            "z": 0.23531503975391388
+          }
+        ],
+        "route_applied": true
+      },
+      "cav_1": {
+        "vehicle_present": true,
+        "actor_id_diagnostic": 142,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": -5.705279350280762,
+            "y": 185.72886657714844,
+            "z": -0.02348463051021099
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.63746643066406,
+            "roll": 0.0
+          }
+        },
+        "velocity_mps": {
+          "x": -5.6983488150308403e-08,
+          "y": -3.3313978242688336e-09,
+          "z": 0.04932836443185806
+        },
+        "speed_mps": 0.04932836443189109,
+        "destination": {
+          "x": -84.03670501708984,
+          "y": 138.30003356933594,
+          "z": 0.0
+        },
+        "route_length_points": 31,
+        "route_sample_points": [
+          {
+            "x": -5.667949199676514,
+            "y": 185.7287139892578,
+            "z": 0.0
+          },
+          {
+            "x": -5.636312484741211,
+            "y": 190.72862243652344,
+            "z": 0.0
+          },
+          {
+            "x": -6.707207679748535,
+            "y": 194.36468505859375,
+            "z": 0.0
+          },
+          {
+            "x": -9.910983085632324,
+            "y": 196.61801147460938,
+            "z": 0.0
+          },
+          {
+            "x": -14.265165328979492,
+            "y": 197.066650390625,
+            "z": 0.0
+          },
+          {
+            "x": -78.2647705078125,
+            "y": 142.662109375,
+            "z": 0.0
+          },
+          {
+            "x": -80.8305892944336,
+            "y": 137.3027801513672,
+            "z": 0.0
+          },
+          {
+            "x": -85.68711853027344,
+            "y": 134.2273712158203,
+            "z": 0.0
+          },
+          {
+            "x": -90.89330291748047,
+            "y": 132.85887145996094,
+            "z": 0.0
+          },
+          {
+            "x": -96.17410278320312,
+            "y": 132.64544677734375,
+            "z": 0.0
+          }
+        ],
+        "route_applied": true
+      },
+      "cav_2": {
+        "vehicle_present": true,
+        "actor_id_diagnostic": 143,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": -9.261773109436035,
+            "y": 155.70883178710938,
+            "z": -0.024157924577593803
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.63746643066406,
+            "roll": 0.0
+          }
+        },
+        "velocity_mps": {
+          "x": -2.5623631927373935e-07,
+          "y": -8.57298854128885e-09,
+          "z": -0.060333482921123505
+        },
+        "speed_mps": 0.06033348292166823,
+        "destination": {
+          "x": -73.59127044677734,
+          "y": 161.87750244140625,
+          "z": 0.0
+        },
+        "route_length_points": 31,
+        "route_sample_points": [
+          {
+            "x": -9.357967376708984,
+            "y": 155.70944213867188,
+            "z": 0.0
+          },
+          {
+            "x": -9.326330184936523,
+            "y": 160.70933532714844,
+            "z": 0.0
+          },
+          {
+            "x": -9.294692993164062,
+            "y": 165.709228515625,
+            "z": 0.0
+          },
+          {
+            "x": -9.263055801391602,
+            "y": 170.70912170410156,
+            "z": 0.0
+          },
+          {
+            "x": -9.23141860961914,
+            "y": 175.7090301513672,
+            "z": 0.0
+          },
+          {
+            "x": -73.78233337402344,
+            "y": 165.17672729492188,
+            "z": 0.0
+          },
+          {
+            "x": -74.40034484863281,
+            "y": 161.13241577148438,
+            "z": 0.0
+          },
+          {
+            "x": -74.59796905517578,
+            "y": 156.97988891601562,
+            "z": 0.0
+          },
+          {
+            "x": -74.61649322509766,
+            "y": 151.97991943359375,
+            "z": 0.0
+          },
+          {
+            "x": -74.63501739501953,
+            "y": 146.97996520996094,
+            "z": 0.0
+          }
+        ],
+        "route_applied": true
+      },
+      "cav_3": {
+        "vehicle_present": true,
+        "actor_id_diagnostic": 144,
+        "type_id": "vehicle.tesla.model3",
+        "transform": {
+          "position": {
+            "x": 5.684788703918457,
+            "y": 153.81900024414062,
+            "z": -0.01680772751569748
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -90.36254119873047,
+            "roll": 0.0
+          }
+        },
+        "velocity_mps": {
+          "x": -5.37845266990189e-07,
+          "y": 7.640478116854865e-08,
+          "z": -0.3171846270561218
+        },
+        "speed_mps": 0.317184627056587,
+        "destination": {
+          "x": 12.131248474121094,
+          "y": 22.450756072998047,
+          "z": 0.0
+        },
+        "route_length_points": 31,
+        "route_sample_points": [
+          {
+            "x": 5.630373954772949,
+            "y": 153.8193359375,
+            "z": 0.0
+          },
+          {
+            "x": 5.598736763000488,
+            "y": 148.81944274902344,
+            "z": 0.0
+          },
+          {
+            "x": 5.5671000480651855,
+            "y": 143.8195343017578,
+            "z": 0.0
+          },
+          {
+            "x": 5.535462856292725,
+            "y": 138.81964111328125,
+            "z": 0.0
+          },
+          {
+            "x": 5.503826141357422,
+            "y": 133.81973266601562,
+            "z": 0.0
+          },
+          {
+            "x": 8.48301887512207,
+            "y": 25.193714141845703,
+            "z": 0.0
+          },
+          {
+            "x": 11.055797576904297,
+            "y": 21.394535064697266,
+            "z": 0.0
+          },
+          {
+            "x": 14.522375106811523,
+            "y": 18.14434051513672,
+            "z": 0.0
+          },
+          {
+            "x": 18.188594818115234,
+            "y": 14.28525447845459,
+            "z": 0.0
+          },
+          {
+            "x": 21.059064865112305,
+            "y": 10.478649139404297,
+            "z": 0.0
+          }
+        ],
+        "route_applied": true
+      }
+    },
+    "overall_route_applied": true,
+    "per_agent_reset": {
+      "cav_0": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      },
+      "cav_1": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      },
+      "cav_2": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      },
+      "cav_3": {
+        "route_applied": true,
+        "selection": {
+          "strategy": "nearest_k",
+          "k": 2,
+          "candidate_source": "v2x",
+          "pool_size": 0,
+          "selected_count": 0,
+          "missing_slots": 2,
+          "selected_ids": [
+            null,
+            null
+          ],
+          "selected_scores": [
+            null,
+            null
+          ]
+        }
+      }
+    }
+  },
+  "tm_after_reset": {
+    "available": true,
+    "port": 8000,
+    "synchronous_mode": {
+      "not_exposed": true
+    },
+    "random_device_seed": {
+      "not_exposed": true
+    },
+    "global_distance_to_leading_vehicle": {
+      "not_exposed": true
+    },
+    "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+  },
+  "step_records": [
+    {
+      "step_index": 1,
+      "steps_env": 1,
+      "terminated_any": false,
+      "truncated_any": false,
+      "has_v2x": true,
+      "has_team_reward": true
+    },
+    {
+      "step_index": 2,
+      "steps_env": 2,
+      "terminated_any": false,
+      "truncated_any": false,
+      "has_v2x": true,
+      "has_team_reward": true
+    }
+  ],
+  "close_error": null,
+  "tm_after_close": {
+    "available": true,
+    "port": 8000,
+    "synchronous_mode": {
+      "not_exposed": true
+    },
+    "random_device_seed": {
+      "not_exposed": true
+    },
+    "global_distance_to_leading_vehicle": {
+      "not_exposed": true
+    },
+    "limitation": "Traffic Manager synchronous mode / random seed have setters but no getters in CARLA 0.9.16; restoration cannot be read back through the Python API."
+  },
+  "world_after_close": {
+    "map_name": "Carla/Maps/Town03",
+    "world_settings": {
+      "synchronous_mode": false,
+      "fixed_delta_seconds": null,
+      "no_rendering_mode": false,
+      "substepping": true,
+      "max_substep_delta_time": 0.01,
+      "max_substeps": 10
+    },
+    "weather": {
+      "cloudiness": 10.0,
+      "precipitation": 0.0,
+      "precipitation_deposits": 0.0,
+      "wind_intensity": 10.0,
+      "sun_azimuth_angle": 180.0,
+      "sun_altitude_angle": 30.0,
+      "fog_density": 2.0,
+      "fog_distance": 0.75,
+      "wetness": 0.0,
+      "fog_falloff": 0.10000000149011612,
+      "scattering_intensity": 1.0,
+      "mie_scattering_scale": 0.029999999329447746,
+      "rayleigh_scattering_scale": 0.03310000151395798,
+      "dust_storm": 0.0
+    },
+    "actor_counts": {
+      "total": 85,
+      "vehicles": 0,
+      "traffic_lights": 38,
+      "sensors": 0,
+      "walkers": 0
+    },
+    "traffic_lights_sample": [
+      {
+        "id": 66,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 224.50999450683594,
+            "y": 80.86000061035156,
+            "z": 0.0
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 67,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 20.463359832763672,
+            "y": -187.89517211914062,
+            "z": 0.1484106481075287
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 90.00007629394531,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 68,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -136.09915161132812,
+            "y": -9.794123649597168,
+            "z": 0.15132293105125427
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 69,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -68.34632873535156,
+            "y": -12.373791694641113,
+            "z": 0.025548400357365608
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0001525878324173391,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 70,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": -93.98273468017578,
+            "y": 145.85897827148438,
+            "z": 0.17269408702850342
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 1.0299626588821411,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 71,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -67.82001495361328,
+            "y": 121.06434631347656,
+            "z": 0.0030340575613081455
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 72,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -66.78717803955078,
+            "y": 142.75335693359375,
+            "z": 0.14790527522563934
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99995422363281,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 73,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -96.88732147216797,
+            "y": 124.37127685546875,
+            "z": 0.15057799220085144
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -95.00008392333984,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 74,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": 10.34000015258789,
+            "y": 119.07999420166016,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 1.0299626588821411,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 75,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -18.010000228881836,
+            "y": 123.13999938964844,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -94.99994659423828,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 76,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 14.920000076293945,
+            "y": 142.09999084472656,
+            "z": 0.09999999403953552
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99993133544922,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 77,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -15.199999809265137,
+            "y": 143.45999145507812,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 78,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": 249.39999389648438,
+            "y": 46.06999969482422,
+            "z": 0.19999998807907104
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 5.00025749206543,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 1.0299626588821411,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 79,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 248.72999572753906,
+            "y": 73.43999481201172,
+            "z": 0.09999999403953552
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99990844726562,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 80,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": -94.0577163696289,
+            "y": 28.359628677368164,
+            "z": 0.10909179598093033
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.9999542236328,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 81,
+        "state": "Green",
+        "transform": {
+          "position": {
+            "x": 163.13726806640625,
+            "y": -123.77120971679688,
+            "z": 8.15240478515625
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99995422363281,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 1.0299626588821411,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 82,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 162.859375,
+            "y": -145.38931274414062,
+            "z": 7.89434814453125
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 83,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 143.33726501464844,
+            "y": -121.52120971679688,
+            "z": 8.15240478515625
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": -179.7501220703125,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 84,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 94.09062194824219,
+            "y": -146.49794006347656,
+            "z": 8.151226997375488
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      },
+      {
+        "id": 85,
+        "state": "Red",
+        "transform": {
+          "position": {
+            "x": 95.87964630126953,
+            "y": -124.72196197509766,
+            "z": 8.142908096313477
+          },
+          "rotation": {
+            "pitch": 0.0,
+            "yaw": 89.99993133544922,
+            "roll": 0.0
+          }
+        },
+        "timing_best_effort": {
+          "elapsed_time": 0.0,
+          "green_time": 10.0,
+          "yellow_time": 2.0,
+          "red_time": 5.0
+        }
+      }
+    ],
+    "vehicles_sample": [],
+    "vehicles_sample_note": "sample of current world vehicles (may include managed/unmanaged); empty list means none observed, errors recorded separately"
+  },
+  "residual_project_actor_ids": []
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "base_seed": 7,
+    "episode_index": 0,
+    "nearest_k": {
+      "steps": 20,
+      "success": false,
+      "collision": false,
+      "off_road": false,
+      "stuck": false,
+      "ending_reason": null,
+      "team_reward_total": -6.651484704897936,
+      "team_reward_mean_step": -0.3325742352448968,
+      "min_ttc": null,
+      "jerk": null
+    },
+    "random_k": {
+      "steps": 20,
+      "success": false,
+      "collision": false,
+      "off_road": false,
+      "stuck": false,
+      "ending_reason": null,
+      "team_reward_total": -6.651484704897936,
+      "team_reward_mean_step": -0.3325742352448968,
+      "min_ttc": null,
+      "jerk": null
+    },
+    "delta_nearest_minus_random": {
+      "steps": 0,
+      "team_reward_total": 0.0,
+      "success": 0,
+      "collision": 0
+    }
+  }
+]

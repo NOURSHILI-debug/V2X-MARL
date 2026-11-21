@@ -1,0 +1,13 @@
+git_sha=d1497b15e0f1d7cf679b25589e9f33fe7f883e29 date=2026-11-08T08:58:08.705126+01:00 seeds=0..99 CARLA=f06817e84 episodes=100 max_steps=300
+STATUS: INCOMPLETE
+INFO:  Found the required file in cache!  Carla/Maps/Nav/Town03.bin 
+INFO:  Found the required file in cache!  Carla/Maps/TM/Town03.bin 
+Traceback (most recent call last):
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\check_obs.py", line 206, in <module>
+    main()
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\check_obs.py", line 118, in main
+    _validate_observations(observations, env.agents, block_stats, saturation)
+  File "C:\Users\souro\Desktop\V2X-MARL\scripts\check_obs.py", line 64, in _validate_observations
+    saturation[name] += int(clipped.sum())
+    ~~~~~~~~~~^^^^^^
+KeyError: 'ego'
