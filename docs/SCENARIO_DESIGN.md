@@ -59,3 +59,35 @@ python scripts/evaluate_h1_scenarios.py --profile h1_mixed_speed
 - No learner performance is validated.
 - Planned next step (not started): evaluate the smallest blocking-lead change
   that would make keep-speed fail, after approval.
+
+## Batch 1: forcing-layer revision
+
+The shared forcing layer replaces same-x CAV starts with staggered starts and
+adds deterministic background roles. This was necessary because seed-100
+inspection showed all old `h1_dense` CAVs starting at x=100; random lane changes
+collided at step 3.
+
+Reusable roles:
+
+- `slow_blocker`: low-speed lead in a CAV lane.
+- `fast_approacher`: faster same-lane follower behind a CAV, using a kinematic
+  vehicle so native car-following cannot make it brake.
+- `alongside`: seeded adjacent-lane traffic that shapes lane-change gaps.
+- `scheduled_hazard`: lane-preserving vehicle that brakes once at a configured
+  decision step.
+
+The generic background spawner reserves protected adjacent-lane gaps around
+CAVs. Role speeds are assigned directly rather than randomized. A CAV may change
+lanes only when the target lane has at least 12 m clearance, no faster rear
+approacher within a 3 s warning horizon, and the action mask permits it.
+
+### Revised profiles
+
+| Profile | Background | CAV lanes | CAV starts | Blocker | Approacher | Hazard |
+| --- | ---: | --- | --- | --- | --- | --- |
+| `h1_forcing` | 20 | `[1,1,0,2]` | x=80, gap 25 m | lane 1 x=150, 8 m/s | lane 2 x=138, 28 m/s | lane 3 x=200, brake step 80 to 12 m/s |
+| `h2_lane_change` | 20 | `[1,1,0,2]` | x=80, gap 20 m | lane 1 x=145, 8 m/s | lane 2 x=123, 28 m/s | lane 3 x=190, brake step 80 to 12 m/s |
+
+Both profiles keep the 56-D observation, six-action mask, reward, termination and
+4-CAV contract unchanged. Measured gate results are in
+`docs/SCENARIO_GATE_REPORT.md`; G1-G5 pass and G6 fails on both profiles.

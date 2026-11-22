@@ -24,6 +24,8 @@ AGENT_COUNT = 4
 MIN_BACKGROUND_VEHICLES = 12
 HIGHWAY_LANES = 4
 MIN_SAFE_CLEARANCE_M = 8.0
+MIN_CAV_SEPARATION_M = 12.0
+PROTECTED_TARGET_GAP_M = 20.0
 
 
 @dataclass(frozen=True)
@@ -50,8 +52,34 @@ class SpeedDistribution:
 
 
 @dataclass(frozen=True)
+class RoleVehicle:
+    """One seeded background vehicle with a forcing role."""
+
+    name: str
+    lane: int
+    x_m: float
+    speed_mps: float
+    brake_step: int | None = None
+    brake_speed_mps: float | None = None
+
+
+@dataclass(frozen=True)
+class ForcingConfig:
+    """Reusable forcing roles used by a scenario."""
+
+    roles: tuple[RoleVehicle, ...] = ()
+
+    @property
+    def scheduled_hazard(self) -> RoleVehicle | None:
+        for role in self.roles:
+            if role.name == "scheduled_hazard":
+                return role
+        return None
+
+
+@dataclass(frozen=True)
 class ScenarioProfile:
-    """Validated, immutable H1 initialization profile."""
+    """Validated, immutable Highway scenario initialization profile."""
 
     scenario_id: str
     lanes_count: int
@@ -64,6 +92,7 @@ class ScenarioProfile:
     cav_lanes: tuple[int, ...]
     cav_x_m: tuple[float, ...]
     cav_speed_mps: float
+    forcing: ForcingConfig = ForcingConfig()
 
     def env_config(self) -> dict[str, Any]:
         """Native Highway-Env config keys changed by this profile."""
@@ -84,6 +113,14 @@ def _require_number(value: Any, name: str, *, minimum: float | None = None) -> f
     if minimum is not None and result < minimum:
         raise ValueError(f"{name} must be at least {minimum}.")
     return result
+
+
+def _require_int(value: Any, name: str, *, minimum: int | None = None) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{name} must be an integer.")
+    if minimum is not None and value < minimum:
+        raise ValueError(f"{name} must be at least {minimum}.")
+    return value
 
 
 def _parse_speeds(raw: Any) -> SpeedDistribution:
@@ -113,6 +150,77 @@ def _parse_speeds(raw: Any) -> SpeedDistribution:
     raise ValueError("speeds_mps.mode must be 'uniform' or 'groups'.")
 
 
+def _parse_role(raw: Any, name: str) -> RoleVehicle | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, Mapping):
+        raise ValueError(f"forcing.{name} must be a mapping.")
+    lane = _require_int(raw.get("lane"), f"forcing.{name}.lane", minimum=0)
+    if lane >= HIGHWAY_LANES:
+        raise ValueError(f"forcing.{name}.lane must be below {HIGHWAY_LANES}.")
+    x_m = _require_number(raw.get("x_m"), f"forcing.{name}.x_m", minimum=0.0)
+    speed = _require_number(
+        raw.get("speed_mps"), f"forcing.{name}.speed_mps", minimum=0.0
+    )
+    brake_step = raw.get("brake_step")
+    brake_speed = raw.get("brake_speed_mps")
+    if (brake_step is None) != (brake_speed is None):
+        raise ValueError(f"forcing.{name} brake_step and brake_speed_mps must be paired.")
+    if brake_step is None:
+        return RoleVehicle(name=name, lane=lane, x_m=x_m, speed_mps=speed)
+    return RoleVehicle(
+        name=name,
+        lane=lane,
+        x_m=x_m,
+        speed_mps=speed,
+        brake_step=_require_int(brake_step, f"forcing.{name}.brake_step", minimum=1),
+        brake_speed_mps=_require_number(
+            brake_speed, f"forcing.{name}.brake_speed_mps", minimum=0.0
+        ),
+    )
+
+
+def _parse_forcing(raw: Any) -> ForcingConfig:
+    if raw is None:
+        return ForcingConfig()
+    if not isinstance(raw, Mapping):
+        raise ValueError("forcing must be a mapping.")
+    roles = []
+    for key in ("slow_blocker", "fast_approacher", "scheduled_hazard"):
+        role = _parse_role(raw.get(key), key)
+        if role is not None:
+            roles.append(role)
+    alongside = raw.get("alongside", ())
+    if not isinstance(alongside, (list, tuple)):
+        raise ValueError("forcing.alongside must be a list.")
+    for index, item in enumerate(alongside):
+        role = _parse_role(item, f"alongside_{index}")
+        if role is not None:
+            roles.append(role)
+    return ForcingConfig(roles=tuple(roles))
+
+
+def _validate_positions(
+    cav_lanes: tuple[int, ...],
+    cav_x: tuple[float, ...],
+    roles: tuple[RoleVehicle, ...],
+) -> None:
+    occupied: dict[int, list[tuple[float, str]]] = {lane: [] for lane in range(HIGHWAY_LANES)}
+    for index, (lane, x) in enumerate(zip(cav_lanes, cav_x, strict=True)):
+        occupied[lane].append((x, f"cav_{index}"))
+    for role in roles:
+        occupied[role.lane].append((role.x_m, role.name))
+    for lane, entries in occupied.items():
+        ordered = sorted(entries)
+        for index in range(len(ordered) - 1):
+            x_a, name_a = ordered[index]
+            x_b, name_b = ordered[index + 1]
+            if x_b - x_a < MIN_SAFE_CLEARANCE_M:
+                raise ValueError(
+                    f"initial vehicles {name_a} and {name_b} in lane {lane} are too close."
+                )
+
+
 def parse_profile(raw: Any) -> ScenarioProfile:
     """Validate one raw scenario mapping and return an immutable profile."""
     if not isinstance(raw, Mapping):
@@ -122,7 +230,7 @@ def parse_profile(raw: Any) -> ScenarioProfile:
         raise ValueError("scenario_id must be a non-empty string.")
     lanes_count = raw.get("lanes_count", HIGHWAY_LANES)
     if isinstance(lanes_count, bool) or lanes_count != HIGHWAY_LANES:
-        raise ValueError(f"lanes_count must be {HIGHWAY_LANES} for H1.")
+        raise ValueError(f"lanes_count must be {HIGHWAY_LANES}.")
     background = raw.get("background_vehicles")
     if isinstance(background, bool) or not isinstance(background, int):
         raise ValueError("background_vehicles must be an integer.")
@@ -139,20 +247,41 @@ def parse_profile(raw: Any) -> ScenarioProfile:
     if not isinstance(cav, Mapping):
         raise ValueError("cav must be a mapping.")
     cav_lanes = tuple(cav.get("lanes", ()))
-    cav_x = tuple(cav.get("start_x_m", ()))
-    if len(cav_lanes) != AGENT_COUNT or len(cav_x) != AGENT_COUNT:
-        raise ValueError("cav.lanes and cav.start_x_m must each have four values.")
-    if len(set(cav_lanes)) != AGENT_COUNT or any(
+    raw_start = cav.get("start_x_m")
+    if isinstance(raw_start, (list, tuple)):
+        if len(raw_start) != AGENT_COUNT:
+            raise ValueError("cav.start_x_m must have four values.")
+        cav_x = tuple(_require_number(x, "cav.start_x_m", minimum=0.0) for x in raw_start)
+    else:
+        base_x = _require_number(raw_start, "cav.start_x_m", minimum=0.0)
+        gap = _require_number(cav.get("start_gap_m"), "cav.start_gap_m", minimum=0.0)
+        if gap < MIN_CAV_SEPARATION_M:
+            raise ValueError("cav.start_gap_m must leave safe CAV separation.")
+        cav_x = tuple(base_x + index * gap for index in range(AGENT_COUNT))
+    if len(cav_lanes) != AGENT_COUNT:
+        raise ValueError("cav.lanes must have four values.")
+    if any(
         isinstance(lane, bool)
         or not isinstance(lane, int)
         or not 0 <= lane < HIGHWAY_LANES
         for lane in cav_lanes
     ):
-        raise ValueError("cav.lanes must contain four distinct valid lane IDs.")
-    cav_x = tuple(_require_number(x, "cav.start_x_m", minimum=0.0) for x in cav_x)
+        raise ValueError("cav.lanes must contain four valid lane IDs.")
+    for index in range(AGENT_COUNT):
+        for other in range(index + 1, AGENT_COUNT):
+            if (
+                cav_lanes[index] == cav_lanes[other]
+                and abs(cav_x[other] - cav_x[index]) < MIN_CAV_SEPARATION_M
+            ):
+                raise ValueError("CAVs sharing a lane must be staggered safely.")
     cav_speed = _require_number(
         cav.get("speed_mps"), "cav.speed_mps", minimum=0.0
     )
+
+    forcing = _parse_forcing(raw.get("forcing"))
+    if len(forcing.roles) > background:
+        raise ValueError("forcing roles cannot exceed background_vehicles.")
+    _validate_positions(cav_lanes, cav_x, forcing.roles)
 
     return ScenarioProfile(
         scenario_id=scenario_id,
@@ -168,6 +297,7 @@ def parse_profile(raw: Any) -> ScenarioProfile:
         cav_lanes=cav_lanes,
         cav_x_m=cav_x,
         cav_speed_mps=cav_speed,
+        forcing=forcing,
     )
 
 
@@ -228,13 +358,9 @@ def _offsets(count: int) -> list[int]:
     return offsets
 
 
-def create_scenario_vehicles(native_env: Any, profile: ScenarioProfile) -> None:
-    """Populate the native road with deterministic CAVs and background traffic."""
+def _create_cavs(native_env: Any, profile: ScenarioProfile) -> None:
     road = native_env.road
-    rng = road.np_random
     controlled_class = native_env.action_type.vehicle_class
-    other_class = utils.class_from_path(native_env.config["other_vehicles_type"])
-
     native_env.controlled_vehicles = []
     for lane_id, start_x in zip(profile.cav_lanes, profile.cav_x_m, strict=True):
         lane_index = _lane_index(road, int(lane_id))
@@ -250,12 +376,40 @@ def create_scenario_vehicles(native_env: Any, profile: ScenarioProfile) -> None:
         native_env.controlled_vehicles.append(vehicle)
         road.vehicles.append(vehicle)
 
+
+def _add_background_vehicle(
+    native_env: Any,
+    other_class: Any,
+    lane_id: int,
+    x: float,
+    speed: float,
+    name: str | None = None,
+    randomize_behavior: bool = True,
+    vehicle_class: Any | None = None,
+) -> Any:
+    road = native_env.road
+    vehicle = (vehicle_class or other_class).make_on_lane(
+        road, _lane_index(road, int(lane_id)), float(x), float(speed)
+    )
+    if randomize_behavior:
+        vehicle.randomize_behavior()
+    elif hasattr(vehicle, "target_speed"):
+        vehicle.target_speed = float(speed)
+    if name is not None:
+        vehicle.scenario_role = name
+    road.vehicles.append(vehicle)
+    return vehicle
+
+
+def _spawn_legacy_background(native_env: Any, profile: ScenarioProfile) -> None:
+    other_class = utils.class_from_path(native_env.config["other_vehicles_type"])
+    rng = native_env.road.np_random
     count = profile.background_vehicles
     base, extra = divmod(count, len(profile.cav_lanes))
     for lane_position, (lane_id, start_x) in enumerate(
         zip(profile.cav_lanes, profile.cav_x_m, strict=True)
     ):
-        lane_index = _lane_index(road, int(lane_id))
+        lane_index = _lane_index(native_env.road, int(lane_id))
         per_lane = base + int(lane_position < extra)
         positions = [
             float(start_x + offset * profile.spacing_m)
@@ -264,21 +418,109 @@ def create_scenario_vehicles(native_env: Any, profile: ScenarioProfile) -> None:
         ]
         speeds = profile.speeds.draw(len(positions), rng)
         for x, speed in zip(sorted(positions), sorted(speeds), strict=True):
-            vehicle = other_class.make_on_lane(road, lane_index, x, speed)
-            vehicle.randomize_behavior()
-            road.vehicles.append(vehicle)
+            _add_background_vehicle(native_env, other_class, lane_id, x, speed)
+
+
+def _spawn_forced_background(
+    native_env: Any,
+    profile: ScenarioProfile,
+    occupied: dict[int, list[float]],
+) -> None:
+    other_class = utils.class_from_path(native_env.config["other_vehicles_type"])
+    rng = native_env.road.np_random
+    generic_count = profile.background_vehicles - len(profile.forcing.roles)
+    base, extra = divmod(generic_count, HIGHWAY_LANES)
+    for lane_id in range(HIGHWAY_LANES):
+        target = base + int(lane_id < extra)
+        positions = []
+        offset_index = 0
+        offsets = _offsets(target * 10 + 64)
+        while len(positions) < target:
+            offset = offsets[offset_index]
+            offset_index += 1
+            x = (
+                120.0
+                + offset * profile.spacing_m
+                + float(rng.uniform(-profile.spacing_jitter_m, profile.spacing_jitter_m))
+            )
+            if x < MIN_SAFE_CLEARANCE_M:
+                continue
+            blocked = False
+            for other_lane, occupied_x in occupied.items():
+                if other_lane == lane_id:
+                    radius = MIN_SAFE_CLEARANCE_M
+                elif abs(other_lane - lane_id) == 1:
+                    radius = PROTECTED_TARGET_GAP_M
+                else:
+                    continue
+                if any(abs(x - other) < radius for other in occupied_x):
+                    blocked = True
+                    break
+            if blocked:
+                continue
+            positions.append(x)
+            occupied[lane_id].append(x)
+        speeds = profile.speeds.draw(len(positions), rng)
+        for x, speed in zip(sorted(positions), sorted(speeds), strict=True):
+            _add_background_vehicle(native_env, other_class, lane_id, x, speed)
+
+
+def create_scenario_vehicles(native_env: Any, profile: ScenarioProfile) -> None:
+    """Populate the native road with deterministic CAVs and background traffic."""
+    _create_cavs(native_env, profile)
+    occupied: dict[int, list[float]] = {lane: [] for lane in range(HIGHWAY_LANES)}
+    for lane_id, x in zip(profile.cav_lanes, profile.cav_x_m, strict=True):
+        occupied[lane_id].append(float(x))
+
+    other_class = utils.class_from_path(native_env.config["other_vehicles_type"])
+    native_env._scenario_roles = {}
+    if profile.forcing.roles:
+        for role in profile.forcing.roles:
+            vehicle = _add_background_vehicle(
+                native_env,
+                other_class,
+                role.lane,
+                role.x_m,
+                role.speed_mps,
+                role.name,
+                randomize_behavior=False,
+                vehicle_class=Vehicle if role.name == "fast_approacher" else None,
+            )
+            native_env._scenario_roles[role.name] = vehicle
+            occupied[role.lane].append(role.x_m)
+        _spawn_forced_background(native_env, profile, occupied)
+    else:
+        _spawn_legacy_background(native_env, profile)
+    native_env._scenario_step_count = 0
 
 
 def install_scenario_spawn(native_env: Any, profile: ScenarioProfile) -> None:
-    """Install one profile-specific ``_create_vehicles`` on a native env instance."""
+    """Install profile-specific spawn and scheduled-hazard hooks on an env instance."""
 
     def create_vehicles(env: Any) -> None:
         create_scenario_vehicles(env, profile)
 
     native_env._create_vehicles = MethodType(create_vehicles, native_env)
+    hazard = profile.forcing.scheduled_hazard
+    if hazard is not None and not getattr(native_env, "_scenario_step_wrapped", False):
+        original_step = native_env.step
+
+        def step_with_hazard(env: Any, action: Any) -> Any:
+            result = original_step(action)
+            env._scenario_step_count += 1
+            if env._scenario_step_count == hazard.brake_step:
+                vehicle = getattr(env, "_scenario_roles", {}).get(hazard.name)
+                if vehicle is not None:
+                    vehicle.target_speed = hazard.brake_speed_mps
+            return result
+
+        native_env.step = MethodType(step_with_hazard, native_env)
+        native_env._scenario_step_wrapped = True
 
 
 __all__ = [
+    "ForcingConfig",
+    "RoleVehicle",
     "ScenarioProfile",
     "SpeedDistribution",
     "create_scenario_vehicles",
