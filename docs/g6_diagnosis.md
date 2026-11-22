@@ -37,6 +37,12 @@ This diagnosis is not a gate edit. The approved G3 thresholds remain: oracle k=2
 at least 15 percentage points below nearest k=2; 95% bootstrap interval of the
 paired difference excludes zero; k=0 worse than k=6.
 
+Stage 2 correction note: all oracle2 values in this Stage 1 diagnosis were
+produced by the uncorrected all-lane `_oracle_ranks`. Stage 2 adds a unit test
+and changes `_oracle_ranks` to rank only approved ego-lane and target-lane TTC.
+Those earlier oracle2 numbers are retained as diagnosis evidence only and must
+not be read as valid Stage 2 G3 results.
+
 ## Commands and raw outputs
 
 Design gate re-measurement (current code, because the old `h1_forcing` raw file

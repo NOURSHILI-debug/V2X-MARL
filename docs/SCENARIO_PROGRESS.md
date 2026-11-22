@@ -132,3 +132,76 @@
 - Next: STOP for user approval. After approval, fix pool density and the
   generic controller/oracle-definition issues in at most two iterations per
   scenario, then re-measure on design seeds.
+
+## Stage 2 — fixes started, incomplete (design seeds only)
+
+### Plain language (5 lines)
+
+The oracle now uses the approved ego-lane/target-lane TTC definition, and a new
+unit test first failed (`1 != 2`) then passed after the fix.
+The competent controller is extended generically: it reads all valid rows, uses
+rear and adjacent-lane TTC for lane-change safety, and brakes when information
+coverage is too low to prove a lane change safe.
+`h1_dense` is unchanged and remains the naturalistic reference; only constructed
+`h1_forcing` and `h2_lane_change` got higher background density, ending iteration
+2 at 48 vehicles / 10 m spacing and 54 vehicles / 9 m spacing respectively.
+Pool measurement reached the target on iteration 2: h1 83.9% of CAV-steps and
+h2 87.8% had at least six candidates over design seeds.
+Full G3/G5 re-measurement is incomplete: the high-density evaluator became too
+slow for the required one-process, under-five-minute command budget, so Stage 3
+confirmation was not started.
+
+### Changes made before iteration measurements
+
+- Added `tests/test_scenario_suite.py::test_oracle_selects_target_lane_hazard_outside_two_nearest`;
+  before the code fix it failed with `assert 1 == 2`, after the fix it passed.
+- `scripts/evaluate_scenario_gate.py::_oracle_ranks` now passes the ego and
+  target lanes to `_candidate_ttc` for every candidate and applies to all
+  scenarios.
+- Gate summary now computes the G3 paired oracle-minus-nearest drop with a 2000-sample
+  95% bootstrap CI and checks the k=0 vs k=6 condition.
+- Added `--keys` and partial raw-output support so gate episodes can be split into
+  short commands; aggregation is done from the gitignored partial JSON files.
+- `scripts/scripted_policies.py` extension is generic and observation-only:
+  documented thresholds `TTC_WARNING_S=3`, `TTC_BRAKE_S=1.5`,
+  `SAFE_LANE_GAP_M=12`, `CLEAR_AHEAD_M=35`, `MAX_TTC_S=10`, and
+  `MIN_LANE_CHANGE_VALID_ROWS=3`; adjacent-lane hazards zero that lane's clearance,
+  and ego/rear hazards trigger lane change or braking.
+- Added `tests/test_scenario_suite.py::test_competent_avoids_target_lane_hazard_in_candidate_set`.
+- `pytest tests/test_scenario_suite.py tests/test_highway_scenarios.py -q`
+  → 36 passed in 102.53s.
+
+### Iteration 1 (design seeds)
+
+- Config: both constructed profiles used 28 vehicles / 14 m spacing.
+- Pool: h1 mean 5.70, 83.9% at least six; h2 iteration-1 final config was
+  32 vehicles / 13 m with mean 5.49 and 77.9% at least six.
+- `h1_forcing` full gate from 16 partial raw files:
+  G1 PASS 1.00; G2 FAIL 0.00; fixed-numbering G4 PASS median 7.5;
+  fixed-numbering G5 PASS 0.814 (fallback 0.244); fixed-numbering G3 FAIL with
+  oracle 1.00, nearest 1.00, none 1.00, all6 1.00, oracle drop 0.00, CI `[0,0]`.
+  Raw: `results/raw/scenarios/iter1_h1_forcing_gate.json` (gitignored).
+- The adjacent-only hazard trigger was removed after this result because dense
+  traffic made the controller brake repeatedly and get rear-ended; the change is
+  generic and applies to every condition and scenario.
+- `h2_lane_change` iteration-1 full G3/G5 was not run; only pool was measured.
+
+### Iteration 2 (design seeds, incomplete)
+
+- Config: `h1_forcing` 48 vehicles / 10 m; `h2_lane_change` 54 vehicles / 9 m.
+- Pool: h1 mean 5.70 and 83.9% at least six; h2 mean 5.85 and 87.8% at least six
+  (five seeds per half, 300 steps per seed, split into under-five-minute commands).
+- Single-seed sanity: h1 seed 100 competent/all6 lasted 300 steps with no collision,
+  raw `results/raw/scenarios/prescreen_h1_48_10_competent_all6_100.json` (gitignored).
+- Full G3/G5 and full validation gates were not completed: repeated evaluator
+  commands with high density exceeded the one-process, under-five-minute budget.
+- No Stage 3 confirmation run was started; both scenarios remain unvalidated.
+
+### Next
+
+- STOP: two iterations were used per constructed scenario and G3 is not shown to pass.
+- Missing evidence: full design-seed G3/G5 for both scenarios on iteration 2, and
+  confirmation seeds 110-129 for any frozen scenario.
+- Options for a new instruction: reduce density and re-run the full gate, use a
+  faster evaluator implementation, or switch to a scenario family where hazards
+  do not require dense background traffic. Do not implement without approval.

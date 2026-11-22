@@ -53,10 +53,10 @@ profiles:
   h1_forcing:
     scenario_id: h1_forcing
     lanes_count: 4
-    background_vehicles: 20
+    background_vehicles: 48
     vehicles_density: 4.0
     duration_s: 60.0
-    spacing_m: 18.0
+    spacing_m: 10.0
     spacing_jitter_m: 0.5
     speeds_mps:
       mode: uniform
@@ -83,10 +83,10 @@ profiles:
   h2_lane_change:
     scenario_id: h2_lane_change
     lanes_count: 4
-    background_vehicles: 20
+    background_vehicles: 54
     vehicles_density: 4.0
     duration_s: 60.0
-    spacing_m: 18.0
+    spacing_m: 9.0
     spacing_jitter_m: 0.5
     speeds_mps:
       mode: uniform

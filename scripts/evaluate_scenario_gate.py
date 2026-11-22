@@ -24,12 +24,25 @@ from envs.highway_env import HighwayV2XEnv
 from envs.obs_builder import CAND, CAND_FEATURES, EGO, M_CANDIDATES, OBS_DIM, ROUTE
 from envs.scenarios.highway_scenarios import load_profiles
 from scripts.scripted_policies import choose_actions
+from scripts.train_common import bootstrap_ci
 
 DEFAULT_SEEDS = tuple(range(100, 110))
 G5_HEADROOM_THRESHOLD = 0.05
+G3_MIN_RATE_DROP = 0.15
 HAZARD_TTC_S = 5.0
 MAX_TTC_S = 10.0
 VOI_CONDITIONS = ("none", "nearest2", "random2", "oracle2", "all6")
+EPISODE_SPECS = (
+    ("keep_speed", "all6"),
+    ("random", "all6"),
+    ("accelerate", "all6"),
+    ("competent", "all6"),
+    ("competent", "none"),
+    ("competent", "nearest2"),
+    ("competent", "random2"),
+    ("competent", "oracle2"),
+)
+ALL_EPISODE_KEYS = tuple(f"{policy}:{condition}" for policy, condition in EPISODE_SPECS)
 _CANDIDATE_START = EGO + ROUTE
 
 
@@ -115,15 +128,16 @@ def _candidate_stats(observations):
 
 def _oracle_ranks(env, agent_id, valid_indices):
     candidates = env.get_candidates(agent_id)[: len(valid_indices)]
+    ego = env._vehicle_for_agent(agent_id)
+    relevant_lanes = {tuple(ego.lane_index), tuple(ego.target_lane_index)}
+    reverse = {
+        env._vehicle_ids[id(vehicle)]: vehicle
+        for vehicle in env.env.unwrapped.road.vehicles
+    }
     risks = []
     for rank, candidate in enumerate(candidates):
-        ego = env._vehicle_for_agent(agent_id)
-        reverse = {
-            env._vehicle_ids[id(vehicle)]: vehicle
-            for vehicle in env.env.unwrapped.road.vehicles
-        }
         other = reverse.get(candidate["actor_id"])
-        ttc = _candidate_ttc(ego, other, candidate)
+        ttc = _candidate_ttc(ego, other, candidate, relevant_lanes)
         risks.append((ttc if ttc is not None else MAX_TTC_S, rank, candidate["actor_id"]))
     ordered = sorted(risks, key=lambda item: (item[0], item[1]))[:2]
     keep = [valid_indices[item[1]] for item in ordered]
@@ -274,24 +288,18 @@ def _rate(records, key):
     return float(np.mean([bool(record[key]) for record in records]))
 
 
-def _summarize(scenario_id, seeds, max_steps):
+def _run_episode_keys(scenario_id, seeds, max_steps, specs):
     episodes = {}
-    for policy, condition in (
-        ("keep_speed", "all6"),
-        ("random", "all6"),
-        ("accelerate", "all6"),
-        ("competent", "all6"),
-        ("competent", "none"),
-        ("competent", "nearest2"),
-        ("competent", "random2"),
-        ("competent", "oracle2"),
-    ):
+    for policy, condition in specs:
         key = f"{policy}:{condition}"
         episodes[key] = [
             _run_episode(scenario_id, policy, condition, seed, max_steps)
             for seed in seeds
         ]
+    return episodes
 
+
+def _summarize_episodes(episodes, scenario_id, seeds, max_steps):
     keep = episodes["keep_speed:all6"]
     competent = episodes["competent:all6"]
     random = episodes["random:all6"]
@@ -341,9 +349,26 @@ def _summarize(scenario_id, seeds, max_steps):
     g3_median = float(statistics.median(record["steps"] for record in random))
     g5_headroom = miss_steps / hazard_steps if hazard_steps else 0.0
     g5_fallback = fallback_steps / total_agent_steps if total_agent_steps else 0.0
+    oracle_minus_nearest = [
+        int(oracle_seed["collision"]) - int(nearest_seed["collision"])
+        for oracle_seed, nearest_seed in zip(
+            oracle["per_seed"], nearest["per_seed"], strict=True
+        )
+    ]
+    oracle_drop, drop_ci_low, drop_ci_high = bootstrap_ci(
+        [-int(diff) for diff in oracle_minus_nearest], n_boot=2000, seed=0
+    )
+    none_minus_all6 = [
+        int(none_seed["collision"]) - int(all6_seed["collision"])
+        for none_seed, all6_seed in zip(
+            none["per_seed"], all6["per_seed"], strict=True
+        )
+    ]
+    none_drop, none_ci_low, none_ci_high = bootstrap_ci(
+        none_minus_all6, n_boot=2000, seed=1
+    )
     g6_pass = bool(
-        oracle["collision_rate"] < nearest["collision_rate"]
-        and none["collision_rate"] > all6["collision_rate"]
+        oracle_drop >= G3_MIN_RATE_DROP and drop_ci_low > 0.0 and none_drop > 0.0
     )
 
     gate_summary = {
@@ -391,8 +416,17 @@ def _summarize(scenario_id, seeds, max_steps):
                 "nearest_collision": nearest["collision_rate"],
                 "none_collision": none["collision_rate"],
                 "all6_collision": all6["collision_rate"],
+                "oracle_drop": oracle_drop,
+                "oracle_drop_ci_low": drop_ci_low,
+                "oracle_drop_ci_high": drop_ci_high,
+                "none_drop": none_drop,
+                "none_drop_ci_low": none_ci_low,
+                "none_drop_ci_high": none_ci_high,
             },
-            "threshold": "oracle < nearest and none > all6 collision rate",
+            "threshold": (
+                "oracle >= 15 pp below nearest, paired 95% CI excludes zero, "
+                "and none > all6 collision rate"
+            ),
             "pass": g6_pass,
             "per_seed": {
                 condition: [
@@ -405,17 +439,27 @@ def _summarize(scenario_id, seeds, max_steps):
     return episodes, per_condition, gate_summary
 
 
+def _summarize(scenario_id, seeds, max_steps):
+    episodes = _run_episode_keys(scenario_id, seeds, max_steps, EPISODE_SPECS)
+    return _summarize_episodes(episodes, scenario_id, seeds, max_steps)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", required=True, choices=sorted(load_profiles()))
     parser.add_argument("--seeds", type=int, nargs="+", default=list(DEFAULT_SEEDS))
     parser.add_argument("--max-steps", type=int, default=300)
+    parser.add_argument("--keys", nargs="+", choices=ALL_EPISODE_KEYS)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
-    if len(args.seeds) < 10:
-        parser.error("gates require at least 10 episodes/seeds")
+    if not args.seeds:
+        parser.error("at least one seed is required")
     if args.max_steps <= 0:
         parser.error("--max-steps must be positive")
+
+    selected = tuple(args.keys) if args.keys else ALL_EPISODE_KEYS
+    specs = tuple(tuple(key.split(":", 1)) for key in selected)
+    complete = set(selected) == set(ALL_EPISODE_KEYS)
 
     try:
         git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
@@ -425,9 +469,13 @@ def main(argv=None):
     output = args.output or Path("results/raw/scenarios") / f"{args.scenario}_{timestamp}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
 
-    episodes, per_condition, gates = _summarize(
-        args.scenario, args.seeds, args.max_steps
-    )
+    episodes = _run_episode_keys(args.scenario, args.seeds, args.max_steps, specs)
+    per_condition = {}
+    gates = {}
+    if complete:
+        episodes, per_condition, gates = _summarize_episodes(
+            episodes, args.scenario, args.seeds, args.max_steps
+        )
     result = {
         "metadata": {
             "scenario": args.scenario,
@@ -440,6 +488,8 @@ def main(argv=None):
             "python": platform.python_version(),
             "hardware_note": "CPU-only i3 laptop; single process, single thread",
             "g5_headroom_threshold": G5_HEADROOM_THRESHOLD,
+            "mode": "complete" if complete else "partial",
+            "keys": list(selected),
         },
         "episodes": episodes,
         "voi": per_condition,
@@ -447,18 +497,24 @@ def main(argv=None):
     }
     output.write_text(json.dumps(_jsonable(result), indent=2), encoding="utf-8")
 
-    print(f"GATE TABLE {args.scenario} seeds={args.seeds[0]}-{args.seeds[-1]}")
-    for gate in ("G1", "G2", "G3", "G4", "G5", "G6"):
-        item = gates[gate]
+    if complete:
+        print(f"GATE TABLE {args.scenario} seeds={args.seeds[0]}-{args.seeds[-1]}")
+        for gate in ("G1", "G2", "G3", "G4", "G5", "G6"):
+            item = gates[gate]
+            print(
+                f"{gate} value={item['value']} threshold={item['threshold']} "
+                f"verdict={'PASS' if item['pass'] else 'FAIL'} per_seed={item['per_seed']}"
+            )
+        for condition in VOI_CONDITIONS:
+            data = per_condition[condition]
+            print(
+                f"VOI {condition}: collision_rate={data['collision_rate']:.2f} "
+                f"mean_speed={data['mean_speed_mps']:.2f}"
+            )
+    else:
         print(
-            f"{gate} value={item['value']} threshold={item['threshold']} "
-            f"verdict={'PASS' if item['pass'] else 'FAIL'} per_seed={item['per_seed']}"
-        )
-    for condition in VOI_CONDITIONS:
-        data = per_condition[condition]
-        print(
-            f"VOI {condition}: collision_rate={data['collision_rate']:.2f} "
-            f"mean_speed={data['mean_speed_mps']:.2f}"
+            f"PARTIAL {args.scenario} seeds={args.seeds[0]}-{args.seeds[-1]} "
+            f"keys={','.join(selected)} episodes={sum(len(v) for v in episodes.values())}"
         )
     print(f"RAW={output}")
     print("STATUS: COMPLETE", flush=True)

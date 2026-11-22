@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
@@ -6,12 +8,16 @@ from envs.highway_env import HighwayV2XEnv
 from envs.obs_builder import (
     CAND,
     CAND_FEATURES,
+    CANDIDATE_RANGE,
     EGO,
+    LANE_RIGHT,
     M_CANDIDATES,
     OBS_DIM,
     ROUTE,
+    V_MAX,
 )
 from envs.scenarios.highway_scenarios import load_profiles, parse_profile
+from scripts.evaluate_scenario_gate import _oracle_ranks
 from scripts.scripted_policies import competent_action
 
 NEW_PROFILES = ("h1_forcing", "h2_lane_change")
@@ -148,3 +154,71 @@ def test_competent_controller_only_reads_observation_and_mask():
     mask = np.ones(6, dtype=bool)
     action = competent_action(ObservationProbe(observation), mask)
     assert action in {0, 1, 2, 3, 4, 5}
+
+
+def test_oracle_selects_target_lane_hazard_outside_two_nearest():
+    ego = SimpleNamespace(
+        lane_index=("a", "b", 1),
+        target_lane_index=("a", "b", 2),
+        position=np.array([0.0, 3.5]),
+        velocity=np.array([22.0, 0.0]),
+        LENGTH=5.0,
+    )
+    vehicles = [
+        SimpleNamespace(
+            lane_index=("a", "b", 1),
+            position=np.array([8.0, 3.5]),
+            LENGTH=5.0,
+        ),
+        SimpleNamespace(
+            lane_index=("a", "b", 0),
+            position=np.array([10.0, 0.0]),
+            LENGTH=5.0,
+        ),
+        SimpleNamespace(
+            lane_index=("a", "b", 2),
+            position=np.array([30.0, 7.0]),
+            LENGTH=5.0,
+        ),
+    ]
+    candidates = [
+        {"actor_id": 0, "x": 8.0, "y": 3.5, "vx": 27.0},
+        {"actor_id": 1, "x": 10.0, "y": 0.0, "vx": 0.0},
+        {"actor_id": 2, "x": 30.0, "y": 7.0, "vx": 0.0},
+    ]
+    env = SimpleNamespace(
+        get_candidates=lambda agent_id: candidates,
+        _vehicle_for_agent=lambda agent_id: ego,
+        _vehicle_ids={id(vehicle): index for index, vehicle in enumerate(vehicles)},
+        env=SimpleNamespace(
+            unwrapped=SimpleNamespace(
+                road=SimpleNamespace(vehicles=vehicles)
+            )
+        ),
+    )
+    valid_indices = [0, 1, 2]
+    nearest = valid_indices[:2]
+    oracle = _oracle_ranks(env, "cav_0", valid_indices)
+    assert nearest == [0, 1]
+    assert 2 not in nearest
+    assert oracle[0] == 2
+    assert 2 in oracle
+
+
+def test_competent_avoids_target_lane_hazard_in_candidate_set():
+    observation = np.zeros(OBS_DIM, dtype=np.float32)
+    observation[0] = 0.7
+
+    def set_candidate(index, rel_x, rel_y, rel_vx):
+        base = EGO + ROUTE + index * CAND_FEATURES
+        observation[base] = rel_x / CANDIDATE_RANGE
+        observation[base + 1] = rel_y / CANDIDATE_RANGE
+        observation[base + 2] = rel_vx / V_MAX
+        observation[base + 5] = 1.0
+
+    set_candidate(0, 30.0, 0.0, -22.0)
+    set_candidate(1, -20.0, -3.5, 10.0)
+    set_candidate(2, 30.0, 3.5, 0.0)
+    mask = np.ones(N_ACTIONS, dtype=bool)
+    action = competent_action(ObservationProbe(observation), mask)
+    assert action == LANE_RIGHT
