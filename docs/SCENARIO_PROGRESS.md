@@ -134,6 +134,7 @@
   scenario, then re-measure on design seeds.
 
 ## Stage 2 — fixes started, incomplete (design seeds only)
+- Commit: `88540c0`.
 
 ### Plain language (5 lines)
 
