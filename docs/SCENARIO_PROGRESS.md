@@ -117,7 +117,7 @@
 
 ## Stage 1 — G6 diagnosis (read-only)
 - Branch: `feat/scenario-suite`.
-- Commit: pending diagnosis commit hash.
+- Commit: `90f6d50` (diagnosis and initial progress entry).
 - Added `docs/g6_diagnosis.md` with measured values only.
 - Design-seed gate re-measurement: h1_forcing G1 PASS 1.00, G2 PASS 0.90,
   G4 PASS median 8, G5 PASS 0.777, G3 FAIL oracle 1.00 = nearest 1.00,
