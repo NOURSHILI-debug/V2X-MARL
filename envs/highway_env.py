@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from typing import Any
 
 import gymnasium as gym
@@ -19,6 +20,7 @@ from envs.obs_builder import (
     build_observation,
 )
 from envs.reward import RewardCalculator
+from envs.scenarios.highway_scenarios import install_scenario_spawn, resolve_scenario
 
 N_ACTIONS = 6
 AGENT_IDS = tuple(f"cav_{index}" for index in range(4))
@@ -52,11 +54,18 @@ class HighwayV2XEnv:
         duration: float = 60,
         obs_layout: str = KINEMATICS25_LAYOUT,
         goal_distance_m: float | None = None,
+        scenario: str | Mapping[str, Any] | None = None,
     ) -> None:
         if obs_layout not in OBS_LAYOUTS:
             raise ValueError(f"obs_layout must be one of {OBS_LAYOUTS}.")
         if goal_distance_m is not None and goal_distance_m <= 0.0:
             raise ValueError("goal_distance_m must be positive when set.")
+        self.scenario = resolve_scenario(scenario)
+        if self.scenario is not None and obs_layout != CONTRACT56_LAYOUT:
+            raise ValueError("scenarios require obs_layout='contract56'.")
+        self._scenario_id = (
+            self.scenario.scenario_id if self.scenario is not None else SCENARIO_ID
+        )
         self.obs_layout = obs_layout
         self.goal_distance_m = (
             None if goal_distance_m is None else float(goal_distance_m)
@@ -87,7 +96,11 @@ class HighwayV2XEnv:
         }
         if obs_layout == CONTRACT56_LAYOUT:
             config["vehicles_density"] = CONTRACT_VEHICLES_DENSITY
+        if self.scenario is not None:
+            config.update(self.scenario.env_config())
         self.env = gym.make("highway-v0", render_mode=render_mode, config=config)
+        if self.scenario is not None:
+            install_scenario_spawn(self.env.unwrapped, self.scenario)
         self.agent_ids = AGENT_IDS
         self.agents = list(AGENT_IDS)
         self.reward_calculator = RewardCalculator(agent_ids=self.agent_ids)
@@ -304,7 +317,7 @@ class HighwayV2XEnv:
         infos = {
             "seed": seed,
             "town": TOWN,
-            "scenario_id": SCENARIO_ID,
+            "scenario_id": self._scenario_id,
             "per_agent": {
                 agent_id: {"seed": seed, "native_info": native_info}
                 for agent_id in self.agent_ids
@@ -456,7 +469,7 @@ class HighwayV2XEnv:
             "steps": self.steps,
             "min_ttc": min(self._agent_min_ttc.values()),
             "jerk": total_jerk / total_jerk_count if total_jerk_count else 0.0,
-            "scenario_id": SCENARIO_ID,
+            "scenario_id": self._scenario_id,
             "town": TOWN,
             "seed": self._seed,
             "team_reward": team_reward,
