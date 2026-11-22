@@ -112,3 +112,23 @@
 - Final command status: full non-CARLA/non-toy suite 207 passed, 4 skipped,
   33 deselected in 91.92s.
 - Batch complete. Do not start I2 or M1 without a new instruction.
+
+# Phase 1 close-out
+
+## Stage 1 — G6 diagnosis (read-only)
+- Branch: `feat/scenario-suite`.
+- Commit: pending diagnosis commit hash.
+- Added `docs/g6_diagnosis.md` with measured values only.
+- Design-seed gate re-measurement: h1_forcing G1 PASS 1.00, G2 PASS 0.90,
+  G4 PASS median 8, G5 PASS 0.777, G3 FAIL oracle 1.00 = nearest 1.00,
+  paired diff 0 and bootstrap CI `[0,0]`; h2_lane_change G1 PASS 1.00,
+  G2 PASS 1.00, G4 PASS median 7.5, G5 PASS 0.697, G3 FAIL with the same
+  oracle/nearest collision rates.
+- Diagnosis trace: pool means 4.22-4.83 with fewer than six candidates on
+  65.2-75.6% of CAV-steps; headroom 0.777/0.697; determinism 20/20 equal
+  observation and outcome hashes; front-hazard brake lead >=2.111 s.
+- Test result: no code changed in this stage; gate and diagnosis commands all
+  returned `STATUS: COMPLETE`. No pytest run in this read-only stage.
+- Next: STOP for user approval. After approval, fix pool density and the
+  generic controller/oracle-definition issues in at most two iterations per
+  scenario, then re-measure on design seeds.
